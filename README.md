@@ -75,7 +75,7 @@ npm run build
    - 打开 Chrome 浏览器，访问 `chrome://extensions/`
    - 开启右上角的「开发者模式」
    - 点击「加载已解压的扩展程序」
-   - 选择项目根目录下的 `dist` 文件夹
+   - 选择项目根目录下的 `build/chat-copilot` 文件夹
    - 扩展安装完成，在支持的 AI 平台页面即可看到功能入口
 
 ---

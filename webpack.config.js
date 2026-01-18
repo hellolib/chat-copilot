@@ -16,7 +16,7 @@ module.exports = (env, argv) => {
       options: './src/options/index.ts',
     },
     output: {
-      path: path.resolve(__dirname, 'dist'),
+      path: path.resolve(__dirname, 'build/chat-copilot'),
       filename: '[name]/index.js',
       clean: true,
     },
