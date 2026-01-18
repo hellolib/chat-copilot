@@ -6,7 +6,7 @@ import { BaseAdapter } from './base';
 
 export class QianwenAdapter extends BaseAdapter {
   name = '通义千问';
-  hostPatterns = ['www.qianwen.com', 'tongyi.aliyun.com', 'chat.qwen.ai'];
+  hostPatterns = ['www.qianwen.com', 'chat.qwen.ai'];
 
   private isQwenChat(): boolean {
     return window.location.hostname.includes('chat.qwen.ai');

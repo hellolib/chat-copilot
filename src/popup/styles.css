@@ -273,68 +273,58 @@ body {
 }
 
 /* ========================================
- * Stats Card - 统计卡片
+ * Stats Cards - 统计卡片
  * ======================================== */
-.stats-card {
+.stats-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-2);
 }
 
-.stat-item {
+.stat-card {
   background: var(--color-bg-base);
-  padding: var(--space-4) var(--space-3);
   border-radius: var(--radius-md);
-  text-align: center;
+  padding: var(--space-2) var(--space-3);
   box-shadow: var(--shadow-sm);
-  transition: all var(--transition-normal);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  border: 1px solid var(--color-primary-light);
+  min-height: 58px;
   position: relative;
   overflow: hidden;
-  border: 1px solid transparent;
 }
 
-.stat-item::before {
+.stat-card::before {
   content: '';
   position: absolute;
-  top: var(--space-2);
-  right: var(--space-2);
-  width: 24px;
-  height: 24px;
-  opacity: 0.15;
-  background-size: contain;
-  background-repeat: no-repeat;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, transparent 0%, rgba(13, 148, 136, 0.03) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
 }
 
-.stat-item:first-child::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230D9488'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z'/%3E%3C/svg%3E");
+.stat-card:hover::before {
+  opacity: 1;
 }
 
-.stat-item:last-child::before {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%230D9488'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M13 7h8m0 0v8m0-8l-8 8-4-4-6 6'/%3E%3C/svg%3E");
-}
-
-.stat-item:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary-light);
-  transform: translateY(-2px);
-}
-
-.stat-value {
-  display: block;
-  font-size: 28px;
+.stat-card .stat-value {
+  font-size: 20px;
   font-weight: var(--font-weight-bold);
   color: var(--color-primary);
-  line-height: var(--line-height-tight);
-  margin-bottom: var(--space-1);
+  line-height: 1;
 }
 
-.stat-label {
-  display: block;
+.stat-card .stat-label {
   font-size: var(--font-size-xs);
   color: var(--color-text-secondary);
   font-weight: var(--font-weight-medium);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
 }
 
 /* ========================================
@@ -372,14 +362,14 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-3) var(--space-2);
+  padding: var(--space-2);
   background: var(--color-bg-subtle);
   border: none;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: all var(--transition-normal);
-  min-height: 60px;
-  gap: var(--space-1);
+  min-height: 48px;
+  gap: 2px;
 }
 
 .site-button:hover {
@@ -393,8 +383,8 @@ body {
 }
 
 .site-icon {
-  width: var(--size-icon-lg);
-  height: var(--size-icon-lg);
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -407,17 +397,17 @@ body {
 }
 
 .site-icon-text {
-  font-size: 22px;
+  font-size: 18px;
 }
 
 .site-name {
-  font-size: 10px;
+  font-size: 9px;
   color: var(--color-text-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 100%;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-normal);
 }
 
 /* ========================================
@@ -545,8 +535,8 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  background: linear-gradient(135deg, var(--color-primary-subtle) 0%, var(--color-bg-base) 100%);
-  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-base);
+  padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-sm);
   cursor: pointer;
@@ -555,6 +545,7 @@ body {
   border: 1px solid var(--color-primary-light);
   position: relative;
   overflow: hidden;
+  min-height: 56px;
 }
 
 .prompt-plaza-card::before {
@@ -584,8 +575,8 @@ body {
 }
 
 .prompt-plaza-icon {
-  width: 40px;
-  height: 40px;
+  width: 36px;
+  height: 36px;
   border-radius: var(--radius-sm);
   background: var(--color-primary);
   display: flex;
@@ -596,8 +587,8 @@ body {
 }
 
 .prompt-plaza-icon svg {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
 }
 
 .prompt-plaza-info {
