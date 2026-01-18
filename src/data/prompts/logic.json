@@ -1,0 +1,238 @@
+{
+  "category": "logic",
+  "name": "逻辑推理",
+  "icon": "🧠",
+  "prompts": [
+    {
+      "id": "logic-001",
+      "title": "组合几何 - 正n边形染色",
+      "difficulty": "hard",
+      "tags": [
+        "组合几何",
+        "染色问题"
+      ],
+      "content": "求具有如下性质的最小正整数 n: 将正 n 边形的每一个顶点任意染上红、黄、蓝三种颜色之一, 那么这 n 个顶点中一定存在四个同色点, 它们是一个等腰梯形的顶点. （两条边平行、另两条边不平行且相等的凸四边形称为等腰梯形）\n",
+      "answer": "1717\n"
+    },
+    {
+      "id": "logic-002",
+      "title": "组合几何 - 矩形内三角形面积",
+      "difficulty": "medium",
+      "tags": [
+        "组合几何",
+        "三角形"
+      ],
+      "content": "在面积为1的矩形ABCD中（包括边界）有5个点，其中任意三点不共线。求以这5个点为顶点的所有三角形中，面积不大于1/4的三角形的个数的最小值。\n",
+      "answer": "2\n"
+    },
+    {
+      "id": "logic-003",
+      "title": "排列组合 - 8位数排列",
+      "difficulty": "easy",
+      "tags": [
+        "排列组合",
+        "数字排列"
+      ],
+      "content": "将 6 个数 2,0,1,9,20,19 按任意次序排成一行, 拼成一个 8 位数 (首位不为 0),则产生的不同的 8 位数的个数为\n",
+      "answer": "498498\n"
+    },
+    {
+      "id": "logic-004",
+      "title": "数列 - 递推数列整数项",
+      "difficulty": "hard",
+      "tags": [
+        "数列",
+        "递推关系"
+      ],
+      "content": "设实数列 \\(\\{x_n\\}\\) 满足：\\(x_0 = 0\\)，\\(x_2 = \\sqrt[3]{2}x_1\\)，\\(x_3\\) 是正整数，且\n\\[x_{n+1} = \\frac{1}{\\sqrt[3]{4}} x_n + \\sqrt[3]{4} x_{n-1} + \\frac{1}{2} x_{n-2} (n \\geq 2).\\]\n问：这类数列中最少有多少个整数项？\n",
+      "answer": "55\n"
+    },
+    {
+      "id": "logic-005",
+      "title": "多项式因式分解",
+      "difficulty": "medium",
+      "tags": [
+        "代数",
+        "因式分解"
+      ],
+      "content": "a^2(b - c) + b^2(a - c) + c^2(a - b) 因式分解\n",
+      "answer": "(a - c)(ab - ac + b^2 + bc)\n"
+    },
+    {
+      "id": "logic-006",
+      "title": "布尔代数 - 与非式转换",
+      "difficulty": "medium",
+      "tags": [
+        "布尔代数",
+        "逻辑电路"
+      ],
+      "content": "将与或式 \\( ABC + \\overline{A} \\cdot \\overline{B} \\cdot \\overline{C} \\) 转换为与非-与非式\n",
+      "answer": "\\overline{\\overline{ABC} \\cdot \\overline{\\overline{A} \\cdot \\overline{B} \\cdot \\overline{C}}}\n"
+    },
+    {
+      "id": "logic-007",
+      "title": "立体几何 - 水位计算",
+      "difficulty": "easy",
+      "tags": [
+        "立体几何",
+        "体积计算"
+      ],
+      "content": "一个棱长为30厘米的立方体铁块，从8个角各去掉一个棱长10厘米的立方体铁块。然后放入一个底面积为2500平方厘米，原本盛有20厘米水的容器。放入后水位是多少厘米\n",
+      "answer": "27厘米\n"
+    },
+    {
+      "id": "logic-008",
+      "title": "解析几何 - 二面角最小值",
+      "difficulty": "hard",
+      "tags": [
+        "解析几何",
+        "二面角"
+      ],
+      "content": "在平面四边形ABCD中，AB = AC = CD = 1,\\angle ADC = 30^{\\circ},\\angle DAB = 120^{\\circ}。将\\triangle ACD沿AC翻折至\\triangle ACP，其中P为动点。求二面角A - CP - B的余弦值的最小值。\n",
+      "answer": "\\frac{\\sqrt{3}}{3}\n"
+    },
+    {
+      "id": "logic-009",
+      "title": "递推数列 - 有理数列",
+      "difficulty": "hard",
+      "tags": [
+        "数列",
+        "递推关系"
+      ],
+      "content": "设有理数数列 \\(x_1, x_2, \\dots\\) 定义如下：\\(x_1 = \\frac{25}{11}\\)，且对于所有 \\(k\\) 有\n\\[ x_{k+1} = \\frac{1}{3}\\left(x_k + \\frac{1}{x_k} - 1\\right). \\]\n其中 \\(x_{2025}\\) 可以表示为互质正整数 \\(m\\) 和 \\(n\\) 的分数 \\(\\frac{m}{n}\\)。求 \\(m+n\\) 除以 \\(1000\\) 的余数。\n",
+      "answer": "248\n"
+    },
+    {
+      "id": "logic-010",
+      "title": "解析几何 - 抛物线与圆锥曲线",
+      "difficulty": "hard",
+      "tags": [
+        "解析几何",
+        "圆锥曲线"
+      ],
+      "content": "已知过点 $A(-1, 0)$ 、 $B(1, 0)$ 两点的动抛物线的准线始终与圆 $x^2 + y^2 = 9$ 相切，该抛物线焦点 $P$ 的轨迹是某圆锥曲线 $E$ 的一部分。\n(1) 求曲线 $E$ 的标准方程；\n(2) 已知点 $C(-3, 0)$ ， $D(2, 0)$ ，过点 $D$ 的动直线与曲线 $E$ 相交于 $M$ 、 $N$ ，设 $\\triangle CMN$ 的外心为 $Q$ ， $O$ 为坐标原点，问：直线 $OQ$ 与直线 $MN$ 的斜率之积是否为定值，如果为定值，求出该定值；如果不是定值，则说明理由。\n",
+      "answer": "\\frac{x^2}{9} + \\frac{y^2}{8} = 1, -5\n"
+    },
+    {
+      "id": "logic-011",
+      "title": "不等式 - 三角函数不等式",
+      "difficulty": "hard",
+      "tags": [
+        "不等式",
+        "三角函数"
+      ],
+      "content": "给定不小于3的正整数 \\( n \\)，求最小的正数 \\(\\lambda\\)，使得对于任何 \\(\\theta_i \\in (0, \\frac{\\pi}{2}) \\) (\\(i = 1, 2, \\cdots, n\\))，只要 \\(\\tan \\theta_1 \\cdot \\tan \\theta_2 \\cdots \\cdot \\tan \\theta_n = 2^{\\frac{n}{2}}\\)，就有 \\(\\cos \\theta_1 + \\cos \\theta_2 + \\cdots + \\cos \\theta_n\\) 不大于 \\(\\lambda\\)。\n",
+      "answer": "n-1\n"
+    },
+    {
+      "id": "logic-012",
+      "title": "逻辑推理 - 保险箱密码",
+      "difficulty": "medium",
+      "tags": [
+        "逻辑推理",
+        "密码破解"
+      ],
+      "content": "Sroan 有一个私人的保险箱，密码是 7 个不同的数字。\nGuess #1: 9062437\nGuess #2: 8593624\nGuess #3: 4286915\nGuess #4: 3450982\nSroan 说：你们 4 个人每人都猜对了位置不相邻的两个数字。（只有 \"位置及其对应的数字\" 都对才算对）\n问：密码是什么？\n",
+      "answer": "4053927\n"
+    },
+    {
+      "id": "logic-013",
+      "title": "支持向量机 - 最大间隔分离超平面",
+      "difficulty": "hard",
+      "tags": [
+        "机器学习",
+        "支持向量机"
+      ],
+      "content": "已知正例点：$\\mathbf{x}_1 = (1,2)^T, \\quad \\mathbf{x}_2 = (2,3)^T, \\quad \\mathbf{x}_3 = (3,3)^T$\n负例点：$\\mathbf{x}_4 = (2,1)^T, \\quad \\mathbf{x}_5 = (3,2)^T$\n试求最大间隔分离超平面，并指出所有的支持向量。\n",
+      "answer": "最大间隔分离超平面为：-x_1 + 2x_2 - 2 = 0\n支持向量为：\\mathbf{x}_1 = (1,2)^T, \\mathbf{x}_3 = (3,3)^T, \\mathbf{x}_5 = (3,2)^T\n"
+    },
+    {
+      "id": "logic-014",
+      "title": "电子技术基础 - LED数码管段码",
+      "difficulty": "easy",
+      "tags": [
+        "电子技术",
+        "数码管"
+      ],
+      "content": "已知8段共阳极LED数码管要显示字符\"5\"（a段为最低位），此时的段码为 _______。\n",
+      "answer": "92H\n"
+    },
+    {
+      "id": "logic-015",
+      "title": "变质量动力学 - 雨滴下落",
+      "difficulty": "hard",
+      "tags": [
+        "物理",
+        "动力学"
+      ],
+      "content": "雨滴开始自自由下落时质量为 $m_0$。在下落过程中，单位时间凝聚的水汽质量为 $\\lambda$（$\\lambda$为常量）。试求雨滴经过时间 $t$下落的距离。忽略空气阻力。重力加速度为$g$。\n",
+      "answer": "s(t) = \\frac{g t^{2}}{4} + \\frac{g m_{0} t}{2 \\lambda} - \\frac{g m_{0}^{2}}{2 \\lambda^{2}} \\ln\\left(1 + \\frac{\\lambda t}{m_{0}}\\right)\n"
+    },
+    {
+      "id": "logic-016",
+      "title": "解析几何 - 函数图像与直线",
+      "difficulty": "medium",
+      "tags": [
+        "解析几何",
+        "函数"
+      ],
+      "content": "在平面直角坐标系中，函数 ( y = \\frac{x+1}{|x|+1} ) 的图像上有三个不同的点位于直线上，且这三点的横坐标之和为 0。求 ( l ) 的斜率的取值范围。\n",
+      "answer": "0 < k < \\frac{2}{9}\n"
+    },
+    {
+      "id": "logic-017",
+      "title": "立体几何 - 正四面体内正方体",
+      "difficulty": "hard",
+      "tags": [
+        "立体几何",
+        "外接球"
+      ],
+      "content": "一个棱长为6的正四面体内部有一个任意旋转的正方体，当正方体的棱长取得最大值时，正方体的外接球的表面积是？\n",
+      "answer": "6\\pi\n"
+    },
+    {
+      "id": "logic-018",
+      "title": "排列问题 - 座位安排",
+      "difficulty": "medium",
+      "tags": [
+        "排列组合",
+        "约束条件"
+      ],
+      "content": "有 8 个人，分别是 A、B、C、D 和另外 4 人。要将这 8 个人随机安排在教室的两排座位上，每排有 4 个座位，共 8 个座位。相邻的定义是：若两个人坐在同一排并且座位编号相邻，则这两个人相邻。现要求 A 与 B 必须相邻，且 C 与 D 不相邻，问在上述条件下共有多少种不同的排法？\n",
+      "answer": "6528\n"
+    },
+    {
+      "id": "logic-019",
+      "title": "几何 - 三角形内切圆",
+      "difficulty": "medium",
+      "tags": [
+        "几何",
+        "内切圆"
+      ],
+      "content": "在$\\Delta ABC$中，$\\angle A$、$\\angle B$、$\\angle C$所对的边分别为$a, b, c$，且$c=10$，$\\frac{\\cos A}{\\cos B} = \\frac{b}{a} = \\frac{4}{3}$，$P$为$\\Delta ABC$内切圆上的动点，求点$P$到顶点$A$、$B$、$C$的距离的平方和的最大值和最小值。\n",
+      "answer": "88, 72\n"
+    },
+    {
+      "id": "logic-020",
+      "title": "单片机定时器 - 定时器初值计算",
+      "difficulty": "easy",
+      "tags": [
+        "单片机",
+        "定时器"
+      ],
+      "content": "AT89S51采用6MHz的晶振，定时2ms，如用定时器方式1时的初值（16进制数）应为多少？（写出计算过程）\n",
+      "answer": "0xFC18\n"
+    },
+    {
+      "id": "logic-021",
+      "title": "组合数学 - 方格染色",
+      "difficulty": "hard",
+      "tags": [
+        "组合数学",
+        "染色问题"
+      ],
+      "content": "求具有下述性质的最小正整数 t：将 100×100 的方格纸的每个小方格染为某一种颜色，若每一种颜色的小方格数目均不超过 104，则存在一个 1×t 或 t×1 的矩形，其中 t 个小方格含有至少三种不同颜色。\n",
+      "answer": "12\n"
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Copilot 设置</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="options-container">
+    <header class="options-header">
+      <h2><img src="../assets/chat-copilot-btn.svg" alt="logo" class="logo"> Chat Copilot 设置</h2>
+    </header>
+
+    <div class="options-layout">
+      <!-- 左侧导航 -->
+      <aside class="options-sidebar">
+        <nav class="sidebar-nav">
+          <a href="#section-model" class="nav-item active" data-section="section-model">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            </svg>
+            <span>模型管理</span>
+          </a>
+          <a href="#section-custom-rules" class="nav-item" data-section="section-custom-rules">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>自定义规则</span>
+          </a>
+          <a href="#section-prompt-plaza" class="nav-item" data-section="section-prompt-plaza">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+            </svg>
+            <span>提示词广场</span>
+          </a>
+          <a href="#section-quick-access" class="nav-item" data-section="section-quick-access">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+            </svg>
+            <span>快速访问</span>
+          </a>
+          <a href="#section-about" class="nav-item" data-section="section-about">
+            <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="16" x2="12" y2="12"/>
+              <line x1="12" y1="8" x2="12.01" y2="8"/>
+            </svg>
+            <span>关于</span>
+          </a>
+        </nav>
+      </aside>
+
+      <!-- 右侧内容 -->
+      <main class="options-main">
+        <!-- Model 管理 -->
+        <section class="section" id="section-model">
+          <h2>模型管理</h2>
+
+          <div class="model-list" id="model-list">
+            <div class="model-item active">
+              <input type="radio" name="model" value="builtin-rules" checked>
+              <div class="model-info">
+                <span class="model-name">内置规则引擎</span>
+                <span class="model-desc">基于 Prompt 工程最佳实践，离线可用</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn-add-model" id="btn-add-model">+ 添加自定义模型</button>
+        </section>
+
+        <!-- 添加/编辑模型弹窗 -->
+        <div class="modal-backdrop" id="model-modal-backdrop" style="display: none;">
+          <div class="modal">
+            <section class="section modal-content" id="model-form-section">
+              <h2>添加自定义模型</h2>
+
+              <form id="model-form">
+                <div class="form-group">
+                  <label>模型提供商</label>
+                  <div class="custom-select" id="model-provider-custom">
+                    <div class="select-trigger" id="select-trigger">
+                      <img src="../assets/models-icons/openai.svg" class="select-trigger-icon" id="select-trigger-icon">
+                      <span class="selected-value">OpenAI</span>
+                      <i class="arrow-icon"></i>
+                    </div>
+                    <div class="select-options" id="select-options">
+                      <div class="select-option selected" data-value="openai">
+                        <img src="../assets/models-icons/openai.svg" class="select-option-icon">
+                        <span>OpenAI</span>
+                      </div>
+                      <div class="select-option" data-value="claude">
+                        <img src="../assets/models-icons/claude.svg" class="select-option-icon">
+                        <span>Claude</span>
+                      </div>
+                      <div class="select-option" data-value="gemini">
+                        <img src="../assets/models-icons/gemini.png" class="select-option-icon">
+                        <span>Gemini</span>
+                      </div>
+                      <div class="select-option" data-value="grok">
+                        <img src="../assets/models-icons/grok.svg" class="select-option-icon">
+                        <span>Grok</span>
+                      </div>
+                      <div class="select-option" data-value="openrouter">
+                        <img src="../assets/models-icons/openrouter.svg" class="select-option-icon">
+                        <span>OpenRouter</span>
+                      </div>
+                      <div class="select-option" data-value="ollama">
+                        <img src="../assets/models-icons/ollama.svg" class="select-option-icon">
+                        <span>Ollama</span>
+                      </div>
+                      <div class="select-option" data-value="custom">
+                        <img src="../assets/models-icons/compatible.svg" class="select-option-icon">
+                        <span>OpenAI 兼容</span>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- 保持原始 select 用于数据同步 -->
+                  <select id="model-provider" style="display: none;">
+                    <option value="openai">OpenAI</option>
+                    <option value="claude">Claude</option>
+                    <option value="gemini">Gemini</option>
+                    <option value="grok">Grok</option>
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="ollama">Ollama</option>
+                    <option value="custom">OpenAI 兼容</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>显示名称</label>
+                  <input type="text" id="model-name" required>
+                </div>
+                <div class="form-group">
+                  <label>API 端点</label>
+                  <input type="url" id="model-endpoint" required>
+                </div>
+                <div class="form-group" id="apikey-group">
+                  <label>API Key</label>
+                  <input type="password" id="model-apikey">
+                </div>
+                <div class="form-group">
+                  <label>模型</label>
+                  <input type="text" id="model-model" required>
+                </div>
+                <div class="form-actions">
+                  <button type="button" class="btn-test" id="btn-test">测试连接</button>
+                  <button type="submit" class="btn-save">保存</button>
+                  <button type="button" class="btn-cancel" id="btn-cancel">取消</button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+
+        <!-- 自定义规则 -->
+        <section class="section" id="section-custom-rules">
+          <h2>自定义规则</h2>
+          <p class="section-desc">配置用户自定义的提示词规则，这些规则将在提问大模型时自动附加</p>
+
+          <div class="custom-rules-list" id="custom-rules-list">
+            <!-- 动态生成 -->
+          </div>
+
+          <button class="btn-add-model" id="btn-add-custom-rule">+ 添加自定义规则</button>
+        </section>
+
+        <!-- 添加/编辑自定义规则弹窗 -->
+        <div class="modal-backdrop" id="custom-rule-modal-backdrop" style="display: none;">
+          <div class="modal custom-rule-modal">
+            <section class="section modal-content" id="custom-rule-form-section">
+              <div class="modal-header">
+                <h2 id="custom-rule-modal-title">添加自定义规则</h2>
+              </div>
+
+              <form id="custom-rule-form" class="custom-rule-form">
+                <div class="form-group">
+                  <label for="custom-rule-name">规则名称</label>
+                  <input type="text" id="custom-rule-name" placeholder="例如：代码风格规范" required>
+                </div>
+
+                <div class="form-group">
+                  <label for="custom-rule-content">规则内容</label>
+                  <textarea id="custom-rule-content" placeholder="描述你的规则内容，例如：请使用驼峰命名法..." required rows="5"></textarea>
+                  <span class="form-hint">此规则将在每次提问时自动附加到你的提示词中</span>
+                </div>
+
+                <div class="form-group form-group-checkbox">
+                  <label for="custom-rule-enabled">
+                    <input type="checkbox" id="custom-rule-enabled" checked>
+                    <span>启用此规则</span>
+                  </label>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="btn-cancel" id="btn-cancel-custom-rule">取消</button>
+                  <button type="submit" class="btn-save">保存</button>
+                </div>
+              </form>
+            </section>
+          </div>
+        </div>
+
+        <!-- 提示词广场设置 -->
+        <section class="section" id="section-prompt-plaza">
+          <h2>提示词广场</h2>
+          <p class="section-desc">配置提示词广场的显示方式</p>
+
+          <div class="setting-item">
+            <div class="setting-info">
+              <span class="setting-label">显示悬浮按钮</span>
+              <span class="setting-desc">在 AI 网站页面右侧显示提示词广场的悬浮入口按钮</span>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="show-sidebar-toggle" checked>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- 快速访问配置 -->
+        <section class="section" id="section-quick-access">
+          <h2>快速访问</h2>
+          <div class="quick-access-header">
+            <p class="section-desc">选择要在弹窗中显示的快速访问站点</p>
+            <div class="quick-access-actions">
+              <button class="btn-select-all" id="btn-select-all">全选</button>
+              <button class="btn-invert-selection" id="btn-invert-selection">反选</button>
+            </div>
+          </div>
+          <div class="quick-access-list" id="quick-access-list">
+            <!-- 动态生成 -->
+          </div>
+        </section>
+
+        <!-- 关于 -->
+        <section class="section" id="section-about">
+          <h2>关于</h2>
+          <p>Chat Copilot <span id="options-version">v0.1.0</span></p>
+          <p>开源协议: Apache License 2.0</p>
+          <p><a href="https://github.com/hellolib/chat-copilot" target="_blank">GitHub</a></p>
+        </section>
+      </main>
+    </div>
+  </div>
+</body>
+
+</html>

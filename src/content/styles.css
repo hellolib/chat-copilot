@@ -1,0 +1,1524 @@
+/**
+ * Content Script Styles - Chat Copilot
+ * 注入到 AI 平台页面的样式
+ * 基于设计令牌的简约现代风格
+ */
+
+/* ========================================
+ * 设计令牌 (内联，因为 Content Script 无法引用外部文件)
+ * ======================================== */
+:root {
+  /* 品牌主色 */
+  --cc-primary: #0D9488;
+  --cc-primary-hover: #0F766E;
+  --cc-primary-light: #CCFBF1;
+  --cc-primary-subtle: #F0FDFA;
+
+  /* 中性色 */
+  --cc-text-primary: #1F2937;
+  --cc-text-secondary: #6B7280;
+  --cc-text-tertiary: #9CA3AF;
+  --cc-text-inverse: #FFFFFF;
+
+  /* 背景色 */
+  --cc-bg-base: #FFFFFF;
+  --cc-bg-subtle: #F9FAFB;
+  --cc-bg-muted: #F3F4F6;
+
+  /* 边框色 */
+  --cc-border: #E5E7EB;
+
+  /* 功能色 */
+  --cc-success: #059669;
+  --cc-success-light: #D1FAE5;
+  --cc-success-subtle: #ECFDF5;
+  --cc-warning: #D97706;
+  --cc-warning-light: #FEF3C7;
+  --cc-error: #DC2626;
+  --cc-error-light: #FEE2E2;
+  --cc-info: #2563EB;
+  --cc-info-light: #DBEAFE;
+
+  /* 圆角 */
+  --cc-radius-sm: 6px;
+  --cc-radius-md: 10px;
+  --cc-radius-lg: 16px;
+  --cc-radius-full: 9999px;
+
+  /* 阴影 */
+  --cc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --cc-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --cc-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --cc-shadow-focus: 0 0 0 3px var(--cc-primary-light);
+
+  /* 间距 */
+  --cc-space-1: 4px;
+  --cc-space-2: 8px;
+  --cc-space-3: 12px;
+  --cc-space-4: 16px;
+  --cc-space-5: 20px;
+  --cc-space-6: 24px;
+
+  /* 字体 */
+  --cc-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --cc-font-size-xs: 11px;
+  --cc-font-size-sm: 13px;
+  --cc-font-size-base: 14px;
+  --cc-font-size-lg: 16px;
+  --cc-font-size-xl: 18px;
+
+  /* 过渡 */
+  --cc-transition-fast: 150ms ease;
+  --cc-transition-normal: 200ms ease;
+  --cc-transition-slow: 300ms ease;
+
+  /* 层级 */
+  --cc-z-modal: 10000;
+  --cc-z-tooltip: 10001;
+  --cc-z-toast: 10002;
+}
+
+/* 深色模式 */
+[data-theme="dark"],
+.dark {
+  --cc-primary: #2DD4BF;
+  --cc-primary-hover: #5EEAD4;
+  --cc-primary-light: #134E4A;
+  --cc-primary-subtle: #042F2E;
+
+  --cc-text-primary: #F3F4F6;
+  --cc-text-secondary: #9CA3AF;
+  --cc-text-tertiary: #6B7280;
+  --cc-text-inverse: #111827;
+
+  --cc-bg-base: #111827;
+  --cc-bg-subtle: #1F2937;
+  --cc-bg-muted: #374151;
+
+  --cc-border: #374151;
+
+  --cc-success: #34D399;
+  --cc-success-light: #065F46;
+  --cc-success-subtle: #064E3B;
+  --cc-warning: #FBBF24;
+  --cc-warning-light: #92400E;
+  --cc-error: #F87171;
+  --cc-error-light: #991B1B;
+  --cc-info: #60A5FA;
+  --cc-info-light: #1E3A8A;
+
+  --cc-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --cc-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --cc-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* ========================================
+ * Optimize Button - 优化按钮
+ * ======================================== */
+.chat-copilot-btn {
+  border: none;
+  border-radius: var(--cc-radius-sm);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--cc-transition-normal);
+  min-width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  user-select: none;
+  color: var(--cc-text-secondary);
+  margin: 0 var(--cc-space-1);
+  position: relative;
+}
+
+.chat-copilot-btn:hover {
+  background: rgba(13, 148, 136, 0.1);
+  color: var(--cc-primary);
+}
+
+.chat-copilot-btn:active {
+  transform: scale(0.95);
+}
+
+[data-theme="dark"] .chat-copilot-btn,
+.dark .chat-copilot-btn {
+  color: var(--cc-text-secondary);
+}
+
+[data-theme="dark"] .chat-copilot-btn:hover,
+.dark .chat-copilot-btn:hover {
+  background: rgba(45, 212, 191, 0.15);
+  color: var(--cc-primary);
+}
+
+.chat-copilot-btn.loading {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ========================================
+ * Loading Spinner - 加载动画
+ * ======================================== */
+.chat-copilot-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--cc-border);
+  border-top-color: var(--cc-primary);
+  border-radius: 50%;
+  animation: cc-spin 0.8s linear infinite;
+}
+
+@keyframes cc-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ========================================
+ * Dialog - 对话框
+ * ======================================== */
+.chat-copilot-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: var(--cc-z-modal);
+  backdrop-filter: blur(8px);
+}
+
+[data-theme="dark"] .chat-copilot-dialog,
+.dark .chat-copilot-dialog {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.chat-copilot-dialog-content {
+  background: var(--cc-bg-base);
+  border-radius: var(--cc-radius-lg);
+  width: 95%;
+  max-width: 1200px;
+  max-height: 85vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--cc-shadow-lg);
+  animation: cc-dialog-in var(--cc-transition-slow) ease-out;
+}
+
+@keyframes cc-dialog-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Dialog Loading State */
+.chat-copilot-dialog-body.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.chat-copilot-dialog-body.loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.85);
+  z-index: 10;
+  border-radius: var(--cc-radius-sm);
+}
+
+[data-theme="dark"] .chat-copilot-dialog-body.loading::after,
+.dark .chat-copilot-dialog-body.loading::after {
+  background: rgba(17, 24, 39, 0.9);
+}
+
+.chat-copilot-dialog-body.loading::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--cc-border);
+  border-top-color: var(--cc-primary);
+  border-radius: 50%;
+  animation: cc-spin 0.8s linear infinite;
+  z-index: 11;
+}
+
+/* Dialog Header */
+.chat-copilot-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--cc-space-3) var(--cc-space-4);
+  flex-shrink: 0;
+  background: var(--cc-bg-subtle);
+  border-bottom: 1px solid var(--cc-border);
+  min-height: 44px;
+}
+
+.chat-copilot-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-3);
+}
+
+.chat-copilot-title {
+  margin: 0;
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-base);
+  font-weight: 600;
+  color: var(--cc-text-primary);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-2);
+}
+
+.chat-copilot-logo {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.chat-copilot-model-info {
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  color: var(--cc-text-secondary);
+  background: var(--cc-bg-base);
+  padding: 3px var(--cc-space-2);
+  border-radius: var(--cc-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cc-space-1);
+  font-weight: 500;
+  border: 1px solid var(--cc-border);
+}
+
+.chat-copilot-model-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.chat-copilot-close {
+  background: var(--cc-bg-base);
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: var(--cc-text-tertiary);
+  padding: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--cc-radius-sm);
+  transition: all var(--cc-transition-fast);
+  flex-shrink: 0;
+}
+
+.chat-copilot-close:hover {
+  background: var(--cc-error-light);
+  color: var(--cc-error);
+}
+
+/* Dialog Body */
+.chat-copilot-dialog-body {
+  padding: var(--cc-space-4);
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Compare Layout */
+.chat-copilot-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--cc-space-4);
+  margin-bottom: var(--cc-space-4);
+}
+
+@media (max-width: 768px) {
+  .chat-copilot-compare {
+    grid-template-columns: 1fr;
+  }
+
+  .chat-copilot-dialog-content {
+    width: 98%;
+    max-height: 90vh;
+    border-radius: var(--cc-radius-md);
+  }
+
+  .chat-copilot-dialog-footer {
+    flex-wrap: wrap;
+    gap: var(--cc-space-2);
+  }
+
+  .chat-copilot-dialog-footer button {
+    flex: 1;
+    min-width: calc(50% - var(--cc-space-1));
+  }
+}
+
+/* Original Content Card */
+.chat-copilot-original {
+  background: var(--cc-bg-subtle);
+  border-radius: var(--cc-radius-md);
+  padding: var(--cc-space-4);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--cc-border);
+}
+
+/* Optimized Content Card */
+.chat-copilot-optimized {
+  background: var(--cc-success-subtle);
+  border-radius: var(--cc-radius-md);
+  padding: var(--cc-space-4);
+  display: flex;
+  flex-direction: column;
+  border-left: 3px solid var(--cc-success);
+}
+
+/* Content Box */
+.chat-copilot-content-box {
+  flex: 1;
+  max-height: 280px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: var(--cc-space-2);
+}
+
+.chat-copilot-content-box p {
+  margin: 0;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.6;
+  font-family: var(--cc-font-family);
+  color: var(--cc-text-primary);
+  font-size: var(--cc-font-size-base);
+}
+
+/* Labels */
+.chat-copilot-original h4,
+.chat-copilot-optimized h4,
+.chat-copilot-label {
+  margin: 0;
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  color: var(--cc-text-secondary);
+  padding-bottom: var(--cc-space-2);
+  flex-shrink: 0;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-2);
+}
+
+.chat-copilot-optimized h4 {
+  color: var(--cc-success);
+}
+
+/* ========================================
+ * Improvements Section - 改进项
+ * ======================================== */
+.chat-copilot-improvements {
+  position: relative;
+}
+
+.chat-copilot-improvements h4 {
+  margin: 0 0 var(--cc-space-2) 0;
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  color: var(--cc-text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-2);
+}
+
+.chat-copilot-improvements-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cc-space-2);
+  max-height: 68px;
+  overflow: hidden;
+  position: relative;
+}
+
+.chat-copilot-improvements-list.expanded {
+  max-height: none;
+}
+
+/* Improvement Tags */
+.chat-copilot-improvement-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cc-space-1);
+  padding: var(--cc-space-1) var(--cc-space-3);
+  background: var(--cc-primary-light);
+  color: var(--cc-primary);
+  border-radius: var(--cc-radius-full);
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .chat-copilot-improvement-tag,
+.dark .chat-copilot-improvement-tag {
+  background: var(--cc-primary-light);
+  color: var(--cc-primary);
+}
+
+/* More Tags Button */
+.chat-copilot-more-tags {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--cc-space-1) var(--cc-space-3);
+  background: var(--cc-bg-subtle);
+  color: var(--cc-text-secondary);
+  border-radius: var(--cc-radius-full);
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  cursor: pointer;
+  position: relative;
+  font-weight: 500;
+  transition: all var(--cc-transition-fast);
+}
+
+.chat-copilot-more-tags:hover {
+  background: var(--cc-primary-subtle);
+  color: var(--cc-primary);
+}
+
+.chat-copilot-more-tags:hover .chat-copilot-hidden-tags {
+  display: flex;
+}
+
+/* Hidden Tags Popup */
+.chat-copilot-hidden-tags {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  margin-bottom: var(--cc-space-2);
+  background: var(--cc-bg-base);
+  color: var(--cc-text-primary);
+  padding: var(--cc-space-3);
+  border-radius: var(--cc-radius-md);
+  flex-wrap: wrap;
+  gap: var(--cc-space-2);
+  min-width: 200px;
+  max-width: 400px;
+  z-index: 10;
+  box-shadow: var(--cc-shadow-md);
+  border: 1px solid var(--cc-border);
+}
+
+.chat-copilot-hidden-tags::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: var(--cc-space-5);
+  border: 6px solid transparent;
+  border-top-color: var(--cc-bg-base);
+}
+
+.chat-copilot-hidden-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cc-space-1);
+  padding: var(--cc-space-1) var(--cc-space-3);
+  background: var(--cc-primary-light);
+  color: var(--cc-primary);
+  border-radius: var(--cc-radius-full);
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+/* ========================================
+ * Dialog Footer - 底部按钮
+ * ======================================== */
+.chat-copilot-dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--cc-space-2);
+  padding: var(--cc-space-3) var(--cc-space-4);
+  flex-shrink: 0;
+  background: var(--cc-bg-subtle);
+  border-top: 1px solid var(--cc-border);
+}
+
+.chat-copilot-dialog-footer button {
+  padding: 6px 14px;
+  border-radius: var(--cc-radius-sm);
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-sm);
+  cursor: pointer;
+  transition: all var(--cc-transition-fast);
+  font-weight: 500;
+  border: 1px solid transparent;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-height: 30px;
+  white-space: nowrap;
+}
+
+.chat-copilot-dialog-footer button:active {
+  transform: scale(0.97);
+}
+
+.chat-copilot-dialog-footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Re-optimize Button */
+.chat-copilot-btn-reoptimize {
+  background: var(--cc-warning-light);
+  color: #B45309;
+  margin-right: auto;
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.chat-copilot-btn-reoptimize:hover {
+  background: rgba(251, 191, 36, 0.35);
+  border-color: rgba(251, 191, 36, 0.5);
+}
+
+[data-theme="dark"] .chat-copilot-btn-reoptimize,
+.dark .chat-copilot-btn-reoptimize {
+  background: rgba(251, 191, 36, 0.12);
+  color: #FBBF24;
+  border-color: rgba(251, 191, 36, 0.25);
+}
+
+[data-theme="dark"] .chat-copilot-btn-reoptimize:hover,
+.dark .chat-copilot-btn-reoptimize:hover {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.35);
+}
+
+/* Apply Button - Primary Action */
+.chat-copilot-btn-apply {
+  background: var(--cc-primary);
+  color: var(--cc-text-inverse);
+  box-shadow: 0 1px 3px rgba(13, 148, 136, 0.2);
+}
+
+.chat-copilot-btn-apply:hover {
+  background: var(--cc-primary-hover);
+  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
+}
+
+[data-theme="dark"] .chat-copilot-btn-apply,
+.dark .chat-copilot-btn-apply {
+  background: var(--cc-primary);
+  box-shadow: 0 1px 3px rgba(45, 212, 191, 0.25);
+}
+
+[data-theme="dark"] .chat-copilot-btn-apply:hover,
+.dark .chat-copilot-btn-apply:hover {
+  background: #14B8A6;
+  box-shadow: 0 2px 6px rgba(45, 212, 191, 0.35);
+}
+
+/* Copy Button */
+.chat-copilot-btn-copy {
+  background: var(--cc-info-light);
+  color: #1E40AF;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+.chat-copilot-btn-copy:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+[data-theme="dark"] .chat-copilot-btn-copy,
+.dark .chat-copilot-btn-copy {
+  background: rgba(59, 130, 246, 0.12);
+  color: #60A5FA;
+  border-color: rgba(59, 130, 246, 0.25);
+}
+
+[data-theme="dark"] .chat-copilot-btn-copy:hover,
+.dark .chat-copilot-btn-copy:hover {
+  background: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.35);
+}
+
+/* Cancel Button */
+.chat-copilot-btn-cancel {
+  background: var(--cc-bg-base);
+  color: var(--cc-text-secondary);
+  border-color: var(--cc-border);
+}
+
+.chat-copilot-btn-cancel:hover {
+  background: var(--cc-bg-muted);
+  color: var(--cc-text-primary);
+  border-color: var(--cc-border);
+}
+
+[data-theme="dark"] .chat-copilot-btn-cancel,
+.dark .chat-copilot-btn-cancel {
+  background: var(--cc-bg-muted);
+  border-color: var(--cc-border);
+}
+
+[data-theme="dark"] .chat-copilot-btn-cancel:hover,
+.dark .chat-copilot-btn-cancel:hover {
+  background: var(--cc-bg-subtle);
+}
+
+/* ========================================
+ * Toast - 通知
+ * ======================================== */
+.cc-toast {
+  position: fixed;
+  top: calc(var(--cc-space-6) + 50px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-2);
+  padding: var(--cc-space-2) var(--cc-space-4);
+  border-radius: var(--cc-radius-lg);
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-sm);
+  font-weight: 500;
+  z-index: var(--cc-z-toast);
+  animation: cc-toast-in var(--cc-transition-slow) ease-out;
+  box-shadow: var(--cc-shadow-lg);
+  max-width: 360px;
+  pointer-events: none;
+}
+
+.cc-toast-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.cc-toast-message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.cc-toast-success {
+  background: #f0fdf4;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.cc-toast-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+.cc-toast-info {
+  background: #eff6ff;
+  color: #1e40af;
+  border: 1px solid #bfdbfe;
+}
+
+.cc-toast-warning {
+  background: #fffbeb;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.cc-toast-hiding {
+  animation: cc-toast-out 0.2s ease-out forwards;
+}
+
+@keyframes cc-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes cc-toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+[data-theme="dark"] .cc-toast-success,
+.dark .cc-toast-success {
+  background: #14532d;
+  color: #dcfce7;
+  border-color: #166534;
+}
+
+[data-theme="dark"] .cc-toast-error,
+.dark .cc-toast-error {
+  background: #7f1d1d;
+  color: #fee2e2;
+  border-color: #991b1b;
+}
+
+[data-theme="dark"] .cc-toast-info,
+.dark .cc-toast-info {
+  background: #1e3a8a;
+  color: #dbeafe;
+  border-color: #1e40af;
+}
+
+[data-theme="dark"] .cc-toast-warning,
+.dark .cc-toast-warning {
+  background: #78350f;
+  color: #fef3c7;
+  border-color: #92400e;
+}
+
+/* ========================================
+ * Prompt Sidebar - 提示词广场侧边栏
+ * ======================================== */
+
+/* Toggle Button - 切换按钮 */
+.chat-copilot-prompt-toggle {
+  position: fixed;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 42px;
+  height: 42px;
+  border-radius: 11px;
+  background: var(--cc-bg-base);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc-text-secondary);
+  transition: all 0.25s ease;
+  z-index: 9998;
+}
+
+.chat-copilot-prompt-toggle:hover {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: var(--cc-primary);
+  color: var(--cc-primary);
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+}
+
+.chat-copilot-prompt-toggle.active {
+  background: var(--cc-primary);
+  border-color: var(--cc-primary);
+  color: var(--cc-text-inverse);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.35);
+}
+
+.chat-copilot-prompt-toggle svg {
+  width: 19px;
+  height: 19px;
+  flex-shrink: 0;
+}
+
+/* Toggle Tooltip */
+.chat-copilot-prompt-toggle-tooltip {
+  position: absolute;
+  right: calc(100% + 10px);
+  top: 50%;
+  transform: translateY(-50%) scale(0.92);
+  background: var(--cc-text-primary);
+  color: var(--cc-text-inverse);
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-family: var(--cc-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.chat-copilot-prompt-toggle-tooltip::after {
+  content: '';
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  border: 4px solid transparent;
+  border-left-color: var(--cc-text-primary);
+}
+
+.chat-copilot-prompt-toggle:hover .chat-copilot-prompt-toggle-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(-50%) scale(1);
+}
+
+.chat-copilot-prompt-toggle.active .chat-copilot-prompt-toggle-tooltip {
+  display: none;
+}
+
+[data-theme="dark"] .chat-copilot-prompt-toggle-tooltip,
+.dark .chat-copilot-prompt-toggle-tooltip {
+  background: var(--cc-text-inverse);
+  color: var(--cc-text-primary);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-toggle-tooltip::after,
+.dark .chat-copilot-prompt-toggle-tooltip::after {
+  border-left-color: var(--cc-text-inverse);
+}
+
+/* Sidebar Panel - 侧边栏面板 */
+.chat-copilot-prompt-sidebar {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 360px;
+  height: 100vh;
+  background: var(--cc-bg-base);
+  border-left: 1px solid var(--cc-border);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  z-index: 9999;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  font-family: var(--cc-font-family);
+}
+
+.chat-copilot-prompt-sidebar.open {
+  transform: translateX(0);
+}
+
+/* Sidebar Header */
+.chat-copilot-prompt-sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 20px 16px;
+  background: linear-gradient(to bottom, var(--cc-bg-base), var(--cc-bg-subtle));
+  flex-shrink: 0;
+}
+
+.chat-copilot-prompt-sidebar-header h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--cc-text-primary);
+}
+
+.chat-copilot-prompt-sidebar-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc-text-tertiary);
+  transition: all 0.2s ease;
+}
+
+.chat-copilot-prompt-sidebar-close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--cc-error);
+}
+
+/* Search Box */
+.chat-copilot-prompt-sidebar-search {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--cc-bg-base);
+  flex-shrink: 0;
+}
+
+.chat-copilot-prompt-sidebar-search input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: var(--cc-text-primary);
+  outline: none;
+  font-family: var(--cc-font-family);
+  font-weight: 400;
+}
+
+.chat-copilot-prompt-sidebar-search input::placeholder {
+  color: var(--cc-text-tertiary);
+  opacity: 0.7;
+}
+
+/* Categories */
+.chat-copilot-prompt-sidebar-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--cc-bg-base);
+  flex-shrink: 0;
+}
+
+.chat-copilot-prompt-category {
+  position: relative;
+  padding: 5px 11px;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  background: transparent;
+  border-radius: 6px;
+  font-size: 11px;
+  color: var(--cc-text-secondary);
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: var(--cc-font-family);
+  font-weight: 500;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+}
+
+.chat-copilot-prompt-category:hover {
+  border-color: rgba(99, 102, 241, 0.15);
+  background: rgba(99, 102, 241, 0.03);
+  color: var(--cc-primary);
+  transform: translateY(-0.5px);
+}
+
+.chat-copilot-prompt-category.active {
+  border-color: var(--cc-primary);
+  background: var(--cc-primary);
+  color: var(--cc-text-inverse);
+  box-shadow: 0 1px 4px rgba(99, 102, 241, 0.2);
+}
+
+/* Prompt List */
+.chat-copilot-prompt-sidebar-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Empty State */
+.chat-copilot-prompt-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--cc-text-tertiary);
+  text-align: center;
+}
+
+.chat-copilot-prompt-empty svg {
+  margin-bottom: 12px;
+  opacity: 0.3;
+}
+
+.chat-copilot-prompt-empty p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Prompt Card */
+.chat-copilot-prompt-card {
+  background: var(--cc-bg-subtle);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 11px;
+  padding: 14px;
+  transition: all 0.25s ease;
+}
+
+.chat-copilot-prompt-card:hover {
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.chat-copilot-prompt-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.chat-copilot-prompt-card-title {
+  flex: 1;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  color: var(--cc-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chat-copilot-prompt-card-favorite {
+  width: 26px;
+  height: 26px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc-text-tertiary);
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.chat-copilot-prompt-card-favorite:hover {
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--cc-warning);
+  transform: scale(1.05);
+}
+
+.chat-copilot-prompt-card-favorite.active {
+  color: var(--cc-warning);
+}
+
+.chat-copilot-prompt-card-content {
+  margin: 0 0 10px 0;
+  font-size: 12px;
+  color: var(--cc-text-secondary);
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chat-copilot-prompt-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 10px;
+}
+
+.chat-copilot-prompt-tag {
+  font-size: 10px;
+  color: var(--cc-text-tertiary);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+
+.chat-copilot-prompt-card-actions {
+  display: flex;
+  gap: 7px;
+}
+
+.chat-copilot-prompt-card-copy,
+.chat-copilot-prompt-card-insert {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--cc-font-family);
+}
+
+.chat-copilot-prompt-card-copy {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--cc-text-secondary);
+}
+
+.chat-copilot-prompt-card-copy:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--cc-info);
+}
+
+.chat-copilot-prompt-card-insert {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--cc-primary);
+}
+
+.chat-copilot-prompt-card-insert:hover {
+  background: var(--cc-primary);
+  color: var(--cc-text-inverse);
+}
+
+/* Resize Handle */
+.chat-copilot-prompt-sidebar-resize {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 4px;
+  height: 100%;
+  cursor: ew-resize;
+  background: transparent;
+  transition: background 0.2s ease;
+}
+
+.chat-copilot-prompt-sidebar-resize:hover {
+  background: var(--cc-primary);
+}
+
+/* Scrollbar Styling */
+.chat-copilot-prompt-sidebar-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.chat-copilot-prompt-sidebar-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+.chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode Adjustments */
+[data-theme="dark"] .chat-copilot-prompt-toggle,
+.dark .chat-copilot-prompt-toggle {
+  background: var(--cc-bg-subtle);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-sidebar,
+.dark .chat-copilot-prompt-sidebar {
+  background: var(--cc-bg-base);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card,
+.dark .chat-copilot-prompt-card {
+  background: var(--cc-bg-subtle);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card:hover,
+.dark .chat-copilot-prompt-card:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-category,
+.dark .chat-copilot-prompt-category {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card-copy,
+.dark .chat-copilot-prompt-card-copy {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-tag,
+.dark .chat-copilot-prompt-tag {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-category,
+.dark .chat-copilot-prompt-category {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-category:hover,
+.dark .chat-copilot-prompt-category:hover {
+  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb,
+.dark .chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb:hover,
+.dark .chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* Animation for sidebar open */
+@keyframes cc-sidebar-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .chat-copilot-prompt-sidebar {
+    width: 100%;
+    right: -100%;
+  }
+
+  .chat-copilot-prompt-toggle {
+    right: 10px;
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* ========================================
+ * Prompt Card - 新增样式
+ * ======================================== */
+
+/* Loading State */
+.chat-copilot-prompt-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  color: var(--cc-text-tertiary);
+}
+
+.chat-copilot-prompt-loading-spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-top-color: var(--cc-primary);
+  border-radius: 50%;
+  animation: cc-spin 0.8s linear infinite;
+  margin-bottom: 12px;
+}
+
+.chat-copilot-prompt-loading p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+/* Difficulty Badge */
+.chat-copilot-prompt-difficulty {
+  font-size: 10px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  font-weight: 500;
+  flex-shrink: 0;
+  letter-spacing: 0.2px;
+}
+
+.chat-copilot-prompt-difficulty.easy {
+  background: rgba(34, 197, 94, 0.12);
+  color: var(--cc-success);
+}
+
+.chat-copilot-prompt-difficulty.medium {
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--cc-warning);
+}
+
+.chat-copilot-prompt-difficulty.hard {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--cc-error);
+}
+
+/* Content Wrapper */
+.chat-copilot-prompt-card-content-wrapper {
+  margin-bottom: 10px;
+}
+
+.chat-copilot-prompt-card-content {
+  margin: 0;
+  font-size: 12px;
+  color: var(--cc-text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.chat-copilot-prompt-card-content:not(.expanded) {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.chat-copilot-prompt-card-content.expanded {
+  display: block;
+}
+
+/* Expand Button */
+.chat-copilot-prompt-expand-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--cc-primary);
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--cc-font-family);
+  transition: all 0.2s ease;
+}
+
+.chat-copilot-prompt-expand-btn:hover {
+  color: var(--cc-primary-hover);
+}
+
+.chat-copilot-prompt-expand-btn svg {
+  transition: transform 0.2s ease;
+}
+
+.chat-copilot-prompt-expand-btn svg.rotated {
+  transform: rotate(180deg);
+}
+
+/* Answer Section */
+.chat-copilot-prompt-card-answer-wrapper {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed rgba(0, 0, 0, 0.08);
+}
+
+.chat-copilot-prompt-card-answer-header {
+  margin-bottom: 8px;
+  color: var(--cc-success);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.chat-copilot-prompt-card-answer {
+  background: rgba(34, 197, 94, 0.06);
+  border-radius: 7px;
+  padding: 10px;
+  max-height: 120px;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
+}
+
+.chat-copilot-prompt-card-answer.expanded {
+  max-height: none;
+}
+
+.chat-copilot-prompt-card-answer pre {
+  margin: 0;
+  font-size: 11px;
+  color: var(--cc-text-secondary);
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  font-family: var(--cc-font-family);
+}
+
+/* Card with Answer */
+.chat-copilot-prompt-card.has-answer {
+  /* 移除了绿色左边框，保持简洁 */
+}
+
+/* Copy Answer Button */
+.chat-copilot-prompt-card-copy-answer {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 10px;
+  border: none;
+  border-radius: 7px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--cc-font-family);
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--cc-success);
+}
+
+.chat-copilot-prompt-card-copy-answer:hover {
+  background: rgba(34, 197, 94, 0.2);
+}
+
+/* Dark Mode for new elements */
+[data-theme="dark"] .chat-copilot-prompt-difficulty.easy,
+.dark .chat-copilot-prompt-difficulty.easy {
+  background: rgba(34, 197, 94, 0.15);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-difficulty.medium,
+.dark .chat-copilot-prompt-difficulty.medium {
+  background: rgba(251, 191, 36, 0.15);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-difficulty.hard,
+.dark .chat-copilot-prompt-difficulty.hard {
+  background: rgba(239, 68, 68, 0.15);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card-answer,
+.dark .chat-copilot-prompt-card-answer {
+  background: rgba(34, 197, 94, 0.1);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card-answer-wrapper,
+.dark .chat-copilot-prompt-card-answer-wrapper {
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card-copy-answer,
+.dark .chat-copilot-prompt-card-copy-answer {
+  background: var(--cc-success-subtle);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-card-copy-answer:hover,
+.dark .chat-copilot-prompt-card-copy-answer:hover {
+  background: var(--cc-success-light);
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat Copilot</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h1><img id="popup-icon" alt="Chat Copilot"> Chat Copilot</h1>
+      <div class="popup-version" id="popup-version">v0.1.0</div>
+    </header>
+
+    <main class="popup-main">
+      <div class="model-selector">
+        <div class="model-card" id="model-card">
+          <img id="current-model-icon" class="current-model-icon" style="display: none;" alt="">
+          <div class="model-info">
+            <span class="model-label">当前模型</span>
+            <span class="model-name" id="current-model">内置规则引擎</span>
+          </div>
+          <div class="model-arrow">▼</div>
+        </div>
+        <div class="model-dropdown" id="model-dropdown" style="display: none;">
+          <div class="model-list" id="model-list">
+            <!-- 动态生成 -->
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <div class="stat-item">
+          <span class="stat-value" id="today-count">0</span>
+          <span class="stat-label">今日优化</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value" id="total-count">0</span>
+          <span class="stat-label">累计优化</span>
+        </div>
+      </div>
+
+      <!-- 提示词广场入口 -->
+      <div class="prompt-plaza-card" id="prompt-plaza-card">
+        <div class="prompt-plaza-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+        </div>
+        <div class="prompt-plaza-info">
+          <span class="prompt-plaza-title">提示词广场</span>
+          <span class="prompt-plaza-desc">精选提示词，一键测试 AI 能力</span>
+        </div>
+        <div class="prompt-plaza-arrow">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 18l6-6-6-6"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="quick-access">
+        <h3 class="quick-access-title">快速访问</h3>
+        <div class="sites-grid" id="sites-grid">
+        </div>
+      </div>
+    </main>
+
+    <footer class="popup-footer">
+      <button class="btn-settings" id="btn-settings">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/>
+          <path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
+        </svg>
+        设置
+      </button>
+      <button class="btn-help" id="btn-help">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/>
+          <line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        帮助
+      </button>
+    </footer>
+  </div>
+</body>
+
+</html>

@@ -1,0 +1,169 @@
+{
+  "category": "coding",
+  "name": "编程能力",
+  "icon": "💻",
+  "prompts": [
+    {
+      "id": "coding-001",
+      "title": "转盘抽奖",
+      "difficulty": "medium",
+      "tags": [
+        "HTML",
+        "JavaScript",
+        "动画"
+      ],
+      "content": "请帮我写一个单文件的 HTML 页面（包含 CSS 和 JS），实现一个幸运抽奖转盘的功能。\n\n**要求：**\n\n1. 转盘上有 6 个奖项（例如：一等奖、二等奖、三等奖、四等奖、50元红包、谢谢参与）。\n2. 界面美观，转盘颜色相间。\n3. 点击中间的\"开始\"按钮后，转盘开始旋转，旋转几圈后缓慢停下。\n4. **（关键点）** 请确保逻辑严密：JavaScript 计算出的最终奖品结果，必须与转盘停止时指针所指的扇区在视觉上保持绝对一致。不要出现结果显示\"一等奖\"，但指针却指着\"谢谢参与\"的情况。\n5. 转动结束后，弹窗显示中奖结果。\n"
+    },
+    {
+      "id": "coding-002",
+      "title": "游戏手柄的SVG",
+      "difficulty": "easy",
+      "tags": [
+        "SVG",
+        "图形设计"
+      ],
+      "content": "请为我画一个游戏手柄的 svg 图，尽可能精细并贴合现实形状\n"
+    },
+    {
+      "id": "coding-003",
+      "title": "鹈鹕自行车 SVG",
+      "difficulty": "medium",
+      "tags": [
+        "SVG",
+        "创意设计"
+      ],
+      "content": "Create code for an SVG of a pelican riding a bicycle as nicely as you can\n"
+    },
+    {
+      "id": "coding-004",
+      "title": "3D体素艺术场景",
+      "difficulty": "hard",
+      "tags": [
+        "3D",
+        "JavaScript",
+        "创意"
+      ],
+      "content": "Create an interactive 3D voxel art scene using HTML, CSS, and JavaScript. The style should be blocky and pixelated, reminiscent of Minecraft. The scene features a pelican on a unicycle, resting on a wooden pier.\n"
+    },
+    {
+      "id": "coding-005",
+      "title": "Minecraft Clone",
+      "difficulty": "hard",
+      "tags": [
+        "游戏开发",
+        "3D",
+        "JavaScript"
+      ],
+      "content": "Create a Minecraft clone within a single .html file. Make it aesthetically pleasing with pixel-art graphics similar to the original game. Include all of the game's core features, such as terrain and tree generation, mobs, and many other elements. Implement as many of these features as possible.\n"
+    },
+    {
+      "id": "coding-006",
+      "title": "莫比乌斯环",
+      "difficulty": "medium",
+      "tags": [
+        "3D",
+        "数学可视化"
+      ],
+      "content": "用单个HTML做一个3D莫比乌斯环\n"
+    },
+    {
+      "id": "coding-007",
+      "title": "随机迷宫生成与寻路",
+      "difficulty": "medium",
+      "tags": [
+        "算法",
+        "Canvas",
+        "动画"
+      ],
+      "content": "请编写一个完整的 HTML 文件，使用 JavaScript 和 canvas：\n1. 生成一个随机迷宫；\n2. 页面有\"生成迷宫\"和\"自动寻路\"按钮；\n3. 点击\"自动寻路\"后，使用 BFS 或 DFS 在迷宫中寻找路径，并用动画展示。\n"
+    },
+    {
+      "id": "coding-008",
+      "title": "计算器",
+      "difficulty": "easy",
+      "tags": [
+        "HTML",
+        "JavaScript",
+        "UI"
+      ],
+      "content": "请编写一个完整的 HTML 文件，实现一个简易计算器：\n1. 包含数字按钮、运算符按钮（+ – * /）和清零按钮；\n2. 点击按钮时在显示框实时显示输入；\n3. 点击等号按钮计算结果并显示。\n"
+    },
+    {
+      "id": "coding-009",
+      "title": "3D 旋转立方体",
+      "difficulty": "medium",
+      "tags": [
+        "Three.js",
+        "3D",
+        "交互"
+      ],
+      "content": "请编写一个完整的 HTML 文件，使用 Three.js 创建一个彩色的 3D 立方体：\n1. 立方体自动旋转；\n2. 用户可以用鼠标拖拽旋转视角；\n3. 页面背景为深色；\n4. 提供在线可运行的完整代码（包含 CDN 引入）。\n"
+    },
+    {
+      "id": "coding-010",
+      "title": "六边形物理模拟",
+      "difficulty": "hard",
+      "tags": [
+        "物理引擎",
+        "Canvas",
+        "碰撞检测"
+      ],
+      "content": "请编写一个【完整的 HTML 文件】（包含 <!DOCTYPE html>、<html>、<head>、<body>），使用原生 HTML/CSS/JavaScript（或 Three.js 也可，但需通过 CDN 引入），实现一个物理模拟场景：\n\n【场景要求】\n1) 容器：一个固定在屏幕中央的六边形边界（规则六边形），使用 canvas 绘制。\n2) 小球：在六边形内部生成若干小球（数量可设定，如 10 个），每个小球有半径、位置、速度和加速度。\n3) 物理：小球受重力作用自由下落；与六边形边界发生碰撞时反弹，考虑弹性（速度方向改变，速度按系数衰减）。\n4) 碰撞检测：小球之间也能发生弹性碰撞（两球交换速度分量），保证相互挤压效果。\n5) 动画：使用 requestAnimationFrame 实现流畅动画，基于 delta time 更新位置，保证不同刷新率下一致性。\n6) UI 控件：在页面提供简单的输入或滑块，允许用户调整参数（如重力大小、弹性系数、小球数量）。\n7) 交互：提供\"暂停/继续\"、\"重置\"按钮，便于演示。\n8) 视觉：小球用不同颜色填充，背景浅色，边界线清晰；数值显示在画布上方（如当前小球数量、重力值）。\n\n【技术规范】\n– 使用 <canvas> 绘制，不依赖后端。\n– 仅输出一个可直接保存为 .html 打开的文件。\n– 代码注释清晰，结构化（Ball 类、Hexagon 类、Game 类）。\n– 不要依赖外部图片或资源；如果使用 Three.js，请通过 jsdelivr 或 unpkg 引入。\n\n请直接输出完整 HTML 源码。\n"
+    },
+    {
+      "id": "coding-011",
+      "title": "飞机大战（Space Shooter）",
+      "difficulty": "medium",
+      "tags": [
+        "游戏开发",
+        "Canvas",
+        "事件处理"
+      ],
+      "content": "请编写一个完整的 HTML 文件，使用 HTML/CSS/JavaScript 创建简易飞机大战游戏。要求：\n1. 玩家飞机用方向键移动，空格键发射子弹；\n2. 敌机自动生成并下落；\n3. 子弹击中敌机加分；\n4. 玩家被撞到游戏结束。\n"
+    },
+    {
+      "id": "coding-012",
+      "title": "打砖块（Breakout Game）",
+      "difficulty": "medium",
+      "tags": [
+        "游戏开发",
+        "Canvas",
+        "物理"
+      ],
+      "content": "请编写一个完整的 HTML 文件，使用 HTML5 canvas 和 JavaScript 制作打砖块游戏。要求：\n1. 玩家用左右键控制挡板；\n2. 小球会反弹，击碎砖块加分；\n3. 全部砖块被打掉后游戏胜利；\n4. 页面有\"重新开始\"按钮。\n"
+    },
+    {
+      "id": "coding-013",
+      "title": "投石机动画",
+      "difficulty": "medium",
+      "tags": [
+        "动画",
+        "物理模拟",
+        "交互"
+      ],
+      "content": "请使用单个完整的HTML文件创建一个简易的交互式投石机动画。投石机拥有一个杠杆臂和一个配重。用户可以通过点击一个'发射'按钮来触发动画：配重下落，杠杆臂随之摆动，将一个投射物以抛物线轨迹发射出去。请确保抛体运动的轨迹在物理上是正确的。\n"
+    },
+    {
+      "id": "coding-014",
+      "title": "天气卡片",
+      "difficulty": "medium",
+      "tags": [
+        "UI设计",
+        "CSS动画",
+        "交互"
+      ],
+      "content": "你是 Apple Inc 的 UI 设计师，以 iOS 18 的设计风格做一个带有动画效果的天气卡片，要求是使用 HTML、CSS 和基础 JavaScript，使用横板天气页面（拥有 4 个天气卡片 (晴天，大风，暴雨，暴雪))。应足够美观，实现一定的交互效果。\n"
+    },
+    {
+      "id": "coding-015",
+      "title": "3D 魔方模拟",
+      "difficulty": "hard",
+      "tags": [
+        "3D",
+        "CSS Transform",
+        "算法"
+      ],
+      "content": "【任务】：创建一个单文件 3x3 魔方模拟器。\n\n【技术要求】：\n- 零依赖：仅使用原生 HTML、CSS、JavaScript，禁止任何外部库（如 Three.js）。\n- 单文件：所有代码都在一个 HTML 文件内。\n- 渲染：使用 CSS 3D Transforms 实现 3D 效果。\n\n【功能要求】：\n- 鼠标拖动旋转视角。\n- 按钮控制层面旋转 (U, U', R, R' 等)。\n- \"打乱\"和\"重置\"功能。\n"
+    }
+  ]
+}
