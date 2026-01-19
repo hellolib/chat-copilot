@@ -1,6 +1,6 @@
 {
   "name": "chat-copilot",
-  "version": "0.1.0",
+  "version": "0.13.1",
   "description": "AI 对话增强助手",
   "private": true,
   "scripts": {
