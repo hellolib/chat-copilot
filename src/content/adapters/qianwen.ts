@@ -12,6 +12,15 @@ export class QianwenAdapter extends BaseAdapter {
     return window.location.hostname.includes('chat.qwen.ai');
   }
 
+  private readonly SEND_BUTTON_SELECTORS = {
+    qwenChat: [
+      '.omni-button-content button',
+      '.chat-prompt-send-button .send-button',
+      '.chat-prompt-send-button .stop-button',
+    ],
+    qwenWeb: ['span[data-icon-type="qwpcicon-sendChat"]'],
+  };
+
   getInputElement(): HTMLElement | null {
     if (this.isQwenChat()) {
       return document.querySelector('textarea#chat-input.chat-input');
@@ -21,12 +30,18 @@ export class QianwenAdapter extends BaseAdapter {
   }
 
   getSendButton(): HTMLElement | null {
-    if (this.isQwenChat()) {
-      // chat.qwen.ai 的“发送”按钮是动态出现的；这里用一个稳定存在的右侧按钮做就绪检测/定位。
-      return document.querySelector('.prompt-input-action-bar .omni-button-content button');
+    const selectors = this.isQwenChat()
+      ? this.SEND_BUTTON_SELECTORS.qwenChat
+      : this.SEND_BUTTON_SELECTORS.qwenWeb;
+
+    for (const selector of selectors) {
+      const element = document.querySelector(selector);
+      if (element) {
+        return element as HTMLElement;
+      }
     }
 
-    return document.querySelector('span[data-icon-type="qwpcicon-sendChat"]');
+    return null;
   }
 
   getInputValue(): string {
@@ -66,7 +81,10 @@ export class QianwenAdapter extends BaseAdapter {
     if (this.isQwenChat()) {
       return this.findElementWithStrategies([
         // 策略1: action bar 左侧按钮区域（最稳定）
-        () => document.querySelector('.prompt-input-action-bar .action-bar-left-btns') as HTMLElement,
+        () => {
+          const sendButton = this.getSendButton();
+          return sendButton?.parentElement as HTMLElement || null;
+        },
 
         // 策略2: action bar 左侧容器
         () => document.querySelector('.prompt-input-action-bar .action-bar-left') as HTMLElement,
