@@ -19,6 +19,7 @@ export class UIManager {
   private currentDialog: HTMLElement | null = null;
   private isLoading = false;
   private themeDetectTimeout: ReturnType<typeof setTimeout> | null = null;
+  private tooltip: HTMLElement | null = null;
   private promptSidebar: PromptSidebar;
 
   constructor(adapter: PlatformAdapter) {
@@ -59,8 +60,36 @@ export class UIManager {
    */
   init(): void {
     this.initTheme();
+    this.initTooltip();
     this.injectButton();
     this.promptSidebar.init();
+  }
+
+  /**
+   * 初始化 Tooltip (Portal 模式)
+   */
+  private initTooltip(): void {
+    if (document.querySelector('.chat-copilot-btn-tooltip')) return;
+
+    this.tooltip = document.createElement('div');
+    this.tooltip.className = 'chat-copilot-btn-tooltip';
+    this.tooltip.textContent = '优化提示词';
+    document.body.appendChild(this.tooltip);
+  }
+
+  /**
+   * 更新 Tooltip 位置
+   */
+  private updateTooltipPosition(): void {
+    if (!this.button || !this.tooltip) return;
+
+    const rect = this.button.getBoundingClientRect();
+    // 居中显示在按钮上方，保持 8px 间距
+    const left = rect.left + rect.width / 2;
+    const top = rect.top - 8;
+
+    this.tooltip.style.left = `${left}px`;
+    this.tooltip.style.top = `${top}px`;
   }
 
   /**
@@ -249,6 +278,17 @@ export class UIManager {
       } else {
         this.handleOptimize();
       }
+    });
+
+    // Tooltip 悬浮事件
+    button.addEventListener('mouseenter', () => {
+      if (!this.tooltip) this.initTooltip();
+      this.updateTooltipPosition();
+      this.tooltip?.classList.add('visible');
+    });
+
+    button.addEventListener('mouseleave', () => {
+      this.tooltip?.classList.remove('visible');
     });
 
     return button;

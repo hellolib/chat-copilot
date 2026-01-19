@@ -159,6 +159,57 @@
   pointer-events: none;
 }
 
+/* Tooltip - 提示文字 (Portal 模式) */
+.chat-copilot-btn-tooltip {
+  position: fixed;
+  z-index: var(--cc-z-tooltip);
+  background: var(--cc-text-primary);
+  color: var(--cc-text-inverse);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: var(--cc-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  transform: translate(-50%, calc(-100% + 10px));
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--cc-shadow-md);
+  white-space: nowrap;
+}
+
+.chat-copilot-btn-tooltip.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -100%);
+}
+
+/* Tooltip Arrow */
+.chat-copilot-btn-tooltip::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid var(--cc-text-primary);
+}
+
+[data-theme="dark"] .chat-copilot-btn-tooltip,
+.dark .chat-copilot-btn-tooltip {
+  background: var(--cc-bg-muted);
+  color: var(--cc-text-primary);
+  border: 1px solid var(--cc-border);
+}
+
+[data-theme="dark"] .chat-copilot-btn-tooltip::after,
+.dark .chat-copilot-btn-tooltip::after {
+  border-bottom-color: transparent;
+  border-top-color: var(--cc-bg-muted);
+}
+
 /* ========================================
  * Loading Spinner - 加载动画
  * ======================================== */
@@ -172,7 +223,9 @@
 }
 
 @keyframes cc-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ========================================
@@ -215,6 +268,7 @@
     opacity: 0;
     transform: scale(0.95) translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
@@ -770,6 +824,7 @@
     opacity: 0;
     transform: translateX(-50%) translateY(-10px);
   }
+
   to {
     opacity: 1;
     transform: translateX(-50%) translateY(0);
@@ -781,6 +836,7 @@
     opacity: 1;
     transform: translateX(-50%) translateY(0);
   }
+
   to {
     opacity: 0;
     transform: translateX(-50%) translateY(-10px);
@@ -1294,6 +1350,7 @@
   from {
     transform: translateX(100%);
   }
+
   to {
     transform: translateX(0);
   }
