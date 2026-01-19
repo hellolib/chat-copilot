@@ -116,7 +116,7 @@ export class ChatGPTAdapter extends BaseAdapter {
   protected styleButton(button: HTMLElement): void {
     super.styleButton(button);
     // ChatGPT 特定的样式调整
-    button.style.height = '36px';
+    button.style.height = '32px';
     button.style.borderRadius = '16px';
   }
 

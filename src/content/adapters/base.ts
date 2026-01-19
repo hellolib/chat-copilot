@@ -71,20 +71,13 @@ export abstract class BaseAdapter implements PlatformAdapter {
   protected styleButton(button: HTMLElement): void {
     button.className = 'chat-copilot-btn';
     button.innerHTML = '';
+    // 保留必要的布局样式，但让 CSS 控制悬停效果（背景色、透明度、变换等）
+    // 这样可以保持悬停效果的一致性（绿色特效）
     button.style.cssText = `
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
-      border: none;
-      padding: 0;
-      border-radius: 8px;
-      background: transparent;
-      cursor: pointer;
-      transition: all 0.2s;
       z-index: 1000;
-      opacity: 0.7;
-      display: inline-flex;
       position: relative;
     `;
 
@@ -107,19 +100,6 @@ export abstract class BaseAdapter implements PlatformAdapter {
     };
 
     button.appendChild(icon);
-
-    // 悬停效果
-    button.addEventListener('mouseenter', () => {
-      button.style.background = 'rgba(0, 0, 0, 0.08)';
-      button.style.opacity = '1';
-      button.style.transform = 'scale(1.05)';
-    });
-
-    button.addEventListener('mouseleave', () => {
-      button.style.background = 'transparent';
-      button.style.opacity = '0.7';
-      button.style.transform = 'scale(1)';
-    });
   }
 
   /**
