@@ -402,7 +402,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--cc-space-4);
-  margin-bottom: var(--cc-space-4);
+  /* margin-bottom: var(--cc-space-4); */
 }
 
 @media (max-width: 768px) {
@@ -444,7 +444,7 @@
   padding: var(--cc-space-4);
   display: flex;
   flex-direction: column;
-  border-left: 3px solid var(--cc-success);
+  border: 1px solid var(--cc-border);
 }
 
 /* Content Box */
@@ -619,7 +619,7 @@
   justify-content: flex-end;
   align-items: center;
   gap: var(--cc-space-2);
-  padding: var(--cc-space-3) var(--cc-space-4);
+  padding: 10px 16px;
   flex-shrink: 0;
   background: var(--cc-bg-subtle);
   border-top: 1px solid var(--cc-border);
