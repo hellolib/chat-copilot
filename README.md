@@ -1,20 +1,17 @@
 <div align="center">
 
-<div style="background-color: white; padding: 20px; border-radius: 50%; display: inline-block;">
-
-<img src="src/assets/chat-copilot-btn.png" alt="Chat Copilot Logo" width="80"/>
-
-</div>
+<img src="src/assets/chat-copilot-btn.svg" alt="Chat Copilot Logo" width="120"/>
 
 # Chat Copilot
 
-### AI 对话增强助手 - 让每一次 AI 对话都更高效
+**AI 对话增强助手 - 让每一次 AI 对话都更高效**
 
+[![Chrome Web Store](https://img.shields.io/chrome-web-store/v/ignafelbdjojmmofofhldldpgkceflal?label=Chrome%20Web%20Store&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/chat-copilot/ignafelbdjojmmofofhldldpgkceflal)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Chrome](https://img.shields.io/badge/Chrome-Manifest%20V3-green.svg)](https://developer.chrome.com/docs/extensions/mv3/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 
-[功能特性](#-功能特性) • [快速开始](#-快速开始) • [贡献指南](#-贡献指南)
+[🌐 官网](https://chatcopilot.com.cn) • [📦 Chrome 商店](https://chromewebstore.google.com/detail/chat-copilot/ignafelbdjojmmofofhldldpgkceflal) • [📖 文档](https://chatcopilot.com.cn/docs/guides/introduce)
 
 </div>
 
@@ -24,59 +21,83 @@
 
 Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对话增强助手，旨在提升用户在使用 AI 平台时的效率和体验。通过智能提示词优化，帮助用户获得更精准、更高质量的 AI 回复。
 
-支持的平台:
+### 支持的平台
 
-[ChatGPT](https://chatgpt.com) · [Claude](https://claude.ai) · [Gemini](https://gemini.google.com) · [Grok](https://grok.com) · [千问](https://qianwen.com) · [千问(国际版)](https://chat.qwen.ai) · [文心一言](https://yiyan.baidu.com) · [腾讯元宝](https://yuanbao.tencent.com) · [DeepSeek](https://chat.deepseek.com)
+| 国际平台 | 国内平台 |
+|---------|---------|
+| <img src="src/assets/website-icons/chatgpt.png" width="16"/> [ChatGPT](https://chatgpt.com) | <img src="src/assets/website-icons/qianwen.png" width="16"/> [通义千问](https://qianwen.com) |
+| <img src="src/assets/website-icons/claude.png" width="16"/> [Claude](https://claude.ai) | <img src="src/assets/website-icons/qianwen.png" width="16"/> [千问国际版](https://chat.qwen.ai) |
+| <img src="src/assets/website-icons/gemini.png" width="16"/> [Gemini](https://gemini.google.com) | <img src="src/assets/website-icons/deepseek.png" width="16"/> [DeepSeek](https://chat.deepseek.com) |
+| <img src="src/assets/website-icons/grok.png" width="16"/> [Grok](https://grok.com) | <img src="src/assets/website-icons/yiyan.png" width="16"/> [文心一言](https://yiyan.baidu.com) |
+| | <img src="src/assets/website-icons/yuanbao.png" width="16"/> [腾讯元宝](https://yuanbao.tencent.com) |
 
 ---
 
 ## 功能特性
 
-### 智能提示词优化
+### 🚀 智能提示词优化
 
-- **自动优化**：基于规则引擎智能分析和优化用户输入的提示词
-- **多维度增强**：提供清晰度、结构化、上下文完整性等多维度优化建议
-- **实时预览**：在发送前预览优化后的提示词，支持一键应用
+- **一键优化** - 基于规则引擎智能分析和优化用户输入的提示词
+- **多维度增强** - 提供清晰度、结构化、上下文完整性等多维度优化
+- **实时预览** - 发送前预览优化后的提示词，支持一键应用
+- **自定义模型** - 支持自定义提示词优化模型，灵活配置优化策略
+
+### 🎯 核心优势
+
+- **多平台支持** - 覆盖主流 AI 对话平台，一个插件搞定所有
+- **隐私优先** - 数据本地存储，不上传任何对话内容
+- **轻量快速** - 基于 Manifest V3，性能优异，资源占用低
 
 ---
 
-## 开始使用
+## 快速开始
 
 ### 方式一：Chrome 商店安装（推荐）
 
-1. 访问 [Chrome Web Store](https://chrome.google.com/webstore/detail/chat-copilot/xxx)
+1. 访问 [Chrome Web Store](https://chromewebstore.google.com/detail/chat-copilot/ignafelbdjojmmofofhldldpgkceflal)
 2. 点击「添加至 Chrome」按钮
 3. 在弹出确认框中点击「添加扩展程序」
 4. 安装完成，在支持的 AI 平台页面即可看到功能入口
 
 ### 方式二：开发者模式安装
 
-1. **克隆仓库**
-
 ```bash
+# 克隆仓库
 git clone https://github.com/hellolib/chat-copilot.git
 cd chat-copilot
-```
 
-2. **安装依赖**
-
-```bash
+# 安装依赖
 npm install
-```
 
-3. **构建项目**
-
-```bash
+# 构建项目
 npm run build
 ```
 
-4. **加载扩展**
+**加载扩展：**
 
-   - 打开 Chrome 浏览器，访问 `chrome://extensions/`
-   - 开启右上角的「开发者模式」
-   - 点击「加载已解压的扩展程序」
-   - 选择项目根目录下的 `build/chat-copilot` 文件夹
-   - 扩展安装完成，在支持的 AI 平台页面即可看到功能入口
+1. 打开 Chrome 浏览器，访问 `chrome://extensions/`
+2. 开启右上角的「开发者模式」
+3. 点击「加载已解压的扩展程序」
+4. 选择项目根目录下的 `build/chat-copilot` 文件夹
+5. 扩展安装完成，在支持的 AI 平台页面即可看到功能入口
+
+---
+
+## 开发
+
+```bash
+# 开发模式（带监听）
+npm run dev
+
+# 类型检查
+npm run type-check
+
+# 代码检查
+npm run lint
+
+# 格式化代码
+npm run format
+```
 
 ---
 
@@ -84,29 +105,18 @@ npm run build
 
 欢迎所有形式的贡献！
 
-### 贡献方式
+| 贡献方式 | 说明 |
+|---------|------|
+| 报告问题 | 在 [Issues](https://github.com/hellolib/chat-copilot/issues) 中报告 Bug 或提出功能建议 |
+| 提交代码 | Fork 项目，创建分支，提交 Pull Request |
+| 完善文档 | 改进文档内容，补充使用示例 |
+| 分享反馈 | 分享使用体验，帮助改进产品 |
 
-1. **报告问题**：在 [Issues](https://github.com/hellolib/chat-copilot/issues) 中报告 Bug 或提出功能建议
-2. **提交代码**：Fork 项目，创建分支，提交 Pull Request
-3. **完善文档**：改进文档内容，补充使用示例
-4. **分享反馈**：分享使用体验，帮助改进产品
+**开发规范：**
 
-### 开发规范
-
-1. **代码风格**
-   - 遵循 ESLint 和 Prettier 配置
-   - 使用有意义的变量和函数命名
-   - 添加必要的注释和文档
-
-2. **提交规范**
-   - 提交信息清晰明确
-   - 参考 [Conventional Commits](https://www.conventionalcommits.org/)
-   - 单次提交聚焦单一功能
-
-3. **测试要求**
-   - 确保代码通过类型检查（`npm run type-check`）
-   - 确保代码通过 Lint 检查（`npm run lint`）
-   - 在多个平台上测试功能
+- 遵循 ESLint 和 Prettier 配置
+- 参考 [Conventional Commits](https://www.conventionalcommits.org/) 提交规范
+- 确保代码通过 `npm run type-check` 和 `npm run lint` 检查
 
 ---
 
@@ -116,29 +126,18 @@ npm run build
 
 ---
 
-## 致谢
-
-🙏 感谢所有为本项目做出贡献的开发者和用户。
-
-特别感谢以下开源项目：
-- [Chrome Extension Samples](https://github.com/GoogleChrome/chrome-extensions-samples)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Webpack](https://webpack.js.org/)
-- [Claude Code](https://claude.ai/code)
-
----
-
 ## 联系方式
 
+- **官网**：[chatcopilot.com.cn](https://chatcopilot.com.cn)
 - **GitHub Issues**：[提交问题](https://github.com/hellolib/chat-copilot/issues)
-- **📮 Email**：bigoxevan@gmil.com
+- **Email**：bigoxevan@gmail.com
 
 ---
 
 <div align="center">
 
-**如果这个项目对您有帮助，请给一个 ⭐️ Star**
+**如果这个项目对您有帮助，请给一个 Star ⭐**
 
-Made with ❤️ by Chat Copilot Team
+Made with ❤️ by [Chat Copilot Team](https://github.com/hellolib/chat-copilot)
 
 </div>
