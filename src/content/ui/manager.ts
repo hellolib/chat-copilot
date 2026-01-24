@@ -489,12 +489,6 @@ export class UIManager {
               </div>
             </div>
           </div>
-          <div class="chat-copilot-improvements">
-            <h4>优化项</h4>
-            <div class="chat-copilot-improvements-list">
-              ${improvementsHtml}
-            </div>
-          </div>
         </div>
         <div class="chat-copilot-dialog-footer">
           <button class="chat-copilot-btn-reoptimize">重新优化</button>
