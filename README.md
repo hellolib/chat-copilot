@@ -41,6 +41,7 @@ Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对
 - **多维度增强** - 提供清晰度、结构化、上下文完整性等多维度优化
 - **实时预览** - 发送前预览优化后的提示词，支持一键应用
 - **自定义模型** - 支持自定义提示词优化模型，灵活配置优化策略
+- **自定义提示词风格** - 支持自定义提示词风格，满足不同场景需求
 
 ### 🎯 核心优势
 
@@ -117,6 +118,15 @@ npm run format
 - 遵循 ESLint 和 Prettier 配置
 - 参考 [Conventional Commits](https://www.conventionalcommits.org/) 提交规范
 - 确保代码通过 `npm run type-check` 和 `npm run lint` 检查
+
+---
+
+## TODO
+
+- [ ] 导出聊天记录 - 支持多种格式、包含历史和元数据
+- [ ] 提示词收藏夹 - 提示词对比页面收藏功能、管理收藏
+- [ ] 暗黑模式优化 - 修复图标颜色、整体 UI 适配
+- [ ] 支持图像平台 - 扩展至图像生成 AI 平台
 
 ---
 
