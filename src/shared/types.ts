@@ -158,10 +158,72 @@ export const QUICK_ACCESS_SITES: QuickAccessSite[] = [
 ];
 
 // 用户设置
+export type PromptMethodTagId =
+  | 'roleplay'
+  | 'reward'
+  | 'stepwise'
+  | 'structured'
+  | 'completeness'
+  | 'style'
+  | 'refusal';
+
+export interface PromptMethodTag {
+  id: PromptMethodTagId;
+  name: string;
+  description: string;
+  prompt: string;
+}
+
+export const PROMPT_METHOD_TAGS: PromptMethodTag[] = [
+  {
+    id: 'roleplay',
+    name: '角色扮演',
+    description: '明确身份、目标、职责边界与专业口径，强化角色一致性。',
+    prompt: '明确身份、目标、职责边界、专业口径、能力范围与不可做事项。',
+  },
+  {
+    id: 'reward',
+    name: '奖惩机制',
+    description: '引入评分与合格门槛，用奖励/惩罚驱动质量。',
+    prompt: '引入评分/合格门槛、奖惩条件与失败处理规则，强化质量控制。',
+  },
+  {
+    id: 'stepwise',
+    name: '分步执行',
+    description: '以阶段/步骤推进任务，但不暴露隐藏推理。',
+    prompt: '明确“先规划后执行”的步骤与里程碑输出，但禁止暴露隐藏推理。',
+  },
+  {
+    id: 'structured',
+    name: '输出结构化',
+    description: '固定模板与字段层级，便于落地执行。',
+    prompt: '明确输出模板、字段定义、顺序、层级与示例字段值类型（非示例内容）。',
+  },
+  {
+    id: 'completeness',
+    name: '要素完备',
+    description: '明确必填要素与缺失处理规则，降低遗漏。',
+    prompt: '列出必填要素、可选要素、缺失处理与默认值规则。',
+  },
+  {
+    id: 'style',
+    name: '风格对齐',
+    description: '锁定语气、受众与语言级别，统一表达。',
+    prompt: '指定语气、受众、语言级别、术语密度、长度范围与格式偏好。',
+  },
+  {
+    id: 'refusal',
+    name: '拒答边界',
+    description: '清晰边界与替代策略，确保合规。',
+    prompt: '明确不可触碰的内容范围、合规优先级与安全替代输出策略。',
+  },
+];
+
 export interface UserSettings {
   currentModelId: string;
   language: string;
   enabledQuickAccessSites?: string[]; // 启用的快速访问站点 ID 列表，默认全部启用
+  promptMethodTagIds?: PromptMethodTagId[];
 }
 
 // 平台适配器接口

@@ -16,6 +16,7 @@ export class StorageManager {
         currentModelId: 'builtin-rules',
         language: 'zh-CN',
         enabledQuickAccessSites: QUICK_ACCESS_SITES.map(site => site.id), // 默认全部启用
+        promptMethodTagIds: [],
       };
 
       const existing = await this.get<UserSettings>('settings');
@@ -23,12 +24,12 @@ export class StorageManager {
         await this.set('settings', defaults);
       } else {
         const allSiteIds = QUICK_ACCESS_SITES.map(site => site.id);
+        let shouldSave = false;
 
         // 如果已存在设置但没有 enabledQuickAccessSites，则添加默认值
         if (!existing.enabledQuickAccessSites) {
           existing.enabledQuickAccessSites = allSiteIds;
-          await this.set('settings', existing);
-          return;
+          shouldSave = true;
         }
 
         // 兼容新增站点：把新增的 site id 合并进已启用列表（不移除用户已有配置）
@@ -42,6 +43,15 @@ export class StorageManager {
         }
         if (changed) {
           existing.enabledQuickAccessSites = Array.from(enabled);
+          shouldSave = true;
+        }
+
+        if (!existing.promptMethodTagIds) {
+          existing.promptMethodTagIds = [];
+          shouldSave = true;
+        }
+
+        if (shouldSave) {
           await this.set('settings', existing);
         }
       }

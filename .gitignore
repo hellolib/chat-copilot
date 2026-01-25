@@ -19,6 +19,7 @@ proxy.go
 /.cursor/
 /.gemini/
 /.shared/
+/.codex/
 /.specstory/
 /docs/
 /.claudeignore

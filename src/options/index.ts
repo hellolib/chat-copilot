@@ -3,7 +3,7 @@
  */
 
 import './styles.css';
-import { ModelConfig, ModelProvider, MODEL_PRESETS, MessageType, QUICK_ACCESS_SITES, PROVIDER_ICONS, CustomRule } from '@shared/types';
+import { ModelConfig, ModelProvider, MODEL_PRESETS, MessageType, QUICK_ACCESS_SITES, PROVIDER_ICONS, CustomRule, PROMPT_METHOD_TAGS, PromptMethodTagId } from '@shared/types';
 import { ConfigValidator } from '@shared/validators';
 import { Toast } from '@shared/toast';
 
@@ -14,6 +14,7 @@ class OptionsApp {
   private editingModelId: string | null = null;
   private customRules: CustomRule[] = [];
   private editingCustomRuleId: string | null = null;
+  private promptMethodTagIds: PromptMethodTagId[] = [];
 
   async init(): Promise<void> {
     this.initTheme();
@@ -21,6 +22,7 @@ class OptionsApp {
     await this.loadModels();
     await this.loadSettings();
     await this.loadCustomRules();
+    this.renderPromptMethodTags();
     this.bindEvents();
     this.renderModelList();
     await this.renderQuickAccess();
@@ -140,6 +142,7 @@ class OptionsApp {
   private async loadSettings(): Promise<void> {
     const result = await chrome.storage.local.get(['settings']);
     this.currentModelId = result.settings?.currentModelId ?? 'builtin-rules';
+    this.promptMethodTagIds = result.settings?.promptMethodTagIds ?? ['roleplay'];
   }
 
   private renderModelList(): void {
@@ -307,6 +310,48 @@ class OptionsApp {
       e.preventDefault();
       this.saveCustomRule();
     });
+
+    document.getElementById('prompt-methods-list')?.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target && target.classList.contains('prompt-method-checkbox')) {
+        this.savePromptMethodTags();
+      }
+    });
+  }
+
+  private renderPromptMethodTags(): void {
+    const container = document.getElementById('prompt-methods-list');
+    if (!container) { return; }
+
+    container.innerHTML = PROMPT_METHOD_TAGS
+      .map((tag) => {
+        const checked = this.promptMethodTagIds.includes(tag.id) ? 'checked' : '';
+        return `
+          <label class="prompt-method-tag">
+            <input type="checkbox" class="prompt-method-checkbox" data-id="${tag.id}" ${checked}>
+            <span class="prompt-method-title">${this.escapeHtml(tag.name)}</span>
+          </label>
+        `;
+      })
+      .join('');
+  }
+
+  private async savePromptMethodTags(): Promise<void> {
+    const container = document.getElementById('prompt-methods-list');
+    if (!container) { return; }
+
+    const selectedIds: PromptMethodTagId[] = [];
+    container.querySelectorAll<HTMLInputElement>('.prompt-method-checkbox').forEach((checkbox) => {
+      if (checkbox.checked) {
+        const id = checkbox.dataset.id as PromptMethodTagId;
+        if (id) {
+          selectedIds.push(id);
+        }
+      }
+    });
+
+    this.promptMethodTagIds = selectedIds;
+    await this.saveSettings({ promptMethodTagIds: selectedIds });
   }
 
   private selectProvider(provider: ModelProvider): void {

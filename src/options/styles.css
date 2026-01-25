@@ -982,6 +982,58 @@ html {
 }
 
 /* ========================================
+ * Prompt Methods - 提示词风格
+ * ======================================== */
+.prompt-methods-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.prompt-method-tag {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-subtle);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.prompt-method-tag:hover {
+  background: var(--color-bg-muted);
+  border-color: var(--color-border);
+}
+
+.prompt-method-tag:has(input:checked) {
+  background: var(--color-primary-subtle);
+  border-color: var(--color-primary-light);
+}
+
+.prompt-method-checkbox {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+
+.prompt-method-title {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========================================
  * Custom Rules - 自定义规则
  * ======================================== */
 .custom-rules-list {
@@ -1263,4 +1315,3 @@ html {
   line-height: 1.6;
   resize: vertical;
 }
-
