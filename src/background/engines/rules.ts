@@ -104,7 +104,6 @@ export class RulesEngine {
    * 优化 Prompt
    */
   optimize(prompt: string): OptimizeResponse {
-    const improvements: string[] = [];
     let optimized = prompt.trim();
 
     // 构建上下文
@@ -120,14 +119,12 @@ export class RulesEngine {
       // 检查规则是否适用
       if (rule.check(optimized, context)) {
         optimized = rule.apply(optimized, context);
-        improvements.push(rule.description);
       }
     }
 
     return {
       original: prompt,
       optimized,
-      improvements,
     };
   }
 

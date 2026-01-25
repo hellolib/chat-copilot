@@ -434,27 +434,6 @@ export class UIManager {
     // 获取模型信息
     const modelInfo = await this.getCurrentModelInfo();
 
-    // 生成优化项标签
-    const maxVisibleTags = 6;
-    const visibleTags = result.improvements.slice(0, maxVisibleTags);
-    const hiddenTags = result.improvements.slice(maxVisibleTags);
-
-    let improvementsHtml = visibleTags
-      .map((i) => `<span class="chat-copilot-improvement-tag">✅ ${i}</span>`)
-      .join('');
-
-    if (hiddenTags.length > 0) {
-      const hiddenTagsHtml = hiddenTags
-        .map((i) => `<span class="chat-copilot-hidden-tag">✅ ${i}</span>`)
-        .join('');
-      improvementsHtml += `
-        <span class="chat-copilot-more-tags">
-          +${hiddenTags.length} 更多
-          <div class="chat-copilot-hidden-tags">${hiddenTagsHtml}</div>
-        </span>
-      `;
-    }
-
     const logoUrl = this.getExtensionURL('assets/chat-copilot-btn.svg');
 
     const dialog = document.createElement('div');
@@ -551,32 +530,6 @@ export class UIManager {
     const optimizedContent = this.currentDialog.querySelector('.chat-copilot-optimized .chat-copilot-content-box p');
     if (optimizedContent) {
       optimizedContent.textContent = result.optimized;
-    }
-
-    // 更新优化项
-    const improvementsList = this.currentDialog.querySelector('.chat-copilot-improvements-list');
-    if (improvementsList) {
-      const maxVisibleTags = 6;
-      const visibleTags = result.improvements.slice(0, maxVisibleTags);
-      const hiddenTags = result.improvements.slice(maxVisibleTags);
-
-      let improvementsHtml = visibleTags
-        .map((i) => `<span class="chat-copilot-improvement-tag">✅ ${i}</span>`)
-        .join('');
-
-      if (hiddenTags.length > 0) {
-        const hiddenTagsHtml = hiddenTags
-          .map((i) => `<span class="chat-copilot-hidden-tag">✅ ${i}</span>`)
-          .join('');
-        improvementsHtml += `
-          <span class="chat-copilot-more-tags">
-            +${hiddenTags.length} 更多
-            <div class="chat-copilot-hidden-tags">${hiddenTagsHtml}</div>
-          </span>
-        `;
-      }
-
-      improvementsList.innerHTML = improvementsHtml;
     }
 
     // 更新按钮事件

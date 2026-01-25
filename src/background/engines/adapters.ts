@@ -82,7 +82,6 @@ export class OpenAIAdapter implements APIAdapter {
     return {
       original: prompt,
       optimized: optimizedPrompt.trim(),
-      improvements: this.analyzeImprovements(prompt, optimizedPrompt),
     };
   }
 
@@ -98,23 +97,6 @@ export class OpenAIAdapter implements APIAdapter {
     } catch {
       return false;
     }
-  }
-
-  private analyzeImprovements(original: string, optimized: string): string[] {
-    const improvements: string[] = [];
-    if (optimized.length > original.length * 1.5) {
-      improvements.push('补充了详细内容');
-    }
-    if (optimized.includes('角色') || optimized.includes('扮演')) {
-      improvements.push('添加了角色设定');
-    }
-    if (optimized.includes('格式') || optimized.includes('输出')) {
-      improvements.push('明确了输出格式');
-    }
-    if (improvements.length === 0) {
-      improvements.push('AI 模型优化');
-    }
-    return improvements;
   }
 
   /**
@@ -164,7 +146,6 @@ export class GeminiAdapter implements APIAdapter {
     return {
       original: prompt,
       optimized: optimizedPrompt.trim(),
-      improvements: ['Gemini 模型优化'],
     };
   }
 
@@ -228,7 +209,6 @@ export class ClaudeAdapter implements APIAdapter {
     return {
       original: prompt,
       optimized: optimizedPrompt.trim(),
-      improvements: this.analyzeImprovements(prompt, optimizedPrompt),
     };
   }
 
@@ -254,23 +234,6 @@ export class ClaudeAdapter implements APIAdapter {
     } catch {
       return false;
     }
-  }
-
-  private analyzeImprovements(original: string, optimized: string): string[] {
-    const improvements: string[] = [];
-    if (optimized.length > original.length * 1.5) {
-      improvements.push('补充了详细内容');
-    }
-    if (optimized.includes('角色') || optimized.includes('扮演')) {
-      improvements.push('添加了角色设定');
-    }
-    if (optimized.includes('格式') || optimized.includes('输出')) {
-      improvements.push('明确了输出格式');
-    }
-    if (improvements.length === 0) {
-      improvements.push('Claude 模型优化');
-    }
-    return improvements;
   }
 
   /**

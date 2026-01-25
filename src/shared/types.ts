@@ -36,7 +36,6 @@ export interface OptimizeRequest {
 export interface OptimizeResponse {
   original: string;
   optimized: string;
-  improvements: string[];
 }
 
 // 模型提供商类型
