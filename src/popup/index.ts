@@ -298,8 +298,25 @@ class PopupApp {
       chrome.runtime.openOptionsPage();
     });
 
-    document.getElementById('btn-help')?.addEventListener('click', () => {
-      chrome.tabs.create({ url: 'https://github.com/hellolib/chat-copilot' });
+    const moreBtn = document.getElementById('btn-more');
+    const moreDropdown = document.getElementById('more-dropdown');
+
+    moreBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!moreDropdown) { return; }
+      const isVisible = moreDropdown.style.display !== 'none';
+      moreDropdown.style.display = isVisible ? 'none' : 'block';
+    });
+
+    moreDropdown?.querySelectorAll('.more-item').forEach((item) => {
+      item.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const url = target.dataset.url;
+        if (url) {
+          chrome.tabs.create({ url });
+          window.close();
+        }
+      });
     });
 
     // 提示词广场入口点击事件
@@ -333,6 +350,14 @@ class PopupApp {
         if (card && dropdown && dropdown.style.display !== 'none') {
           if (!card.contains(e.target as Node) && !dropdown.contains(e.target as Node)) {
             this.toggleModelDropdown();
+          }
+        }
+
+        const more = document.getElementById('more-dropdown');
+        const moreButton = document.getElementById('btn-more');
+        if (more && moreButton && more.style.display !== 'none') {
+          if (!more.contains(e.target as Node) && !moreButton.contains(e.target as Node)) {
+            more.style.display = 'none';
           }
         }
       });

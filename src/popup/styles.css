@@ -421,6 +421,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
 }
 
 .popup-footer button {
@@ -446,6 +447,39 @@ body {
 
 .popup-footer button:active {
   transform: scale(0.98);
+}
+
+/* More Dropdown */
+.more-dropdown {
+  position: absolute;
+  right: var(--space-3);
+  bottom: calc(100% + var(--space-2));
+  background: var(--color-bg-base);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--color-border);
+  min-width: 180px;
+  padding: var(--space-2);
+  z-index: var(--z-dropdown);
+  animation: slideDown var(--transition-normal) var(--ease-out);
+}
+
+.more-item {
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.more-item:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-primary);
 }
 
 .btn-primary {
