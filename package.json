@@ -36,5 +36,8 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/hellolib/chat-copilot.git"
+  },
+  "dependencies": {
+    "@vicons/ionicons5": "^0.13.0"
   }
 }
