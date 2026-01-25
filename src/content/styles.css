@@ -1079,6 +1079,15 @@
   line-height: 1.4;
 }
 
+.chat-copilot-prompt-category input[type="radio"] {
+  width: 14px;
+  height: 14px;
+  accent-color: var(--cc-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
+}
+
 .chat-copilot-prompt-category:hover {
   border-color: rgba(99, 102, 241, 0.15);
   background: rgba(99, 102, 241, 0.03);

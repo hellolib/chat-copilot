@@ -3,10 +3,10 @@
  * 模型管理器，处理模型配置和 API 调用
  */
 
-import { ModelConfig, OptimizeRequest, OptimizeResponse } from '@shared/types';
+import { ModelConfig, OptimizeRequest, OptimizeResponse, UserSettings } from '@shared/types';
 import { StorageManager } from './storage';
 import { RulesEngine } from '../engines/rules';
-import { getAdapter } from '../engines/adapters';
+import { buildSystemPrompt, getAdapter } from '../engines/adapters';
 import { AppError, ErrorCode, ErrorHandler } from '@shared/errors';
 import { SecurityChecker } from '../security';
 
@@ -26,7 +26,7 @@ export class ModelManager {
    */
   async optimize(request: OptimizeRequest): Promise<OptimizeResponse> {
     try {
-      const settings = await this.storageManager.get<{ currentModelId: string }>('settings');
+      const settings = await this.storageManager.get<UserSettings>('settings');
       const modelId = settings?.currentModelId ?? 'builtin-rules';
 
       // 使用内置规则引擎
@@ -69,7 +69,7 @@ export class ModelManager {
       .map(rule => `- ${rule.name}: ${rule.content}`)
       .join('\n');
 
-    return `\n\n用户自定义规则要求：\n${rulesText}\n请在遵循上述规则的基础上，处理用户的请求。`;
+    return `\n\n[用户自定义规则]\n${rulesText}`;
   }
 
   /**
@@ -78,7 +78,8 @@ export class ModelManager {
   private async callModelAPI(model: ModelConfig, prompt: string): Promise<OptimizeResponse> {
     try {
       const adapter = getAdapter(model.provider);
-      return await adapter.optimize(model, prompt);
+      const systemPrompt = await this.buildSystemPrompt();
+      return await adapter.optimize(model, prompt, systemPrompt);
     } catch (error) {
       ErrorHandler.logError(error, `callModelAPI(${model.provider})`);
       if (error instanceof AppError) {
@@ -103,5 +104,12 @@ export class ModelManager {
       ErrorHandler.logError(error, `testConnection(${model.provider})`);
       return false;
     }
+  }
+
+  private async buildSystemPrompt(): Promise<string> {
+    const settings = await this.storageManager.get<UserSettings>('settings');
+    const methodTagIds = settings?.promptMethodTagIds ?? [];
+    const customRules = await this.storageManager.getCustomRules();
+    return buildSystemPrompt(methodTagIds, customRules);
   }
 }
