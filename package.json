@@ -6,15 +6,18 @@
   "scripts": {
     "dev": "webpack --mode development",
     "build": "webpack --mode production",
+    "release": "webpack --mode production && node scripts/release.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts,.tsx",
     "format": "prettier --write src/**/*.{ts,tsx,css}"
   },
   "devDependencies": {
+    "@types/archiver": "^7.0.0",
     "@types/chrome": "^0.0.268",
     "@types/node": "^20.11.0",
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",
+    "archiver": "^7.0.1",
     "copy-webpack-plugin": "^12.0.0",
     "css-loader": "^6.10.0",
     "css-minimizer-webpack-plugin": "^7.0.4",
