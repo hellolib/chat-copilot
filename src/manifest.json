@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Chat Copilot",
-  "version": "0.14.1",
+  "version": "0.14.2",
   "description": "AI 对话增强助手",
   "permissions": [
     "storage"

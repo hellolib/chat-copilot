@@ -223,7 +223,7 @@ export class PromptSidebar {
    */
   private renderPromptCard(prompt: PromptItem): string {
     const isFavorite = this.favoriteIds.has(prompt.id);
-    const categoryConfig = PROMPT_CATEGORIES.find(c => c.id === prompt.category);
+    PROMPT_CATEGORIES.find(c => c.id === prompt.category);
     const isContentExpanded = this.expandedPrompts.has(prompt.id);
     const isAnswerExpanded = this.expandedAnswers.has(prompt.id);
 
@@ -235,11 +235,13 @@ export class PromptSidebar {
 
     // 处理答案显示
     const hasAnswer = !!prompt.answer;
-    const needsAnswerExpand = hasAnswer && prompt.answer!.length > ANSWER_TRUNCATE_LENGTH;
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    const needsAnswerExpand = hasAnswer && prompt.answer?.length > ANSWER_TRUNCATE_LENGTH;
     const displayAnswer = hasAnswer
       ? (isAnswerExpanded || !needsAnswerExpand
         ? prompt.answer
-        : prompt.answer!.substring(0, ANSWER_TRUNCATE_LENGTH) + '...')
+        : prompt.answer?.substring(0, ANSWER_TRUNCATE_LENGTH) + '...')
       : '';
 
     // 难度标签
@@ -280,7 +282,7 @@ export class PromptSidebar {
               <span>参考答案</span>
             </div>
             <div class="chat-copilot-prompt-card-answer ${isAnswerExpanded ? 'expanded' : ''}">
-              <pre>${this.escapeHtml(displayAnswer!)}</pre>
+              <pre>${this.escapeHtml(displayAnswer ?? '')}</pre>
             </div>
             ${needsAnswerExpand ? `
               <button class="chat-copilot-prompt-expand-btn" data-prompt-id="${prompt.id}" data-type="answer">

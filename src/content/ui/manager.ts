@@ -69,7 +69,7 @@ export class UIManager {
    * 初始化 Tooltip (Portal 模式)
    */
   private initTooltip(): void {
-    if (document.querySelector('.chat-copilot-btn-tooltip')) return;
+    if (document.querySelector('.chat-copilot-btn-tooltip')) {return;}
 
     this.tooltip = document.createElement('div');
     this.tooltip.className = 'chat-copilot-btn-tooltip';
@@ -81,7 +81,7 @@ export class UIManager {
    * 更新 Tooltip 位置
    */
   private updateTooltipPosition(): void {
-    if (!this.button || !this.tooltip) return;
+    if (!this.button || !this.tooltip) {return;}
 
     const rect = this.button.getBoundingClientRect();
     // 居中显示在按钮上方，保持 8px 间距
@@ -282,7 +282,7 @@ export class UIManager {
 
     // Tooltip 悬浮事件
     button.addEventListener('mouseenter', () => {
-      if (!this.tooltip) this.initTooltip();
+      if (!this.tooltip) {this.initTooltip();}
       this.updateTooltipPosition();
       this.tooltip?.classList.add('visible');
     });

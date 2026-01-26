@@ -62,7 +62,7 @@ export async function loadBuiltinPrompts(): Promise<PromptItem[]> {
   try {
     // 并行加载所有分类
     const results = await Promise.all(
-      CATEGORY_FILES.map(category => loadCategoryPrompts(category))
+      CATEGORY_FILES.map(category => loadCategoryPrompts(category)),
     );
 
     // 合并所有提示词
@@ -107,7 +107,7 @@ export async function searchPrompts(query: string): Promise<PromptItem[]> {
   return allPrompts.filter(p =>
     p.title.toLowerCase().includes(lowerQuery) ||
     p.content.toLowerCase().includes(lowerQuery) ||
-    p.tags.some(tag => tag.toLowerCase().includes(lowerQuery))
+    p.tags.some(tag => tag.toLowerCase().includes(lowerQuery)),
   );
 }
 

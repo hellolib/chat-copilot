@@ -60,7 +60,21 @@ Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对
 3. 在弹出确认框中点击「添加扩展程序」
 4. 安装完成，在支持的 AI 平台页面即可看到功能入口
 
-### 方式二：开发者模式安装
+### 方式二：Release 下载安装
+
+1. 访问 [GitHub Releases](https://github.com/hellolib/chat-copilot/releases) 页面
+2. 下载最新版本的 `chat-copilot-vX.X.X.zip` 压缩包
+3. 解压压缩包到本地文件夹
+
+**加载扩展：**
+
+1. 打开 Chrome 浏览器，访问 `chrome://extensions/`
+2. 开启右上角的「开发者模式」
+3. 点击「加载已解压的扩展程序」
+4. 选择解压后的文件夹
+5. 扩展安装完成，在支持的 AI 平台页面即可看到功能入口
+
+### 方式三：开发者模式安装
 
 ```bash
 # 克隆仓库
