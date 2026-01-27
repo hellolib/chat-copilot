@@ -55,6 +55,19 @@ export class UIManager {
     }
   }
 
+  private requestOpenOptionsPage(): void {
+    if (!this.isExtensionContextValid()) {
+      Toast.error('扩展已更新，请刷新页面后重试');
+      return;
+    }
+
+    chrome.runtime.sendMessage({ type: MessageType.OPEN_OPTIONS }, (response: MessageResponse) => {
+      if (!response?.success) {
+        Toast.error(response?.error || '打开设置页失败');
+      }
+    });
+  }
+
   /**
    * 初始化 UI
    */
@@ -389,7 +402,7 @@ export class UIManager {
   /**
    * 获取当前模型信息
    */
-  private async getCurrentModelInfo(): Promise<{ name: string; icon: string }> {
+  private async getCurrentModelInfo(): Promise<{ name: string; icon: string; isBuiltin: boolean }> {
     try {
       const result = await chrome.storage.local.get(['settings', 'models']);
       const modelId = result.settings?.currentModelId ?? 'builtin-rules';
@@ -398,6 +411,7 @@ export class UIManager {
         return {
           name: '内置规则引擎',
           icon: this.getExtensionURL('assets/models-icons/inner.svg'),
+          isBuiltin: true,
         };
       }
 
@@ -408,17 +422,20 @@ export class UIManager {
         return {
           name: model.name,
           icon: this.getExtensionURL(`assets/models-icons/${iconPath}`),
+          isBuiltin: false,
         };
       }
 
       return {
         name: '未知模型',
         icon: this.getExtensionURL('assets/models-icons/compatible.svg'),
+        isBuiltin: false,
       };
     } catch {
       return {
         name: '内置规则引擎',
         icon: this.getExtensionURL('assets/models-icons/inner.svg'),
+        isBuiltin: true,
       };
     }
   }
@@ -450,6 +467,12 @@ export class UIManager {
               ${modelInfo.icon ? `<img src="${modelInfo.icon}" class="chat-copilot-model-icon" alt="model" />` : ''}
               <span>${this.escapeHtml(modelInfo.name)}</span>
             </div>
+            ${modelInfo.isBuiltin ? `
+              <div class="chat-copilot-model-tip">
+                <span>内置规则引擎效果有限，建议</span>
+                <button class="chat-copilot-model-tip-action" type="button">添加自定义模型</button>
+              </div>
+            ` : ''}
           </div>
           <button class="chat-copilot-close">&times;</button>
         </div>
@@ -497,6 +520,9 @@ export class UIManager {
       // 不关闭弹窗，直接更新内容
       await this.handleOptimize(true, originalText);
     });
+    dialog.querySelector('.chat-copilot-model-tip-action')?.addEventListener('click', () => {
+      this.requestOpenOptionsPage();
+    });
 
     document.body.appendChild(dialog);
     this.currentDialog = dialog;
@@ -518,6 +544,28 @@ export class UIManager {
         ${modelInfoData.icon ? `<img src="${modelInfoData.icon}" class="chat-copilot-model-icon" alt="model" />` : ''}
         <span>${this.escapeHtml(modelInfoData.name)}</span>
       `;
+    }
+
+    // 更新内置模型提示
+    const headerLeft = this.currentDialog.querySelector('.chat-copilot-header-left');
+    const existingTip = this.currentDialog.querySelector('.chat-copilot-model-tip');
+    if (modelInfoData.isBuiltin) {
+      if (!existingTip && headerLeft) {
+        headerLeft.insertAdjacentHTML(
+          'beforeend',
+          `
+            <div class="chat-copilot-model-tip">
+              <span>内置规则引擎效果有限，建议</span>
+              <button class="chat-copilot-model-tip-action" type="button">添加自定义模型</button>
+            </div>
+          `,
+        );
+        headerLeft.querySelector('.chat-copilot-model-tip-action')?.addEventListener('click', () => {
+          this.requestOpenOptionsPage();
+        });
+      }
+    } else {
+      existingTip?.remove();
     }
 
     // 更新原始内容

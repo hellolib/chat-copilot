@@ -140,6 +140,21 @@ export class MessageHandler {
           break;
         }
 
+        case MessageType.OPEN_OPTIONS: {
+          try {
+            if (chrome.runtime.openOptionsPage) {
+              await chrome.runtime.openOptionsPage();
+            } else {
+              const optionsUrl = chrome.runtime.getURL('options/index.html');
+              await chrome.tabs.create({ url: optionsUrl });
+            }
+            sendResponse({ success: true });
+          } catch (error) {
+            throw new AppError(ErrorCode.UNKNOWN_ERROR, '打开设置页失败', error);
+          }
+          break;
+        }
+
         default:
           throw new AppError(ErrorCode.UNKNOWN_ERROR, `未知的消息类型: ${message.type}`);
       }

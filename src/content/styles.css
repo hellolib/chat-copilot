@@ -326,6 +326,7 @@
   display: flex;
   align-items: center;
   gap: var(--cc-space-3);
+  flex-wrap: wrap;
 }
 
 .chat-copilot-title {
@@ -364,6 +365,57 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+}
+
+.chat-copilot-model-tip {
+  font-family: var(--cc-font-family);
+  font-size: var(--cc-font-size-xs);
+  color: #92400E;
+  background: var(--cc-warning-light);
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  padding: 3px 8px;
+  border-radius: var(--cc-radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cc-space-2);
+  box-shadow: 0 1px 3px rgba(251, 191, 36, 0.12);
+}
+
+.chat-copilot-model-tip-action {
+  background: transparent;
+  color: #B45309;
+  border: none;
+  padding: 0;
+  font-size: var(--cc-font-size-xs);
+  cursor: pointer;
+  transition: all var(--cc-transition-fast);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.chat-copilot-model-tip-action:hover {
+  color: #92400E;
+}
+
+.chat-copilot-model-tip-action:focus-visible {
+  outline: 2px solid rgba(217, 119, 6, 0.4);
+  outline-offset: 2px;
+  border-radius: 9999px;
+}
+
+[data-theme="dark"] .chat-copilot-model-tip,
+.dark .chat-copilot-model-tip {
+  color: #FBBF24;
+  background: rgba(251, 191, 36, 0.12);
+  border-color: rgba(251, 191, 36, 0.35);
+  box-shadow: 0 1px 3px rgba(251, 191, 36, 0.12);
+}
+
+[data-theme="dark"] .chat-copilot-model-tip-action,
+.dark .chat-copilot-model-tip-action {
+  color: #FCD34D;
 }
 
 .chat-copilot-close {
