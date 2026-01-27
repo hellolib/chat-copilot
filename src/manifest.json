@@ -7,16 +7,7 @@
     "storage"
   ],
   "host_permissions": [
-    "https://chatgpt.com/*",
-    "https://chat.openai.com/*",
-    "https://claude.ai/*",
-    "https://gemini.google.com/*",
-    "https://grok.com/*",
-    "https://*.qianwen.com/*",
-    "https://chat.qwen.ai/*",
-    "https://yiyan.baidu.com/*",
-    "https://yuanbao.tencent.com/*",
-    "https://chat.deepseek.com/*"
+    "<all_urls>"
   ],
   "background": {
     "service_worker": "background/index.js",
@@ -25,16 +16,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://chatgpt.com/*",
-        "https://chat.openai.com/*",
-        "https://claude.ai/*",
-        "https://gemini.google.com/*",
-        "https://grok.com/*",
-        "https://*.qianwen.com/*",
-        "https://chat.qwen.ai/*",
-        "https://yiyan.baidu.com/*",
-        "https://yuanbao.tencent.com/*",
-        "https://chat.deepseek.com/*"
+        "<all_urls>"
       ],
       "js": [
         "content/index.js"
