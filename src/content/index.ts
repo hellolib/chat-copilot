@@ -26,6 +26,8 @@ class ContentScript {
       return;
     }
 
+    console.log('chat copilot init...');
+
     this.uiManager = new UIManager(adapter);
     this.uiManager.init();
 
