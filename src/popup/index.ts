@@ -312,7 +312,14 @@ class PopupApp {
       item.addEventListener('click', (e) => {
         const target = e.currentTarget as HTMLElement;
         const url = target.dataset.url;
-        if (url) {
+        const action = target.dataset.action;
+
+        if (action === 'open-about') {
+          // 打开设置页面并滚动到关于章节
+          const optionsUrl = chrome.runtime.getURL('options/index.html#section-about');
+          chrome.tabs.create({ url: optionsUrl });
+          window.close();
+        } else if (url) {
           chrome.tabs.create({ url });
           window.close();
         }

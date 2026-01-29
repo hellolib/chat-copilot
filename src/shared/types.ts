@@ -150,11 +150,12 @@ export const QUICK_ACCESS_SITES: QuickAccessSite[] = [
   { id: 'claude', name: 'Claude', url: 'https://claude.ai/', icon: 'claude.png' },
   { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/', icon: 'gemini.png' },
   { id: 'grok', name: 'Grok', url: 'https://grok.com/', icon: 'grok.png' },
-  { id: 'qianwen', name: '通义千问', url: 'https://www.qianwen.com/', icon: 'qianwen.png' },
+  { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/', icon: 'deepseek.png' },
   { id: 'qwen', name: 'Qwen', url: 'https://chat.qwen.ai/', icon: 'qianwen.png' },
   { id: 'yiyan', name: '文心一言', url: 'https://yiyan.baidu.com/', icon: 'yiyan.png' },
-  { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/', icon: 'deepseek.png' },
   { id: 'yuanbao', name: '元宝', url: 'https://yuanbao.tencent.com/', icon: 'yuanbao.png' },
+  { id: 'qianwen', name: '通义千问', url: 'https://www.qianwen.com/', icon: 'qianwen.png' },
+  { id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/', icon: 'perplexity.png' },
 ];
 
 // 用户设置

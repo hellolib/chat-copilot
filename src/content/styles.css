@@ -375,7 +375,7 @@
   border: 1px solid rgba(217, 119, 6, 0.35);
   padding: 3px 8px;
   border-radius: var(--cc-radius-sm);
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: var(--cc-space-2);
   box-shadow: 0 1px 3px rgba(251, 191, 36, 0.12);
