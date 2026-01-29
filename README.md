@@ -29,7 +29,7 @@ Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对
 | <img src="src/assets/website-icons/claude.png" width="16"/> [Claude](https://claude.ai) | <img src="src/assets/website-icons/qianwen.png" width="16"/> [千问国际版](https://chat.qwen.ai) |
 | <img src="src/assets/website-icons/gemini.png" width="16"/> [Gemini](https://gemini.google.com) | <img src="src/assets/website-icons/deepseek.png" width="16"/> [DeepSeek](https://chat.deepseek.com) |
 | <img src="src/assets/website-icons/grok.png" width="16"/> [Grok](https://grok.com) | <img src="src/assets/website-icons/yiyan.png" width="16"/> [文心一言](https://yiyan.baidu.com) |
-| | <img src="src/assets/website-icons/yuanbao.png" width="16"/> [腾讯元宝](https://yuanbao.tencent.com) |
+| <img src="src/assets/website-icons/perplexity.png" width="16"/> [Perplexity](https://www.perplexity.ai) | <img src="src/assets/website-icons/yuanbao.png" width="16"/> [腾讯元宝](https://yuanbao.tencent.com) |
 
 ---
 

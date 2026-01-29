@@ -29,6 +29,8 @@ class OptionsApp {
     await this.renderCustomRules();
     await this.loadPromptPlazaSettings();
     this.initSidebarNavigation();
+    // 处理页面加载时的 hash 导航
+    this.handleHashNavigation();
   }
 
   /**
@@ -85,6 +87,23 @@ class OptionsApp {
         item.classList.remove('active');
       }
     });
+  }
+
+  /**
+   * 处理页面加载时的 hash 导航
+   */
+  private handleHashNavigation(): void {
+    const hash = window.location.hash.slice(1); // 去掉 # 号
+    if (hash) {
+      // 等待 DOM 渲染完成后滚动
+      requestAnimationFrame(() => {
+        const targetSection = document.getElementById(hash);
+        if (targetSection) {
+          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          this.updateActiveNavItem(hash);
+        }
+      });
+    }
   }
 
   /**
@@ -289,6 +308,11 @@ class OptionsApp {
     // 反选按钮
     document.getElementById('btn-invert-selection')?.addEventListener('click', () => {
       this.invertQuickAccessSelection();
+    });
+
+    // 恢复默认设置按钮
+    document.getElementById('btn-reset-quick-access')?.addEventListener('click', () => {
+      this.resetQuickAccessToDefault();
     });
 
     // 提示词广场悬浮按钮开关
@@ -722,7 +746,10 @@ class OptionsApp {
     if (!container) { return; }
 
     const result = await chrome.storage.local.get(['settings']);
-    const enabledSiteIds = result.settings?.enabledQuickAccessSites ?? QUICK_ACCESS_SITES.map(s => s.id);
+    // 默认启用除 perplexity 和 qianwen之外的所有站点
+    const defaultDisabledSites = ['perplexity', 'qianwen'];
+    const defaultEnabledSites = QUICK_ACCESS_SITES.map(s => s.id).filter(id => !defaultDisabledSites.includes(id));
+    const enabledSiteIds = result.settings?.enabledQuickAccessSites ?? defaultEnabledSites;
 
     container.innerHTML = QUICK_ACCESS_SITES
       .map(
@@ -792,6 +819,20 @@ class OptionsApp {
       checkbox.checked = !checkbox.checked;
     });
     await this.saveQuickAccessSettings();
+  }
+
+  /**
+   * 恢复快速访问为默认设置
+   */
+  private async resetQuickAccessToDefault(): Promise<void> {
+    // 清除已保存的快速访问设置，使其下次使用默认值
+    const result = await chrome.storage.local.get(['settings']);
+    const settings = result.settings ?? {};
+    delete settings.enabledQuickAccessSites;
+    await chrome.storage.local.set({ settings });
+
+    // 重新渲染列表
+    await this.renderQuickAccess();
   }
 
   /**
