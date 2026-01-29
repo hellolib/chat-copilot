@@ -12,11 +12,15 @@ export class StorageManager {
    */
   async initDefaults(): Promise<void> {
     try {
+      // 默认禁用 perplexity 和 qianwen，其他站点默认启用
+      const defaultDisabledSites = ['perplexity', 'qianwen'];
+      const defaultEnabledSites = QUICK_ACCESS_SITES.map(site => site.id).filter(id => !defaultDisabledSites.includes(id));
+      
       const defaults: UserSettings = {
         currentModelId: 'builtin-rules',
         language: 'zh-CN',
-        enabledQuickAccessSites: QUICK_ACCESS_SITES.map(site => site.id), // 默认全部启用
-        promptMethodTagIds: [],
+        enabledQuickAccessSites: defaultEnabledSites,
+        promptMethodTagIds: ['roleplay'], // 默认选中角色扮演
       };
 
       const existing = await this.get<UserSettings>('settings');
@@ -28,7 +32,9 @@ export class StorageManager {
 
         // 如果已存在设置但没有 enabledQuickAccessSites，则添加默认值
         if (!existing.enabledQuickAccessSites) {
-          existing.enabledQuickAccessSites = allSiteIds;
+          // 默认禁用 perplexity 和 qianwen，其他站点默认启用
+          const defaultDisabledSites = ['perplexity', 'qianwen'];
+          existing.enabledQuickAccessSites = allSiteIds.filter(id => !defaultDisabledSites.includes(id));
           shouldSave = true;
         }
 
@@ -47,7 +53,7 @@ export class StorageManager {
         }
 
         if (!existing.promptMethodTagIds) {
-          existing.promptMethodTagIds = [];
+          existing.promptMethodTagIds = ['roleplay']; // 默认选中角色扮演
           shouldSave = true;
         }
 
