@@ -45,7 +45,9 @@ export class PerplexityAdapter extends BaseAdapter {
    */
   getInputValue(): string {
     const input = this.getInputElement();
-    if (!input) { return ''; }
+    if (!input) {
+      return '';
+    }
 
     // 处理 textarea
     if (input instanceof HTMLTextAreaElement) {
@@ -66,7 +68,7 @@ export class PerplexityAdapter extends BaseAdapter {
   /**
    * 设置输入框的值
    * Lexical 编辑器需要特殊处理以维护内部状态
-   * 
+   *
    * 最佳实践：
    * 1. 使用 paste 事件模拟（最可靠的方式）
    * 2. 回退使用 DOM 操作 + 事件触发
@@ -74,7 +76,9 @@ export class PerplexityAdapter extends BaseAdapter {
    */
   setInputValue(value: string): void {
     const input = this.getInputElement();
-    if (!input) { return; }
+    if (!input) {
+      return;
+    }
 
     // 处理 textarea
     if (input instanceof HTMLTextAreaElement) {
@@ -98,7 +102,6 @@ export class PerplexityAdapter extends BaseAdapter {
       input.focus();
       // 先选中所有内容
 
-
       // 方案1: 使用 paste 事件模拟（最可靠）
       const success = this.setValueViaPaste(input, value);
 
@@ -114,42 +117,56 @@ export class PerplexityAdapter extends BaseAdapter {
   }
 
   /**
-   * 使用 paste 事件模拟设置值（推荐方案）
-   * 这是更新 Lexical 编辑器最可靠的方式
+   * 使用 InputEvent 模拟粘贴（替代 ClipboardEvent）
+   * Lexical 编辑器更支持 InputEvent
    */
   private setValueViaPaste(input: HTMLElement, value: string): boolean {
     try {
-      console.log('Using paste event to set value...');
+      console.log('Using InputEvent to set value...');
+
+      // 1. 先选中所有内容
       const range = document.createRange();
       range.selectNodeContents(input);
-
-      // 1. 选中所有内容
       const selection = window.getSelection();
-      if (!selection) {return false;}
+      if (!selection) {
+        return false;
+      }
       selection.removeAllRanges();
       selection.addRange(range);
 
-      // 2. 创建 ClipboardEvent 并使用 DataTransfer
-      const dataTransfer = new DataTransfer();
-      dataTransfer.setData('text/plain', value);
-
-      const pasteEvent = new ClipboardEvent('paste', {
+      // 2. 触发 beforeinput 事件（插入类型设为 insertFromPaste）
+      const beforeInputEvent = new InputEvent('beforeinput', {
         bubbles: true,
         cancelable: true,
-        clipboardData: dataTransfer,
+        inputType: 'insertFromPaste',
+        data: value,
       });
+      input.dispatchEvent(beforeInputEvent);
 
-      // 3. 触发 paste 事件
-      const handled = input.dispatchEvent(pasteEvent);
+      // 3. 如果事件没被阻止默认行为，手动设置内容
+      if (!beforeInputEvent.defaultPrevented) {
+        this.setValueViaDOMManipulation(input, value);
+      }
 
-      // 如果事件被处理（preventDefault 被调用），说明 Lexical 处理了粘贴
-      return !handled || pasteEvent.defaultPrevented;
+      // 4. 触发 input 事件
+      const inputEvent = new InputEvent('input', {
+        bubbles: true,
+        cancelable: true,
+        inputType: 'insertFromPaste',
+        data: value,
+      });
+      input.dispatchEvent(inputEvent);
+
+      // 5. 移动光标到末尾
+      this.moveCursorToEnd(input);
+
+      console.log('Value set successfully:', input.innerText);
+      return true;
     } catch (error) {
-      console.warn('Paste event failed:', error);
+      console.warn('InputEvent set value failed:', error);
       return false;
     }
   }
-
 
   /**
    * 使用 DOM 操作设置值（方案2 - 回退方案）
@@ -211,18 +228,22 @@ export class PerplexityAdapter extends BaseAdapter {
    */
   private triggerLexicalEvents(input: HTMLElement): void {
     // 1. 先触发 beforeinput 事件（Lexical 可能监听此事件来准备更新）
-    input.dispatchEvent(new InputEvent('beforeinput', {
-      bubbles: true,
-      cancelable: true,
-      inputType: 'insertText',
-    }));
+    input.dispatchEvent(
+      new InputEvent('beforeinput', {
+        bubbles: true,
+        cancelable: true,
+        inputType: 'insertText',
+      }),
+    );
 
     // 2. 触发 input 事件（使用 InputEvent）
-    input.dispatchEvent(new InputEvent('input', {
-      bubbles: true,
-      cancelable: false,
-      inputType: 'insertText',
-    }));
+    input.dispatchEvent(
+      new InputEvent('input', {
+        bubbles: true,
+        cancelable: false,
+        inputType: 'insertText',
+      }),
+    );
 
     // 3. 使用微任务延迟触发 change 事件
     // 这样可以确保 Lexical 编辑器有时间处理 input 事件
@@ -230,11 +251,13 @@ export class PerplexityAdapter extends BaseAdapter {
       input.dispatchEvent(new Event('change', { bubbles: true }));
 
       // 再次触发 input 事件，确保 Lexical 完全更新
-      input.dispatchEvent(new InputEvent('input', {
-        bubbles: true,
-        cancelable: false,
-        inputType: 'insertText',
-      }));
+      input.dispatchEvent(
+        new InputEvent('input', {
+          bubbles: true,
+          cancelable: false,
+          inputType: 'insertText',
+        }),
+      );
     });
   }
 
@@ -252,10 +275,14 @@ export class PerplexityAdapter extends BaseAdapter {
   private moveCursorToEnd(input: HTMLElement): void {
     try {
       const selection = window.getSelection();
-      if (!selection) {return;}
+      if (!selection) {
+        return;
+      }
 
       // 确保有内容
-      if (input.childNodes.length === 0) {return;}
+      if (input.childNodes.length === 0) {
+        return;
+      }
 
       // 获取最后一个子节点
       const lastChild = input.childNodes[input.childNodes.length - 1];

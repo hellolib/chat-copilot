@@ -4,7 +4,7 @@
   "description": "AI 对话增强助手",
   "private": true,
   "scripts": {
-    "dev": "webpack --mode development",
+    "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
     "release": "webpack --mode production && node scripts/release.js",
     "type-check": "tsc --noEmit",
