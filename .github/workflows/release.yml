@@ -38,16 +38,16 @@ jobs:
         id: get_version
         run: echo "version=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Generate release notes
-        id: release_notes
-        run: |
-          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
-          if [ -n "$PREV_TAG" ]; then
-            echo "## Changes since $PREV_TAG" > release_notes.md
-            git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD >> release_notes.md
-          else
-            echo "## Initial release" > release_notes.md
-          fi
+#      - name: Generate release notes
+#        id: release_notes
+#        run: |
+#          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+#          if [ -n "$PREV_TAG" ]; then
+#            echo "## Changes since $PREV_TAG" > release_notes.md
+#            git log --pretty=format:"- %s (%h)" $PREV_TAG..HEAD >> release_notes.md
+#          else
+#            echo "## Initial release" > release_notes.md
+#          fi
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
