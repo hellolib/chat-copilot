@@ -438,6 +438,11 @@ body {
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  line-height: 1;
+}
+
+.popup-footer button svg {
+  flex-shrink: 0;
 }
 
 .popup-footer button:hover {
