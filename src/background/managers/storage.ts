@@ -21,6 +21,7 @@ export class StorageManager {
         language: 'zh-CN',
         enabledQuickAccessSites: defaultEnabledSites,
         promptMethodTagIds: ['roleplay'], // 默认选中角色扮演
+        showFloatingButton: true,
       };
 
       const existing = await this.get<UserSettings>('settings');
@@ -54,6 +55,11 @@ export class StorageManager {
 
         if (!existing.promptMethodTagIds) {
           existing.promptMethodTagIds = ['roleplay']; // 默认选中角色扮演
+          shouldSave = true;
+        }
+
+        if (typeof existing.showFloatingButton !== 'boolean') {
+          existing.showFloatingButton = true;
           shouldSave = true;
         }
 

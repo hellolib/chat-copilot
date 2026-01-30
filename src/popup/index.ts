@@ -4,7 +4,6 @@
 
 import './styles.css';
 import { QUICK_ACCESS_SITES, QuickAccessSite, ModelConfig, PROVIDER_ICONS } from '@shared/types';
-import { Toast } from '@shared/toast';
 
 class PopupApp {
   private allSites: QuickAccessSite[] = QUICK_ACCESS_SITES;
@@ -324,23 +323,6 @@ class PopupApp {
           window.close();
         }
       });
-    });
-
-    // 提示词广场入口点击事件
-    document.getElementById('prompt-plaza-card')?.addEventListener('click', async () => {
-      // 获取当前活动标签页
-      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-      if (tab?.id) {
-        // 向 content script 发送消息，打开提示词广场
-        try {
-          await chrome.tabs.sendMessage(tab.id, { type: 'TOGGLE_PROMPT_SIDEBAR' });
-          // 关闭 popup
-          window.close();
-        } catch {
-          // 如果当前页面没有 content script，提示用户
-          Toast.warning('请先打开支持的 AI 网站');
-        }
-      }
     });
 
     // 模型卡片点击事件
