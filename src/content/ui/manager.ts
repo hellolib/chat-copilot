@@ -481,13 +481,13 @@ export class UIManager {
             <div class="chat-copilot-original">
               <h4 class="chat-copilot-label">原始内容</h4>
               <div class="chat-copilot-content-box">
-                <p>${this.escapeHtml(result.original)}</p>
+                <textarea class="chat-copilot-original-textarea">${this.escapeHtml(result.original)}</textarea>
               </div>
             </div>
             <div class="chat-copilot-optimized">
               <h4 class="chat-copilot-label">优化内容</h4>
               <div class="chat-copilot-content-box">
-                <p>${this.escapeHtml(result.optimized)}</p>
+                <textarea class="chat-copilot-optimized-textarea">${this.escapeHtml(result.optimized)}</textarea>
               </div>
             </div>
           </div>
@@ -505,18 +505,23 @@ export class UIManager {
     dialog.querySelector('.chat-copilot-close')?.addEventListener('click', () => dialog.remove());
     dialog.querySelector('.chat-copilot-btn-cancel')?.addEventListener('click', () => dialog.remove());
     dialog.querySelector('.chat-copilot-btn-apply')?.addEventListener('click', async () => {
-      const enhancedPrompt = await enhancePromptWithCustomRules(result.optimized);
+      const optimizedTextarea = dialog.querySelector('.chat-copilot-optimized-textarea') as HTMLTextAreaElement;
+      const optimizedText = optimizedTextarea?.value || result.optimized;
+      const enhancedPrompt = await enhancePromptWithCustomRules(optimizedText);
       this.adapter.setInputValue(enhancedPrompt);
       dialog.remove();
       Toast.success('已应用优化');
     });
     dialog.querySelector('.chat-copilot-btn-copy')?.addEventListener('click', () => {
-      navigator.clipboard.writeText(result.optimized);
+      const optimizedTextarea = dialog.querySelector('.chat-copilot-optimized-textarea') as HTMLTextAreaElement;
+      const optimizedText = optimizedTextarea?.value || result.optimized;
+      navigator.clipboard.writeText(optimizedText);
       Toast.success('已复制到剪贴板');
     });
     dialog.querySelector('.chat-copilot-btn-reoptimize')?.addEventListener('click', async () => {
       // 获取当前弹窗中的原始内容
-      const originalText = dialog.querySelector('.chat-copilot-original .chat-copilot-content-box p')?.textContent || '';
+      const originalTextarea = dialog.querySelector('.chat-copilot-original-textarea') as HTMLTextAreaElement;
+      const originalText = originalTextarea?.value || '';
       // 不关闭弹窗，直接更新内容
       await this.handleOptimize(true, originalText);
     });
@@ -569,40 +574,15 @@ export class UIManager {
     }
 
     // 更新原始内容
-    const originalContent = this.currentDialog.querySelector('.chat-copilot-original .chat-copilot-content-box p');
+    const originalContent = this.currentDialog.querySelector('.chat-copilot-original .chat-copilot-content-box textarea');
     if (originalContent) {
       originalContent.textContent = result.original;
     }
 
     // 更新优化内容
-    const optimizedContent = this.currentDialog.querySelector('.chat-copilot-optimized .chat-copilot-content-box p');
+    const optimizedContent = this.currentDialog.querySelector('.chat-copilot-optimized .chat-copilot-content-box textarea');
     if (optimizedContent) {
       optimizedContent.textContent = result.optimized;
-    }
-
-    // 更新按钮事件
-    const applyBtn = this.currentDialog.querySelector('.chat-copilot-btn-apply');
-    const copyBtn = this.currentDialog.querySelector('.chat-copilot-btn-copy');
-
-    if (applyBtn) {
-      const newApplyBtn = applyBtn.cloneNode(true) as HTMLElement;
-      applyBtn.replaceWith(newApplyBtn);
-      newApplyBtn.addEventListener('click', async () => {
-        const enhancedPrompt = await enhancePromptWithCustomRules(result.optimized);
-        this.adapter.setInputValue(enhancedPrompt);
-        this.currentDialog?.remove();
-        this.currentDialog = null;
-        Toast.success('已应用优化');
-      });
-    }
-
-    if (copyBtn) {
-      const newCopyBtn = copyBtn.cloneNode(true) as HTMLElement;
-      copyBtn.replaceWith(newCopyBtn);
-      newCopyBtn.addEventListener('click', () => {
-        navigator.clipboard.writeText(result.optimized);
-        Toast.success('已复制到剪贴板');
-      });
     }
   }
 
