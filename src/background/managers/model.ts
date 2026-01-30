@@ -29,7 +29,7 @@ export class ModelManager {
       const settings = await this.storageManager.get<UserSettings>('settings');
       const modelId = settings?.currentModelId ?? 'builtin-rules';
 
-      // 使用内置规则引擎
+      // 使用内置优化引擎
       if (modelId === 'builtin-rules') {
         return this.rulesEngine.optimize(request.prompt);
       }

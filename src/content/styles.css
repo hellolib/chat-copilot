@@ -368,24 +368,59 @@
 }
 
 .chat-copilot-model-tip {
+  --cc-tip-flash-start: var(--cc-warning-light);
+  --cc-tip-flash-end: #FCD34D;
+  --cc-tip-border-color: rgba(217, 119, 6, 0.35);
+  --cc-tip-border-width: 1px;
+  --cc-tip-triangle-width: 8px;
+  --cc-tip-triangle-height: 12px;
   font-family: var(--cc-font-family);
   font-size: var(--cc-font-size-xs);
   color: #92400E;
   background: var(--cc-warning-light);
-  border: 1px solid rgba(217, 119, 6, 0.35);
+  border: var(--cc-tip-border-width) solid var(--cc-tip-border-color);
   padding: 3px 8px;
   border-radius: var(--cc-radius-sm);
   display: flex;
   align-items: center;
   gap: var(--cc-space-2);
   box-shadow: 0 1px 3px rgba(251, 191, 36, 0.12);
+  animation: chat-copilot-tip-flash 2.2s ease-in-out infinite;
+  position: relative;
+}
+
+.chat-copilot-model-tip::before {
+  content: '';
+  position: absolute;
+  left: calc(-1 * (var(--cc-tip-triangle-width) + var(--cc-tip-border-width)));
+  top: 50%;
+  width: calc(var(--cc-tip-triangle-width) + var(--cc-tip-border-width));
+  height: calc(var(--cc-tip-triangle-height) + (var(--cc-tip-border-width) * 2));
+  transform: translateY(-50%);
+  background-color: var(--cc-tip-border-color);
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  z-index: 0;
+}
+
+.chat-copilot-model-tip::after {
+  content: '';
+  position: absolute;
+  left: calc(-1 * var(--cc-tip-triangle-width));
+  top: 50%;
+  width: var(--cc-tip-triangle-width);
+  height: var(--cc-tip-triangle-height);
+  transform: translateY(-50%);
+  background-color: var(--cc-tip-flash-start);
+  clip-path: polygon(0 50%, 100% 0, 100% 100%);
+  animation: chat-copilot-tip-flash 2.2s ease-in-out infinite;
+  z-index: 1;
 }
 
 .chat-copilot-model-tip-action {
   background: transparent;
   color: #B45309;
   border: none;
-  padding: 0;
+  padding: 2px 0px;
   font-size: var(--cc-font-size-xs);
   cursor: pointer;
   transition: all var(--cc-transition-fast);
@@ -393,6 +428,7 @@
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 2px;
+  border-radius: 9999px;
 }
 
 .chat-copilot-model-tip-action:hover {
@@ -411,11 +447,24 @@
   background: rgba(251, 191, 36, 0.12);
   border-color: rgba(251, 191, 36, 0.35);
   box-shadow: 0 1px 3px rgba(251, 191, 36, 0.12);
+  --cc-tip-flash-start: rgba(251, 191, 36, 0.12);
+  --cc-tip-flash-end: rgba(251, 191, 36, 0.38);
+  --cc-tip-border-color: rgba(251, 191, 36, 0.35);
 }
 
 [data-theme="dark"] .chat-copilot-model-tip-action,
 .dark .chat-copilot-model-tip-action {
   color: #FCD34D;
+}
+
+@keyframes chat-copilot-tip-flash {
+  0%,
+  100% {
+    background-color: var(--cc-tip-flash-start);
+  }
+  50% {
+    background-color: var(--cc-tip-flash-end);
+  }
 }
 
 .chat-copilot-close {
