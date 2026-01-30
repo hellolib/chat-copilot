@@ -174,8 +174,8 @@ class OptionsApp {
         <input type="radio" name="model" value="builtin-rules" ${isBuiltinSelected ? 'checked' : ''}>
         <img src="${chrome.runtime.getURL('assets/models-icons/inner.svg')}" alt="builtin" class="model-provider-icon">
         <div class="model-info">
-          <span class="model-name">内置规则引擎</span>
-          <span class="model-desc">基于 Prompt 工程最佳实践，离线可用</span>
+          <span class="model-name">内置优化引擎</span>
+          <span class="model-desc">系统内置规则模版</span>
         </div>
       </div>
     `;
@@ -654,7 +654,7 @@ class OptionsApp {
     this.models = this.models.filter((m) => m.id !== id);
     await chrome.storage.local.set({ models: this.models });
 
-    // 如果删除的是当前选中的模型，切换到内置规则引擎
+    // 如果删除的是当前选中的模型，切换到内置优化引擎
     if (this.currentModelId === id) {
       this.currentModelId = 'builtin-rules';
       const result = await chrome.storage.local.get(['settings']);

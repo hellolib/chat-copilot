@@ -184,7 +184,7 @@ class PopupApp {
 
     if (modelEl) {
       if (modelId === 'builtin-rules') {
-        modelEl.textContent = '内置规则引擎';
+        modelEl.textContent = '内置优化引擎';
         if (modelIconEl) {
           modelIconEl.src = chrome.runtime.getURL('assets/models-icons/inner.svg');
           modelIconEl.alt = 'builtin';
@@ -216,13 +216,13 @@ class PopupApp {
     const currentModelId = result.settings?.currentModelId ?? 'builtin-rules';
     const models = (result.models ?? []) as ModelConfig[];
 
-    // 内置规则引擎
+    // 内置优化引擎
     const builtinHtml = `
       <div class="model-option ${currentModelId === 'builtin-rules' ? 'active' : ''}" data-model-id="builtin-rules">
         <img src="${chrome.runtime.getURL('assets/models-icons/inner.svg')}" alt="builtin" class="model-option-icon">
         <div class="model-option-info">
-          <span class="model-option-name">内置规则引擎</span>
-          <span class="model-option-desc">基于 Prompt 工程最佳实践，离线可用</span>
+          <span class="model-option-name">内置优化引擎</span>
+          <span class="model-option-desc">系统内置规则模版</span>
         </div>
         ${currentModelId === 'builtin-rules' ? '<span class="model-option-check">✓</span>' : ''}
       </div>

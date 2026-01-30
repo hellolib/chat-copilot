@@ -409,7 +409,7 @@ export class UIManager {
 
       if (modelId === 'builtin-rules') {
         return {
-          name: '内置规则引擎',
+          name: '内置优化引擎',
           icon: this.getExtensionURL('assets/models-icons/inner.svg'),
           isBuiltin: true,
         };
@@ -433,7 +433,7 @@ export class UIManager {
       };
     } catch {
       return {
-        name: '内置规则引擎',
+        name: '内置优化引擎',
         icon: this.getExtensionURL('assets/models-icons/inner.svg'),
         isBuiltin: true,
       };
@@ -469,7 +469,7 @@ export class UIManager {
             </div>
             ${modelInfo.isBuiltin ? `
               <div class="chat-copilot-model-tip">
-                <span>内置规则引擎效果有限，建议</span>
+                <span>内置优化引擎效果有限，建议</span>
                 <button class="chat-copilot-model-tip-action" type="button">添加自定义模型</button>
               </div>
             ` : ''}
@@ -560,7 +560,7 @@ export class UIManager {
           'beforeend',
           `
             <div class="chat-copilot-model-tip">
-              <span>内置规则引擎效果有限，建议</span>
+              <span>内置优化引擎效果有限，建议</span>
               <button class="chat-copilot-model-tip-action" type="button">添加自定义模型</button>
             </div>
           `,
