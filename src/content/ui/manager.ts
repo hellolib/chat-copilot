@@ -6,6 +6,7 @@
 import { PlatformAdapter, MessageType, OptimizeResponse, MessageResponse, ModelConfig, PROVIDER_ICONS } from '@shared/types';
 import { ErrorHandler, AppError, ErrorCode } from '@shared/errors';
 import { PromptSidebar } from './promptSidebar';
+import { FloatingButton } from './floatingButton';
 import { Toast } from '@shared/toast';
 import { enhancePromptWithCustomRules } from '../utils/customRules';
 
@@ -20,11 +21,29 @@ export class UIManager {
   private isLoading = false;
   private themeDetectTimeout: ReturnType<typeof setTimeout> | null = null;
   private tooltip: HTMLElement | null = null;
+  private floatingButton: FloatingButton;
   private promptSidebar: PromptSidebar;
+  private showFloatingButton = true;
 
   constructor(adapter: PlatformAdapter) {
     this.adapter = adapter;
     this.promptSidebar = new PromptSidebar(adapter);
+    this.floatingButton = new FloatingButton({
+      getExtensionURL: this.getExtensionURL.bind(this),
+      onClick: () => this.handleOptimize(),
+      actions: [
+        {
+          id: 'prompt-plaza',
+          label: '提示词广场',
+          onClick: () => this.promptSidebar.toggle(),
+        },
+        {
+          id: 'settings',
+          label: '设置',
+          onClick: () => this.requestOpenOptionsPage(),
+        },
+      ],
+    });
   }
 
   /**
@@ -55,6 +74,27 @@ export class UIManager {
     }
   }
 
+  private async loadFloatingButtonSettings(): Promise<void> {
+    try {
+      const result = await chrome.storage.local.get(['settings']);
+      this.showFloatingButton = result.settings?.showFloatingButton ?? true;
+      this.floatingButton.setVisible(this.showFloatingButton);
+    } catch (error) {
+      ErrorHandler.logError(error, 'loadFloatingButtonSettings');
+    }
+  }
+
+  private setupSettingsListener(): void {
+    chrome.storage.onChanged.addListener((changes, areaName) => {
+      if (areaName !== 'local' || !changes.settings) {return;}
+      const newSettings = changes.settings.newValue;
+      if (newSettings && typeof newSettings.showFloatingButton === 'boolean') {
+        this.showFloatingButton = newSettings.showFloatingButton;
+        this.floatingButton.setVisible(this.showFloatingButton);
+      }
+    });
+  }
+
   private requestOpenOptionsPage(): void {
     if (!this.isExtensionContextValid()) {
       Toast.error('扩展已更新，请刷新页面后重试');
@@ -74,6 +114,9 @@ export class UIManager {
   init(): void {
     this.initTheme();
     this.initTooltip();
+    this.floatingButton.init();
+    void this.loadFloatingButtonSettings();
+    this.setupSettingsListener();
     this.injectButton();
     this.promptSidebar.init();
   }
@@ -181,6 +224,9 @@ export class UIManager {
   refresh(): void {
     if (!this.isInjected || !document.contains(this.button)) {
       this.injectButton();
+    }
+    if (this.showFloatingButton) {
+      this.floatingButton.refresh();
     }
     this.promptSidebar.refresh();
   }
@@ -447,6 +493,7 @@ export class UIManager {
     // 移除已存在的弹窗
     document.querySelector('.chat-copilot-dialog')?.remove();
     this.currentDialog = null;
+    document.body.classList.remove('chat-copilot-modal-open');
 
     // 获取模型信息
     const modelInfo = await this.getCurrentModelInfo();
@@ -501,15 +548,27 @@ export class UIManager {
       </div>
     `;
 
+    const enterModalState = () => {
+      document.body.classList.add('chat-copilot-modal-open');
+      const floatingWrapper = document.querySelector('.chat-copilot-floating-wrapper');
+      if (floatingWrapper) {
+        floatingWrapper.classList.remove('drawer-open', 'drawer-open-down');
+      }
+    };
+    const closeDialog = () => {
+      dialog.remove();
+      document.body.classList.remove('chat-copilot-modal-open');
+    };
+
     // 事件绑定
-    dialog.querySelector('.chat-copilot-close')?.addEventListener('click', () => dialog.remove());
-    dialog.querySelector('.chat-copilot-btn-cancel')?.addEventListener('click', () => dialog.remove());
+    dialog.querySelector('.chat-copilot-close')?.addEventListener('click', closeDialog);
+    dialog.querySelector('.chat-copilot-btn-cancel')?.addEventListener('click', closeDialog);
     dialog.querySelector('.chat-copilot-btn-apply')?.addEventListener('click', async () => {
       const optimizedTextarea = dialog.querySelector('.chat-copilot-optimized-textarea') as HTMLTextAreaElement;
       const optimizedText = optimizedTextarea?.value || result.optimized;
       const enhancedPrompt = await enhancePromptWithCustomRules(optimizedText);
       this.adapter.setInputValue(enhancedPrompt);
-      dialog.remove();
+      closeDialog();
       Toast.success('已应用优化');
     });
     dialog.querySelector('.chat-copilot-btn-copy')?.addEventListener('click', () => {
@@ -531,6 +590,7 @@ export class UIManager {
 
     document.body.appendChild(dialog);
     this.currentDialog = dialog;
+    enterModalState();
   }
 
   /**

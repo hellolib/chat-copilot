@@ -225,6 +225,7 @@ export interface UserSettings {
   language: string;
   enabledQuickAccessSites?: string[]; // 启用的快速访问站点 ID 列表，默认全部启用
   promptMethodTagIds?: PromptMethodTagId[];
+  showFloatingButton?: boolean;
 }
 
 // 平台适配器接口

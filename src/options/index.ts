@@ -27,7 +27,7 @@ class OptionsApp {
     this.renderModelList();
     await this.renderQuickAccess();
     await this.renderCustomRules();
-    await this.loadPromptPlazaSettings();
+    await this.loadFloatingButtonSettings();
     this.initSidebarNavigation();
     // 处理页面加载时的 hash 导航
     this.handleHashNavigation();
@@ -315,10 +315,10 @@ class OptionsApp {
       this.resetQuickAccessToDefault();
     });
 
-    // 提示词广场悬浮按钮开关
-    document.getElementById('show-sidebar-toggle')?.addEventListener('change', (e) => {
+    // 悬浮按钮开关
+    document.getElementById('show-floating-button-toggle')?.addEventListener('change', (e) => {
       const checked = (e.target as HTMLInputElement).checked;
-      this.savePromptPlazaSettings(checked);
+      this.saveFloatingButtonSettings(checked);
     });
 
     // 自定义规则相关
@@ -836,23 +836,23 @@ class OptionsApp {
   }
 
   /**
-   * 加载提示词广场设置
+   * 加载悬浮按钮设置
    */
-  private async loadPromptPlazaSettings(): Promise<void> {
+  private async loadFloatingButtonSettings(): Promise<void> {
     const result = await chrome.storage.local.get(['settings']);
-    const showSidebarToggle = result.settings?.showPromptSidebarToggle ?? true;
+    const showFloatingButton = result.settings?.showFloatingButton ?? true;
 
-    const toggle = document.getElementById('show-sidebar-toggle') as HTMLInputElement;
+    const toggle = document.getElementById('show-floating-button-toggle') as HTMLInputElement;
     if (toggle) {
-      toggle.checked = showSidebarToggle;
+      toggle.checked = showFloatingButton;
     }
   }
 
   /**
-   * 保存提示词广场设置
+   * 保存悬浮按钮设置
    */
-  private async savePromptPlazaSettings(showToggle: boolean): Promise<void> {
-    await this.saveSettings({ showPromptSidebarToggle: showToggle });
+  private async saveFloatingButtonSettings(showToggle: boolean): Promise<void> {
+    await this.saveSettings({ showFloatingButton: showToggle });
   }
 
   /**
