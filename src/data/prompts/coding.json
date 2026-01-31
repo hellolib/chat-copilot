@@ -46,17 +46,6 @@
       "content": "Create an interactive 3D voxel art scene using HTML, CSS, and JavaScript. The style should be blocky and pixelated, reminiscent of Minecraft. The scene features a pelican on a unicycle, resting on a wooden pier.\n"
     },
     {
-      "id": "coding-005",
-      "title": "Minecraft Clone",
-      "difficulty": "hard",
-      "tags": [
-        "游戏开发",
-        "3D",
-        "JavaScript"
-      ],
-      "content": "Create a Minecraft clone within a single .html file. Make it aesthetically pleasing with pixel-art graphics similar to the original game. Include all of the game's core features, such as terrain and tree generation, mobs, and many other elements. Implement as many of these features as possible.\n"
-    },
-    {
       "id": "coding-006",
       "title": "莫比乌斯环",
       "difficulty": "medium",
