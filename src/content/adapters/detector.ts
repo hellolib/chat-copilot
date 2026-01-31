@@ -13,6 +13,7 @@ import { YiyanAdapter } from './yiyan';
 import { YuanbaoAdapter } from './yuanbao';
 import { DeepSeekAdapter } from './deepseek';
 import { PerplexityAdapter } from './perplexity';
+import { KimiAdapter } from './kimi';
 
 export class PlatformDetector {
   private adapters: PlatformAdapter[] = [
@@ -25,6 +26,7 @@ export class PlatformDetector {
     new YuanbaoAdapter(),
     new DeepSeekAdapter(),
     new PerplexityAdapter(),
+    new KimiAdapter(),
   ];
 
   /**
