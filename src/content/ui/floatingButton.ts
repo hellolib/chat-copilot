@@ -240,7 +240,6 @@ export class FloatingButton {
       actionButton.type = 'button';
       actionButton.className = 'chat-copilot-floating-action';
       actionButton.setAttribute('aria-label', action.label);
-      actionButton.title = action.label;
       actionButton.appendChild(this.createActionIcon(action.id));
       const actionTooltip = document.createElement('span');
       actionTooltip.className = 'chat-copilot-floating-tooltip chat-copilot-floating-action-tooltip';
