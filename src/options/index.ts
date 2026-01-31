@@ -3,9 +3,19 @@
  */
 
 import './styles.css';
-import { ModelConfig, ModelProvider, MODEL_PRESETS, MessageType, QUICK_ACCESS_SITES, PROVIDER_ICONS, CustomRule, PROMPT_METHOD_TAGS, PromptMethodTagId } from '@shared/types';
-import { ConfigValidator } from '@shared/validators';
-import { Toast } from '@shared/toast';
+import {
+  ModelConfig,
+  ModelProvider,
+  MODEL_PRESETS,
+  MessageType,
+  QUICK_ACCESS_SITES,
+  PROVIDER_ICONS,
+  CustomRule,
+  PROMPT_METHOD_TAGS,
+  PromptMethodTagId
+} from '@shared/types';
+import {ConfigValidator} from '@shared/validators';
+import {Toast} from '@shared/toast';
 
 class OptionsApp {
   private models: ModelConfig[] = [];
@@ -48,7 +58,7 @@ class OptionsApp {
         if (targetId) {
           const targetSection = document.getElementById(targetId);
           if (targetSection) {
-            targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            targetSection.scrollIntoView({behavior: 'smooth', block: 'start'});
             this.updateActiveNavItem(targetId);
           }
         }
@@ -99,7 +109,7 @@ class OptionsApp {
       requestAnimationFrame(() => {
         const targetSection = document.getElementById(hash);
         if (targetSection) {
-          targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          targetSection.scrollIntoView({behavior: 'smooth', block: 'start'});
           this.updateActiveNavItem(hash);
         }
       });
@@ -166,7 +176,9 @@ class OptionsApp {
 
   private renderModelList(): void {
     const container = document.getElementById('model-list');
-    if (!container) { return; }
+    if (!container) {
+      return;
+    }
 
     const isBuiltinSelected = this.currentModelId === 'builtin-rules';
     const builtinHtml = `
@@ -210,7 +222,9 @@ class OptionsApp {
     container.querySelectorAll('.btn-delete:not(:disabled)').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const id = (e.target as HTMLElement).dataset.id;
-        if (id) { this.deleteModel(id); }
+        if (id) {
+          this.deleteModel(id);
+        }
       });
     });
 
@@ -218,7 +232,9 @@ class OptionsApp {
     container.querySelectorAll('.btn-edit').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const id = (e.target as HTMLElement).dataset.id;
-        if (id) { this.startEditModel(id); }
+        if (id) {
+          this.startEditModel(id);
+        }
       });
     });
 
@@ -227,7 +243,9 @@ class OptionsApp {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         const id = (e.target as HTMLElement).dataset.id;
-        if (id) { this.testModel(id); }
+        if (id) {
+          this.testModel(id);
+        }
       });
     });
 
@@ -345,7 +363,9 @@ class OptionsApp {
 
   private renderPromptMethodTags(): void {
     const container = document.getElementById('prompt-methods-list');
-    if (!container) { return; }
+    if (!container) {
+      return;
+    }
 
     container.innerHTML = PROMPT_METHOD_TAGS
       .map((tag) => {
@@ -362,7 +382,9 @@ class OptionsApp {
 
   private async savePromptMethodTags(): Promise<void> {
     const container = document.getElementById('prompt-methods-list');
-    if (!container) { return; }
+    if (!container) {
+      return;
+    }
 
     const selectedIds: PromptMethodTagId[] = [];
     container.querySelectorAll<HTMLInputElement>('.prompt-method-checkbox').forEach((checkbox) => {
@@ -375,7 +397,7 @@ class OptionsApp {
     });
 
     this.promptMethodTagIds = selectedIds;
-    await this.saveSettings({ promptMethodTagIds: selectedIds });
+    await this.saveSettings({promptMethodTagIds: selectedIds});
   }
 
   private selectProvider(provider: ModelProvider): void {
@@ -391,7 +413,9 @@ class OptionsApp {
 
       // 仅在创建新模型时自动填充默认值，编辑模式下保留用户原有配置
       if (!this.editingModelId) {
-        if (endpointInput) { endpointInput.value = preset.endpoint; }
+        if (endpointInput) {
+          endpointInput.value = preset.endpoint;
+        }
         // 只保留 API 端点的默认值，其他字段不填充
       }
 
@@ -416,7 +440,9 @@ class OptionsApp {
     let displayName = provider as string;
     if (providerSelect) {
       const option = Array.from(providerSelect.options).find(opt => opt.value === provider);
-      if (option) { displayName = option.text; }
+      if (option) {
+        displayName = option.text;
+      }
     }
 
     if (selectedValue) {
@@ -440,7 +466,9 @@ class OptionsApp {
 
   private showModelForm(): void {
     const backdrop = document.getElementById('model-modal-backdrop');
-    if (backdrop) { backdrop.style.display = 'flex'; }
+    if (backdrop) {
+      backdrop.style.display = 'flex';
+    }
 
     // 更新标题
     const titleElement = document.querySelector('#model-form-section h2');
@@ -451,7 +479,9 @@ class OptionsApp {
 
   private hideModelForm(): void {
     const backdrop = document.getElementById('model-modal-backdrop');
-    if (backdrop) { backdrop.style.display = 'none'; }
+    if (backdrop) {
+      backdrop.style.display = 'none';
+    }
     (document.getElementById('model-form') as HTMLFormElement)?.reset();
     this.editingModelId = null;
   }
@@ -481,7 +511,9 @@ class OptionsApp {
    */
   private startEditModel(id: string): void {
     const model = this.models.find((m) => m.id === id);
-    if (!model) { return; }
+    if (!model) {
+      return;
+    }
 
     this.editingModelId = id;
 
@@ -491,11 +523,21 @@ class OptionsApp {
     const apikeyInput = document.getElementById('model-apikey') as HTMLInputElement | null;
     const modelInput = document.getElementById('model-model') as HTMLInputElement | null;
 
-    if (providerSelect) { providerSelect.value = model.provider; }
-    if (nameInput) { nameInput.value = model.name; }
-    if (endpointInput) { endpointInput.value = model.endpoint; }
-    if (apikeyInput) { apikeyInput.value = model.apiKey ?? ''; }
-    if (modelInput) { modelInput.value = model.model; }
+    if (providerSelect) {
+      providerSelect.value = model.provider;
+    }
+    if (nameInput) {
+      nameInput.value = model.name;
+    }
+    if (endpointInput) {
+      endpointInput.value = model.endpoint;
+    }
+    if (apikeyInput) {
+      apikeyInput.value = model.apiKey ?? '';
+    }
+    if (modelInput) {
+      modelInput.value = model.model;
+    }
 
     // 应用 provider 对 API Key 显示等的控制逻辑
     this.updateCustomSelect(model.provider);
@@ -638,7 +680,7 @@ class OptionsApp {
       this.models.push(model);
     }
 
-    await chrome.storage.local.set({ models: this.models });
+    await chrome.storage.local.set({models: this.models});
 
     this.hideModelForm();
     this.renderModelList();
@@ -646,13 +688,17 @@ class OptionsApp {
 
   private async deleteModel(id: string): Promise<void> {
     const model = this.models.find((m) => m.id === id);
-    if (!model) { return; }
+    if (!model) {
+      return;
+    }
 
     const confirmed = window.confirm(`确定要删除模型 "${model.name}" 吗？此操作不可撤销。`);
-    if (!confirmed) { return; }
+    if (!confirmed) {
+      return;
+    }
 
     this.models = this.models.filter((m) => m.id !== id);
-    await chrome.storage.local.set({ models: this.models });
+    await chrome.storage.local.set({models: this.models});
 
     // 如果删除的是当前选中的模型，切换到内置优化引擎
     if (this.currentModelId === id) {
@@ -660,7 +706,7 @@ class OptionsApp {
       const result = await chrome.storage.local.get(['settings']);
       const settings = result.settings ?? {};
       settings.currentModelId = 'builtin-rules';
-      await chrome.storage.local.set({ settings });
+      await chrome.storage.local.set({settings});
     }
 
     this.renderModelList();
@@ -671,7 +717,7 @@ class OptionsApp {
     const result = await chrome.storage.local.get(['settings']);
     const settings = result.settings ?? {};
     settings.currentModelId = modelId;
-    await chrome.storage.local.set({ settings });
+    await chrome.storage.local.set({settings});
 
     // 重新渲染列表以更新删除按钮状态
     this.renderModelList();
@@ -734,8 +780,8 @@ class OptionsApp {
 
   private async saveSettings(partial: Record<string, unknown>): Promise<void> {
     const result = await chrome.storage.local.get(['settings']);
-    const settings = { ...result.settings, ...partial };
-    await chrome.storage.local.set({ settings });
+    const settings = {...result.settings, ...partial};
+    await chrome.storage.local.set({settings});
   }
 
   /**
@@ -743,11 +789,13 @@ class OptionsApp {
    */
   private async renderQuickAccess(): Promise<void> {
     const container = document.getElementById('quick-access-list');
-    if (!container) { return; }
+    if (!container) {
+      return;
+    }
 
     const result = await chrome.storage.local.get(['settings']);
-    // 默认启用除 perplexity 和 qianwen之外的所有站点
-    const defaultDisabledSites = ['perplexity', 'qianwen'];
+    // 默认启用除 yiyan、perplexity 和 qianwen 之外的所有站点
+    const defaultDisabledSites = ['yiyan', 'perplexity', 'qianwen'];
     const defaultEnabledSites = QUICK_ACCESS_SITES.map(s => s.id).filter(id => !defaultDisabledSites.includes(id));
     const enabledSiteIds = result.settings?.enabledQuickAccessSites ?? defaultEnabledSites;
 
@@ -796,7 +844,7 @@ class OptionsApp {
       }
     });
 
-    await this.saveSettings({ enabledQuickAccessSites: enabledSiteIds });
+    await this.saveSettings({enabledQuickAccessSites: enabledSiteIds});
   }
 
   /**
@@ -825,10 +873,13 @@ class OptionsApp {
    * 恢复快速访问为默认设置
    */
   private async resetQuickAccessToDefault(): Promise<void> {
-    // 清除已保存的快速访问设置，使其下次使用默认值
+    // 立刻写回默认的快速访问设置
+    const defaultDisabledSites = ['yiyan', 'perplexity', 'qianwen'];
+    const defaultEnabledSites = QUICK_ACCESS_SITES.map(site => site.id)
+      .filter(id => !defaultDisabledSites.includes(id));
+
     const result = await chrome.storage.local.get(['settings']);
-    const settings = result.settings ?? {};
-    delete settings.enabledQuickAccessSites;
+    const settings = { ...result.settings, enabledQuickAccessSites: defaultEnabledSites };
     await chrome.storage.local.set({ settings });
 
     // 重新渲染列表
@@ -852,7 +903,7 @@ class OptionsApp {
    * 保存悬浮按钮设置
    */
   private async saveFloatingButtonSettings(showToggle: boolean): Promise<void> {
-    await this.saveSettings({ showFloatingButton: showToggle });
+    await this.saveSettings({showFloatingButton: showToggle});
   }
 
   /**
@@ -877,7 +928,9 @@ class OptionsApp {
    */
   private async renderCustomRules(): Promise<void> {
     const container = document.getElementById('custom-rules-list');
-    if (!container) { return; }
+    if (!container) {
+      return;
+    }
 
     if (this.customRules.length === 0) {
       container.innerHTML = '<p class="empty-state">暂无自定义规则，点击下方按钮添加</p>';
@@ -912,21 +965,27 @@ class OptionsApp {
     container.querySelectorAll('.btn-toggle-rule').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const id = (e.target as HTMLElement).dataset.id;
-        if (id) { this.toggleCustomRule(id); }
+        if (id) {
+          this.toggleCustomRule(id);
+        }
       });
     });
 
     container.querySelectorAll('.btn-edit-rule').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const id = (e.target as HTMLElement).dataset.id;
-        if (id) { this.editCustomRule(id); }
+        if (id) {
+          this.editCustomRule(id);
+        }
       });
     });
 
     container.querySelectorAll('.btn-delete-rule').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         const id = (e.target as HTMLElement).dataset.id;
-        if (id) { this.deleteCustomRule(id); }
+        if (id) {
+          this.deleteCustomRule(id);
+        }
       });
     });
   }
@@ -942,12 +1001,20 @@ class OptionsApp {
     const _contentInput = document.getElementById('custom-rule-content') as HTMLTextAreaElement;
     const enabledInput = document.getElementById('custom-rule-enabled') as HTMLInputElement;
 
-    if (title) { title.textContent = '添加自定义规则'; }
-    if (form) { form.reset(); }
-    if (enabledInput) { enabledInput.checked = true; }
+    if (title) {
+      title.textContent = '添加自定义规则';
+    }
+    if (form) {
+      form.reset();
+    }
+    if (enabledInput) {
+      enabledInput.checked = true;
+    }
 
     const backdrop = document.getElementById('custom-rule-modal-backdrop');
-    if (backdrop) { backdrop.style.display = 'flex'; }
+    if (backdrop) {
+      backdrop.style.display = 'flex';
+    }
   }
 
   /**
@@ -955,7 +1022,9 @@ class OptionsApp {
    */
   private hideCustomRuleForm(): void {
     const backdrop = document.getElementById('custom-rule-modal-backdrop');
-    if (backdrop) { backdrop.style.display = 'none'; }
+    if (backdrop) {
+      backdrop.style.display = 'none';
+    }
     this.editingCustomRuleId = null;
   }
 
@@ -964,7 +1033,9 @@ class OptionsApp {
    */
   private editCustomRule(id: string): void {
     const rule = this.customRules.find((r) => r.id === id);
-    if (!rule) { return; }
+    if (!rule) {
+      return;
+    }
 
     this.editingCustomRuleId = id;
 
@@ -973,13 +1044,23 @@ class OptionsApp {
     const _contentInput = document.getElementById('custom-rule-content') as HTMLTextAreaElement;
     const enabledInput = document.getElementById('custom-rule-enabled') as HTMLInputElement;
 
-    if (title) { title.textContent = '编辑自定义规则'; }
-    if (_nameInput) { _nameInput.value = rule.name; }
-    if (_contentInput) { _contentInput.value = rule.content; }
-    if (enabledInput) { enabledInput.checked = rule.enabled; }
+    if (title) {
+      title.textContent = '编辑自定义规则';
+    }
+    if (_nameInput) {
+      _nameInput.value = rule.name;
+    }
+    if (_contentInput) {
+      _contentInput.value = rule.content;
+    }
+    if (enabledInput) {
+      enabledInput.checked = rule.enabled;
+    }
 
     const backdrop = document.getElementById('custom-rule-modal-backdrop');
-    if (backdrop) { backdrop.style.display = 'flex'; }
+    if (backdrop) {
+      backdrop.style.display = 'flex';
+    }
   }
 
   /**
@@ -1001,12 +1082,12 @@ class OptionsApp {
 
     try {
       if (this.editingCustomRuleId) {
-        await this.updateCustomRule(this.editingCustomRuleId, { name, content, enabled });
+        await this.updateCustomRule(this.editingCustomRuleId, {name, content, enabled});
         Toast.success('规则更新成功');
       } else {
         const response = await chrome.runtime.sendMessage({
           type: MessageType.SAVE_CUSTOM_RULES,
-          payload: { name, content, enabled },
+          payload: {name, content, enabled},
         });
 
         if (response.success) {
@@ -1031,7 +1112,9 @@ class OptionsApp {
    */
   private async updateCustomRule(id: string, updates: Partial<CustomRule>): Promise<void> {
     const index = this.customRules.findIndex((r) => r.id === id);
-    if (index === -1) { return; }
+    if (index === -1) {
+      return;
+    }
 
     this.customRules[index] = {
       ...this.customRules[index],
@@ -1039,7 +1122,7 @@ class OptionsApp {
       updatedAt: Date.now(),
     };
 
-    await chrome.storage.local.set({ custom_rules: this.customRules });
+    await chrome.storage.local.set({custom_rules: this.customRules});
   }
 
   /**
@@ -1047,9 +1130,11 @@ class OptionsApp {
    */
   private async toggleCustomRule(id: string): Promise<void> {
     const rule = this.customRules.find((r) => r.id === id);
-    if (!rule) { return; }
+    if (!rule) {
+      return;
+    }
 
-    await this.updateCustomRule(id, { enabled: !rule.enabled });
+    await this.updateCustomRule(id, {enabled: !rule.enabled});
     await this.renderCustomRules();
   }
 
@@ -1058,10 +1143,14 @@ class OptionsApp {
    */
   private async deleteCustomRule(id: string): Promise<void> {
     const rule = this.customRules.find((r) => r.id === id);
-    if (!rule) { return; }
+    if (!rule) {
+      return;
+    }
 
     const confirmed = window.confirm(`确定要删除规则 "${rule.name}" 吗？此操作不可撤销。`);
-    if (!confirmed) { return; }
+    if (!confirmed) {
+      return;
+    }
 
     try {
       const response = await chrome.runtime.sendMessage({
