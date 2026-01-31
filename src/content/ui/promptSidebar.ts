@@ -68,7 +68,7 @@ export class PromptSidebar {
   private async loadSettings(): Promise<void> {
     try {
       const result = await chrome.storage.local.get(['settings']);
-      this.showToggleButton = result.settings?.showPromptSidebarToggle ?? true;
+      this.showToggleButton = this.resolveToggleVisibility(result.settings);
       this.updateToggleButtonVisibility();
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -82,12 +82,21 @@ export class PromptSidebar {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === 'local' && changes.settings) {
         const newSettings = changes.settings.newValue;
-        if (newSettings && typeof newSettings.showPromptSidebarToggle === 'boolean') {
-          this.showToggleButton = newSettings.showPromptSidebarToggle;
-          this.updateToggleButtonVisibility();
-        }
+        this.showToggleButton = this.resolveToggleVisibility(newSettings);
+        this.updateToggleButtonVisibility();
       }
     });
+  }
+
+  private resolveToggleVisibility(settings?: { showFloatingButton?: boolean; showPromptSidebarToggle?: boolean }): boolean {
+    const showFloatingButton = settings?.showFloatingButton ?? true;
+    if (showFloatingButton) {
+      return false;
+    }
+    if (typeof settings?.showPromptSidebarToggle === 'boolean') {
+      return settings.showPromptSidebarToggle;
+    }
+    return true;
   }
 
   /**
