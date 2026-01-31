@@ -83,7 +83,9 @@ class PopupApp {
 
     // 从配置中读取启用的站点
     const result = await chrome.storage.local.get(['settings']);
-    const enabledSiteIds = result.settings?.enabledQuickAccessSites ?? this.allSites.map(s => s.id);
+    const defaultDisabledSites = ['yiyan', 'perplexity', 'qianwen'];
+    const defaultEnabledSites = this.allSites.map(s => s.id).filter(id => !defaultDisabledSites.includes(id));
+    const enabledSiteIds = result.settings?.enabledQuickAccessSites ?? defaultEnabledSites;
 
     // 过滤出启用的站点
     const enabledSites = this.allSites.filter(site => enabledSiteIds.includes(site.id));

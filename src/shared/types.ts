@@ -152,8 +152,9 @@ export const QUICK_ACCESS_SITES: QuickAccessSite[] = [
   { id: 'grok', name: 'Grok', url: 'https://grok.com/', icon: 'grok.png' },
   { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/', icon: 'deepseek.png' },
   { id: 'qwen', name: 'Qwen', url: 'https://chat.qwen.ai/', icon: 'qianwen.png' },
-  { id: 'yiyan', name: '文心一言', url: 'https://yiyan.baidu.com/', icon: 'yiyan.png' },
+  { id: 'kimi', name: 'Kimi', url: 'https://kimi.moonshot.cn/', icon: 'kimi.png' },
   { id: 'yuanbao', name: '元宝', url: 'https://yuanbao.tencent.com/', icon: 'yuanbao.png' },
+  { id: 'yiyan', name: '文心一言', url: 'https://yiyan.baidu.com/', icon: 'yiyan.png' },
   { id: 'qianwen', name: '通义千问', url: 'https://www.qianwen.com/', icon: 'qianwen.png' },
   { id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/', icon: 'perplexity.png' },
 ];
