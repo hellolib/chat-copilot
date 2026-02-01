@@ -55,7 +55,7 @@ export class ModelManager {
   }
 
   /**
-   * 获取用户自定义规则上下文
+   * 获取用户自定义优化规则上下文
    */
   async getCustomRulesContext(): Promise<string> {
     const customRules = await this.storageManager.getCustomRules();
@@ -69,7 +69,7 @@ export class ModelManager {
       .map(rule => `- ${rule.name}: ${rule.content}`)
       .join('\n');
 
-    return `\n\n[用户自定义规则]\n${rulesText}`;
+    return `\n\n[用户自定义优化规则]\n${rulesText}`;
   }
 
   /**

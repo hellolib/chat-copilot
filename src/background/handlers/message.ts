@@ -95,7 +95,7 @@ export class MessageHandler {
             const rules = await this.storageManager.getCustomRules();
             sendResponse({ success: true, data: rules });
           } catch (error) {
-            throw new AppError(ErrorCode.STORAGE_ERROR, '获取自定义规则失败', error);
+            throw new AppError(ErrorCode.STORAGE_ERROR, '获取自定义优化规则失败', error);
           }
           break;
         }
@@ -118,7 +118,7 @@ export class MessageHandler {
             if (error instanceof AppError) {
               throw error;
             }
-            throw new AppError(ErrorCode.STORAGE_ERROR, '保存自定义规则失败', error);
+            throw new AppError(ErrorCode.STORAGE_ERROR, '保存自定义优化规则失败', error);
           }
           break;
         }
@@ -135,7 +135,7 @@ export class MessageHandler {
             if (error instanceof AppError) {
               throw error;
             }
-            throw new AppError(ErrorCode.STORAGE_ERROR, '删除自定义规则失败', error);
+            throw new AppError(ErrorCode.STORAGE_ERROR, '删除自定义优化规则失败', error);
           }
           break;
         }

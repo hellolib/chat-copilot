@@ -162,10 +162,62 @@ html {
   margin-bottom: var(--space-4);
   box-shadow: var(--shadow-sm);
   transition: box-shadow var(--transition-normal);
+  position: relative;
 }
 
 .section:hover {
   box-shadow: var(--shadow-md);
+}
+
+.section.is-disabled {
+  opacity: 0.55;
+  filter: grayscale(0.15);
+  cursor: not-allowed;
+}
+
+.section.is-disabled::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.18);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+.section.is-disabled::after {
+  content: attr(data-disabled-hint);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 var(--space-6);
+  text-align: center;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-md);
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  pointer-events: none;
+}
+
+[data-theme="dark"] .section.is-disabled::before,
+.dark .section.is-disabled::before {
+  background: rgba(0, 0, 0, 0.38);
+}
+
+[data-theme="dark"] .section.is-disabled::after,
+.dark .section.is-disabled::after {
+  background: rgba(17, 24, 39, 0.88);
+}
+
+.section.is-disabled:hover::before,
+.section.is-disabled:hover::after {
+  opacity: 1;
 }
 
 .section h2 {
@@ -394,7 +446,15 @@ html {
   background: var(--color-primary-subtle);
 }
 
-/* 自定义规则区域的添加按钮间距 */
+.btn-add-model:disabled {
+  border-color: var(--color-border);
+  color: var(--color-text-tertiary);
+  background: var(--color-bg-subtle);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* 自定义优化规则区域的添加按钮间距 */
 #section-custom-rules .btn-add-model {
   margin-top: var(--space-3);
 }
@@ -1057,7 +1117,7 @@ html {
 }
 
 /* ========================================
- * Prompt Methods - 提示词风格
+ * Prompt Methods - 提示词生成风格
  * ======================================== */
 .prompt-methods-list {
   display: grid;
@@ -1109,7 +1169,7 @@ html {
 }
 
 /* ========================================
- * Custom Rules - 自定义规则
+ * Custom Rules - 自定义优化规则
  * ======================================== */
 .custom-rules-list {
   display: flex;
@@ -1119,7 +1179,7 @@ html {
 
 .custom-rule-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: var(--space-3);
   padding: var(--space-4);
   border-radius: var(--radius-md);
@@ -1149,7 +1209,7 @@ html {
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  margin-bottom: var(--space-1);
+  margin-bottom: 0;
 }
 
 .custom-rule-name {
@@ -1263,10 +1323,10 @@ html {
 }
 
 /* ========================================
- * Custom Rule Form - 自定义规则表单
+ * Custom Rule Form - 自定义优化规则表单
  * ======================================== */
 
-/* 自定义规则弹窗样式 */
+/* 自定义优化规则弹窗样式 */
 .custom-rule-modal {
   max-width: 480px;
 }

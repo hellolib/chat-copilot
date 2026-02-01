@@ -312,10 +312,10 @@ export interface PromptCategoryJson {
 }
 
 // ========================================
-// 用户自定义规则相关类型
+// 用户自定义优化规则相关类型
 // ========================================
 
-// 用户自定义规则
+// 用户自定义优化规则
 export interface CustomRule {
   id: string;
   name: string;

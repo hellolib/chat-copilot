@@ -21,7 +21,7 @@ export function appendCustomRulesToPrompt(originalPrompt: string, customRules: C
     .map(rule => `- ${rule.name}: ${rule.content}`)
     .join('\n');
 
-  return `${originalPrompt}\n\n用户自定义规则要求：\n${rulesText}\n请在遵循上述规则的基础上，处理用户的请求。`;
+  return `${originalPrompt}\n\n用户自定义优化规则要求：\n${rulesText}\n请在遵循上述规则的基础上，处理用户的请求。`;
 }
 
 export async function enhancePromptWithCustomRules(prompt: string): Promise<string> {

@@ -23,7 +23,7 @@ export function buildSystemPrompt(methodTagIds: PromptMethodTagId[], customRules
   const enabledRules = customRules.filter(rule => rule.enabled);
   if (enabledRules.length > 0) {
     const rulesText = enabledRules.map(rule => `- ${rule.name}: ${rule.content}`).join('\n');
-    parts.push(`[用户自定义规则]\n${rulesText}`);
+    parts.push(`[用户自定义优化规则]\n${rulesText}`);
   }
 
   return parts.join('\n\n');

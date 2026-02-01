@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/assets/chat-copilot-btn.svg" alt="Chat Copilot Logo" width="120"/>
+<img src="src/assets/chat-copilot-btn-light-1.svg" alt="Chat Copilot Logo" width="120"/>
 
 # Chat Copilot
 
@@ -41,8 +41,9 @@ Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对
 - **一键优化** - 基于规则引擎智能分析和优化用户输入的提示词
 - **多维度增强** - 提供清晰度、结构化、上下文完整性等多维度优化
 - **实时预览** - 发送前预览优化后的提示词，支持一键应用
-- **自定义模型** - 支持自定义提示词优化模型，灵活配置优化策略
-- **自定义提示词风格** - 支持自定义提示词风格，满足不同场景需求
+- **优化引擎（大模型）** - 支持自定义提示词优化模型，灵活配置优化策略
+- **优化风格** - 支持选择提示词生成风格，满足不同场景需求
+- **自定义优化规则** - 支持自定义提示词优化规则，满足不同场景需求
 
 ### 🎯 核心优势
 
@@ -138,10 +139,21 @@ npm run format
 
 ## TODO
 
-- [ ] 导出聊天记录 - 支持多种格式、包含历史和元数据
 - [ ] 提示词收藏夹 - 提示词对比页面收藏功能、管理收藏
-- [ ] 暗黑模式优化 - 修复图标颜色、整体 UI 适配
 - [ ] 支持图像平台 - 扩展至图像生成 AI 平台
+
+---
+
+## 🥰 鸣谢
+
+### 开发者
+- [@hellolib](https://github.com/hellolib)
+- [@ipfred](https://github.com/ipfred)
+- [@JiaoShuaiBing](https://github.com/JiaoShuaiBing)
+
+### 开源项目
+
+- [vuepress-theme-reco](https://theme-reco.vuejs.press/)
 
 ---
 

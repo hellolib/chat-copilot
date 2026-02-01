@@ -35,14 +35,14 @@
               <circle cx="80" cy="256" r="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
               <circle cx="80" cy="368" r="16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
             </svg>
-            <span>提示词风格</span>
+            <span>优化风格</span>
           </a>
           <a href="#section-custom-rules" class="nav-item" data-section="section-custom-rules">
             <svg class="nav-icon" viewBox="0 0 512 512" aria-hidden="true">
               <path d="M448 256c0-106-86-192-192-192S64 150 64 256s86 192 192 192s192-86 192-192z" fill="none" stroke="currentColor" stroke-miterlimit="10" stroke-width="32"/>
               <path d="M352 176L217.6 336L160 272" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/>
             </svg>
-            <span>自定义规则</span>
+            <span>自定义优化规则</span>
           </a>
           <a href="#section-floating-button" class="nav-item" data-section="section-floating-button">
             <svg class="nav-icon" viewBox="0 0 512 512" aria-hidden="true">
@@ -174,33 +174,33 @@
           </div>
         </div>
 
-        <!-- 提示词风格 -->
+        <!-- 提示词生成风格 -->
         <section class="section" id="section-prompt-methods">
-          <h2>提示词风格</h2>
-
+          <h2>优化风格</h2>
+          <p class="section-desc">选择提示词优化风格，这些风格将影响你的提示词生成</p>
           <div class="prompt-methods-list" id="prompt-methods-list">
             <!-- 动态生成 -->
           </div>
         </section>
 
-        <!-- 自定义规则 -->
+        <!-- 自定义优化规则 -->
         <section class="section" id="section-custom-rules">
-          <h2>自定义规则</h2>
-          <p class="section-desc">配置用户自定义的提示词规则，这些规则将在提问大模型时自动附加</p>
+          <h2>自定义优化规则</h2>
+          <p class="section-desc">配置提示词优化规则，这些规则将影响你的提示词生成</p>
 
           <div class="custom-rules-list" id="custom-rules-list">
             <!-- 动态生成 -->
           </div>
 
-          <button class="btn-add-model" id="btn-add-custom-rule">+ 添加自定义规则</button>
+          <button class="btn-add-model" id="btn-add-custom-rule">+ 添加自定义优化规则</button>
         </section>
 
-        <!-- 添加/编辑自定义规则弹窗 -->
+        <!-- 添加/编辑自定义优化规则弹窗 -->
         <div class="modal-backdrop" id="custom-rule-modal-backdrop" style="display: none;">
           <div class="modal custom-rule-modal">
             <section class="section modal-content" id="custom-rule-form-section">
               <div class="modal-header">
-                <h2 id="custom-rule-modal-title">添加自定义规则</h2>
+                <h2 id="custom-rule-modal-title">添加自定义优化规则</h2>
               </div>
 
               <form id="custom-rule-form" class="custom-rule-form">
