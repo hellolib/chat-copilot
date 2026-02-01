@@ -21,6 +21,10 @@ html {
   scroll-behavior: smooth;
 }
 
+:root {
+  --cc-icon-bg: #ffffff;
+}
+
 .options-container {
   max-width: 1100px;
   margin: 0 auto;
@@ -136,6 +140,16 @@ html {
 .logo {
   width: 32px;
   height: 32px;
+  display: block;
+  background-color: currentColor;
+  -webkit-mask-image: var(--cc-logo-url);
+  mask-image: var(--cc-logo-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 /* ========================================
@@ -703,6 +717,15 @@ html {
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+.model-provider-icon,
+.select-trigger-icon,
+.select-option-icon,
+.quick-access-icon-img {
+  background: var(--cc-icon-bg);
+  border-radius: var(--radius-sm);
+  box-sizing: border-box;
 }
 
 .quick-access-icon-text {

@@ -4,6 +4,7 @@
  */
 
 import { PlatformAdapter } from '@shared/types';
+import { createLogoUseSvg } from '../ui/logoSprite';
 
 export abstract class BaseAdapter implements PlatformAdapter {
   abstract name: string;
@@ -70,7 +71,6 @@ export abstract class BaseAdapter implements PlatformAdapter {
    */
   protected styleButton(button: HTMLElement): void {
     button.className = 'chat-copilot-btn';
-    button.innerHTML = '';
     // 保留必要的布局样式，但让 CSS 控制悬停效果（背景色、透明度、变换等）
     // 这样可以保持悬停效果的一致性（绿色特效）
     button.style.cssText = `
@@ -81,25 +81,15 @@ export abstract class BaseAdapter implements PlatformAdapter {
       position: relative;
     `;
 
-    // 添加图标
-    const icon = document.createElement('img');
-    icon.src = chrome.runtime.getURL('assets/chat-copilot-btn.svg');
-    icon.alt = '优化';
-    icon.style.width = '18px';
-    icon.style.height = '18px';
-    icon.style.objectFit = 'contain';
-    icon.style.display = 'block';
-    icon.style.margin = 'auto';
-    icon.style.pointerEvents = 'none';
-
-    // 图标加载错误处理
-    icon.onerror = () => {
-      this.logWarning('图标加载失败，使用文本替代');
-      button.textContent = '✨';
-      button.style.fontSize = '16px';
-    };
-
-    button.appendChild(icon);
+    if (button.childElementCount === 0) {
+      const svg = createLogoUseSvg('chat-copilot-btn-icon', 18);
+      svg.style.width = '18px';
+      svg.style.height = '18px';
+      svg.style.display = 'block';
+      svg.style.margin = 'auto';
+      svg.style.pointerEvents = 'none';
+      button.appendChild(svg);
+    }
   }
 
   /**

@@ -26,4 +26,5 @@ proxy.go
 /.cursorignore
 /.cursorindexingignore
 /CLAUDE.md
+/AGENTS.md
 /build/

@@ -345,6 +345,22 @@
   width: 18px;
   height: 18px;
   flex-shrink: 0;
+  display: block;
+  color: var(--cc-text-primary);
+}
+
+.chat-copilot-logo,
+.chat-copilot-btn-icon,
+.chat-copilot-floating-icon {
+  background-color: currentColor;
+  -webkit-mask-image: var(--cc-logo-url);
+  mask-image: var(--cc-logo-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 .chat-copilot-model-info {
