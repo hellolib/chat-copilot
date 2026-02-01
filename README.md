@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="src/assets/chat-copilot-btn.svg" alt="Chat Copilot Logo" width="120"/>
+<img src="src/assets/chat-copilot-btn-light-1.svg" alt="Chat Copilot Logo" width="120"/>
 
 # Chat Copilot
 
@@ -138,10 +138,21 @@ npm run format
 
 ## TODO
 
-- [ ] 导出聊天记录 - 支持多种格式、包含历史和元数据
 - [ ] 提示词收藏夹 - 提示词对比页面收藏功能、管理收藏
-- [ ] 暗黑模式优化 - 修复图标颜色、整体 UI 适配
 - [ ] 支持图像平台 - 扩展至图像生成 AI 平台
+
+---
+
+## 🥰 鸣谢
+
+### 开发者
+- [@hellolib](https://github.com/hellolib)
+- [@ipfred](https://github.com/ipfred)
+- [@JiaoShuaiBing](https://github.com/JiaoShuaiBing)
+
+### 开源项目
+
+- [vuepress-theme-reco](https://theme-reco.vuejs.press/)
 
 ---
 
