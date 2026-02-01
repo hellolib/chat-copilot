@@ -4,6 +4,7 @@
  */
 
 import { ErrorHandler } from '@shared/errors';
+import { createLogoUseSvg } from './logoSprite';
 
 type FloatingButtonPosition = {
   side: 'left' | 'right';
@@ -84,43 +85,8 @@ export class FloatingButton {
     button.type = 'button';
     button.setAttribute('aria-label', 'chat copilot');
 
-    const defaultIconUrl = this.options.getExtensionURL('assets/chat-copilot-btn-no-light.svg');
-    const hoverIconUrl = this.options.getExtensionURL('assets/chat-copilot-btn.svg');
-
-    if (defaultIconUrl) {
-      const icon = document.createElement('img');
-      icon.className = 'chat-copilot-floating-icon';
-      icon.src = defaultIconUrl;
-      icon.alt = 'chat copilot';
-      icon.draggable = false;
-      const fallback = document.createElement('span');
-      fallback.className = 'chat-copilot-floating-fallback';
-      fallback.textContent = 'CC';
-      fallback.style.display = 'none';
-      icon.onerror = () => {
-        icon.remove();
-        fallback.style.display = 'block';
-      };
-      button.appendChild(icon);
-      button.appendChild(fallback);
-
-      button.addEventListener('mouseenter', () => {
-        if (hoverIconUrl) {
-          icon.src = hoverIconUrl;
-        }
-      });
-
-      button.addEventListener('mouseleave', () => {
-        if (!wrapper.classList.contains('drawer-open') && defaultIconUrl) {
-          icon.src = defaultIconUrl;
-        }
-      });
-    } else {
-      const fallback = document.createElement('span');
-      fallback.className = 'chat-copilot-floating-fallback';
-      fallback.textContent = 'CC';
-      button.appendChild(fallback);
-    }
+    const svg = createLogoUseSvg('chat-copilot-floating-icon', 31);
+    button.appendChild(svg);
 
     button.addEventListener('click', (event) => {
       event.preventDefault();
@@ -258,17 +224,9 @@ export class FloatingButton {
     tooltip.textContent = 'chat copilot';
 
     let closeTimer: ReturnType<typeof setTimeout> | null = null;
-    const resetIcon = () => {
-      if (!defaultIconUrl) {return;}
-      const icon = wrapper.querySelector('.chat-copilot-floating-icon') as HTMLImageElement | null;
-      if (icon) {
-        icon.src = defaultIconUrl;
-      }
-    };
     const closeDrawer = () => {
       wrapper.classList.remove('drawer-open');
       wrapper.classList.remove('drawer-open-down');
-      resetIcon();
     };
     const openDrawer = () => {
       if (closeTimer) {
@@ -284,12 +242,6 @@ export class FloatingButton {
         wrapper.classList.remove('drawer-open-down');
       }
       wrapper.classList.add('drawer-open');
-      if (hoverIconUrl) {
-        const icon = wrapper.querySelector('.chat-copilot-floating-icon') as HTMLImageElement | null;
-        if (icon) {
-          icon.src = hoverIconUrl;
-        }
-      }
     };
     const scheduleClose = () => {
       if (closeTimer) {

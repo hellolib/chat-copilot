@@ -14,6 +14,7 @@ export class StorageManager {
     try {
       // 默认禁用 yiyan、perplexity 和 qianwen，其他站点默认启用
       const defaultDisabledSites = ['yiyan', 'perplexity', 'qianwen'];
+      // eslint-disable-next-line max-len
       const defaultEnabledSites = QUICK_ACCESS_SITES.map(site => site.id).filter(id => !defaultDisabledSites.includes(id));
       
       const defaults: UserSettings = {

@@ -53,9 +53,19 @@ body {
   opacity: 0.8;
 }
 
-.popup-header h1 img {
+.popup-logo {
   width: 22px;
   height: 22px;
+  display: block;
+  background-color: currentColor;
+  -webkit-mask-image: var(--cc-logo-url);
+  mask-image: var(--cc-logo-url);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  mask-size: contain;
 }
 
 .popup-version {
@@ -239,6 +249,12 @@ body {
   border-radius: var(--radius-sm);
   object-fit: contain;
   flex-shrink: 0;
+}
+
+.current-model-icon,
+.model-option-icon {
+  background: #ffffff;
+  box-sizing: border-box;
 }
 
 .model-option-info {

@@ -88,6 +88,7 @@ export class PromptSidebar {
     });
   }
 
+  // eslint-disable-next-line max-len
   private resolveToggleVisibility(settings?: { showFloatingButton?: boolean; showPromptSidebarToggle?: boolean }): boolean {
     const showFloatingButton = settings?.showFloatingButton ?? true;
     if (showFloatingButton) {

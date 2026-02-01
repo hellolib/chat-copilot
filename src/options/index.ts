@@ -12,7 +12,7 @@ import {
   PROVIDER_ICONS,
   CustomRule,
   PROMPT_METHOD_TAGS,
-  PromptMethodTagId
+  PromptMethodTagId,
 } from '@shared/types';
 import {ConfigValidator} from '@shared/validators';
 import {Toast} from '@shared/toast';

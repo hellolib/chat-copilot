@@ -57,9 +57,10 @@ class PopupApp {
   }
 
   private loadIcon(): void {
-    const iconEl = document.getElementById('popup-icon') as HTMLImageElement;
+    const iconEl = document.getElementById('popup-icon') as HTMLElement | null;
     if (iconEl) {
-      iconEl.src = chrome.runtime.getURL('assets/chat-copilot-btn.svg');
+      const logoUrl = chrome.runtime.getURL('assets/chat-copilot-btn.svg');
+      iconEl.style.setProperty('--cc-logo-url', `url("${logoUrl}")`);
     }
   }
 
