@@ -37,6 +37,7 @@ class OptionsApp {
     this.renderModelList();
     await this.renderQuickAccess();
     await this.renderCustomRules();
+    this.updateOptimizationAvailability();
     await this.loadFloatingButtonSettings();
     this.initSidebarNavigation();
     // 处理页面加载时的 hash 导航
@@ -339,7 +340,7 @@ class OptionsApp {
       this.saveFloatingButtonSettings(checked);
     });
 
-    // 自定义规则相关
+    // 自定义优化规则相关
     document.getElementById('btn-add-custom-rule')?.addEventListener('click', () => {
       this.showCustomRuleForm();
     });
@@ -398,6 +399,45 @@ class OptionsApp {
 
     this.promptMethodTagIds = selectedIds;
     await this.saveSettings({promptMethodTagIds: selectedIds});
+  }
+
+  private updateOptimizationAvailability(): void {
+    const isBuiltinSelected = this.currentModelId === 'builtin-rules';
+    this.toggleSectionDisabled('section-prompt-methods', isBuiltinSelected);
+    this.toggleSectionDisabled('section-custom-rules', isBuiltinSelected);
+
+    const promptContainer = document.getElementById('prompt-methods-list');
+    promptContainer?.querySelectorAll<HTMLInputElement>('.prompt-method-checkbox').forEach((checkbox) => {
+      checkbox.disabled = isBuiltinSelected;
+    });
+
+    const addCustomRuleButton = document.getElementById('btn-add-custom-rule') as HTMLButtonElement | null;
+    if (addCustomRuleButton) {
+      addCustomRuleButton.disabled = isBuiltinSelected;
+    }
+
+    const customRulesContainer = document.getElementById('custom-rules-list');
+    customRulesContainer?.querySelectorAll<HTMLButtonElement>('button').forEach((button) => {
+      button.disabled = isBuiltinSelected;
+    });
+
+    if (isBuiltinSelected) {
+      this.hideCustomRuleForm();
+    }
+  }
+
+  private toggleSectionDisabled(sectionId: string, disabled: boolean): void {
+    const section = document.getElementById(sectionId);
+    if (!section) {
+      return;
+    }
+    section.classList.toggle('is-disabled', disabled);
+    section.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    if (disabled) {
+      section.setAttribute('data-disabled-hint', '使用内置优化引擎时不可用，请切换为自定义模型以启用。');
+    } else {
+      section.removeAttribute('data-disabled-hint');
+    }
   }
 
   private selectProvider(provider: ModelProvider): void {
@@ -684,6 +724,7 @@ class OptionsApp {
 
     this.hideModelForm();
     this.renderModelList();
+    this.updateOptimizationAvailability();
   }
 
   private async deleteModel(id: string): Promise<void> {
@@ -721,6 +762,7 @@ class OptionsApp {
 
     // 重新渲染列表以更新删除按钮状态
     this.renderModelList();
+    this.updateOptimizationAvailability();
   }
 
   /**
@@ -907,7 +949,7 @@ class OptionsApp {
   }
 
   /**
-   * 加载自定义规则
+   * 加载自定义优化规则
    */
   private async loadCustomRules(): Promise<void> {
     try {
@@ -924,7 +966,7 @@ class OptionsApp {
   }
 
   /**
-   * 渲染自定义规则列表
+   * 渲染自定义优化规则列表
    */
   private async renderCustomRules(): Promise<void> {
     const container = document.getElementById('custom-rules-list');
@@ -933,7 +975,7 @@ class OptionsApp {
     }
 
     if (this.customRules.length === 0) {
-      container.innerHTML = '<p class="empty-state">暂无自定义规则，点击下方按钮添加</p>';
+      container.innerHTML = '<p class="empty-state">暂无自定义优化规则，点击下方按钮添加</p>';
       return;
     }
 
@@ -991,7 +1033,7 @@ class OptionsApp {
   }
 
   /**
-   * 显示自定义规则表单
+   * 显示自定义优化规则表单
    */
   private showCustomRuleForm(): void {
     this.editingCustomRuleId = null;
@@ -1002,7 +1044,7 @@ class OptionsApp {
     const enabledInput = document.getElementById('custom-rule-enabled') as HTMLInputElement;
 
     if (title) {
-      title.textContent = '添加自定义规则';
+      title.textContent = '添加自定义优化规则';
     }
     if (form) {
       form.reset();
@@ -1018,7 +1060,7 @@ class OptionsApp {
   }
 
   /**
-   * 隐藏自定义规则表单
+   * 隐藏自定义优化规则表单
    */
   private hideCustomRuleForm(): void {
     const backdrop = document.getElementById('custom-rule-modal-backdrop');
@@ -1029,7 +1071,7 @@ class OptionsApp {
   }
 
   /**
-   * 编辑自定义规则
+   * 编辑自定义优化规则
    */
   private editCustomRule(id: string): void {
     const rule = this.customRules.find((r) => r.id === id);
@@ -1045,7 +1087,7 @@ class OptionsApp {
     const enabledInput = document.getElementById('custom-rule-enabled') as HTMLInputElement;
 
     if (title) {
-      title.textContent = '编辑自定义规则';
+      title.textContent = '编辑自定义优化规则';
     }
     if (_nameInput) {
       _nameInput.value = rule.name;
@@ -1064,7 +1106,7 @@ class OptionsApp {
   }
 
   /**
-   * 保存自定义规则
+   * 保存自定义优化规则
    */
   private async saveCustomRule(): Promise<void> {
     const nameInput = document.getElementById('custom-rule-name') as HTMLInputElement;
@@ -1108,7 +1150,7 @@ class OptionsApp {
   }
 
   /**
-   * 更新自定义规则
+   * 更新自定义优化规则
    */
   private async updateCustomRule(id: string, updates: Partial<CustomRule>): Promise<void> {
     const index = this.customRules.findIndex((r) => r.id === id);
@@ -1126,7 +1168,7 @@ class OptionsApp {
   }
 
   /**
-   * 切换自定义规则启用状态
+   * 切换自定义优化规则启用状态
    */
   private async toggleCustomRule(id: string): Promise<void> {
     const rule = this.customRules.find((r) => r.id === id);
@@ -1139,7 +1181,7 @@ class OptionsApp {
   }
 
   /**
-   * 删除自定义规则
+   * 删除自定义优化规则
    */
   private async deleteCustomRule(id: string): Promise<void> {
     const rule = this.customRules.find((r) => r.id === id);

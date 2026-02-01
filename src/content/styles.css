@@ -76,6 +76,9 @@
   --cc-z-modal: 10000;
   --cc-z-tooltip: 10001;
   --cc-z-toast: 10002;
+
+  /* 图标背景 */
+  --cc-icon-bg: #ffffff;
 }
 
 /* 深色模式 */
@@ -381,6 +384,9 @@
   width: 14px;
   height: 14px;
   flex-shrink: 0;
+  background: var(--cc-icon-bg);
+  border-radius: var(--cc-radius-sm);
+  box-sizing: border-box;
 }
 
 .chat-copilot-model-tip {

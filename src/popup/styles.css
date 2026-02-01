@@ -18,6 +18,10 @@ body {
   transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
+:root {
+  --cc-icon-bg: #ffffff;
+}
+
 .popup-container {
   padding: var(--space-3);
   display: flex;
@@ -410,6 +414,9 @@ body {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  background: var(--cc-icon-bg);
+  border-radius: var(--radius-sm);
+  box-sizing: border-box;
 }
 
 .site-icon-text {
@@ -425,6 +432,7 @@ body {
   max-width: 100%;
   font-weight: var(--font-weight-normal);
 }
+
 
 /* ========================================
  * Footer - 页脚

@@ -188,21 +188,21 @@ export class StorageManager {
   }
 
   /**
-   * 获取用户自定义规则
+   * 获取用户自定义优化规则
    */
   async getCustomRules(): Promise<CustomRule[]> {
     return (await this.get<CustomRule[]>('custom_rules')) ?? [];
   }
 
   /**
-   * 保存用户自定义规则
+   * 保存用户自定义优化规则
    */
   async saveCustomRules(rules: CustomRule[]): Promise<void> {
     await this.set('custom_rules', rules);
   }
 
   /**
-   * 添加自定义规则
+   * 添加自定义优化规则
    */
   async addCustomRule(rule: Omit<CustomRule, 'id' | 'createdAt' | 'updatedAt'>): Promise<CustomRule> {
     const rules = await this.getCustomRules();
@@ -219,7 +219,7 @@ export class StorageManager {
   }
 
   /**
-   * 更新自定义规则
+   * 更新自定义优化规则
    */
   async updateCustomRule(id: string, updates: Partial<CustomRule>): Promise<void> {
     const rules = await this.getCustomRules();
@@ -238,7 +238,7 @@ export class StorageManager {
   }
 
   /**
-   * 删除自定义规则
+   * 删除自定义优化规则
    */
   async deleteCustomRule(id: string): Promise<void> {
     const rules = await this.getCustomRules();

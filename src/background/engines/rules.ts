@@ -254,7 +254,7 @@ export class RulesEngine {
   }
 
   /**
-   * 添加自定义规则
+   * 添加自定义优化规则
    */
   addCustomRule(rule: OptimizationRule): void {
     this.rules.push(rule);
