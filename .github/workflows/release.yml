@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -41,6 +43,7 @@ jobs:
       - name: Generate release notes
         id: release_notes
         run: |
+          git fetch --tags --force
           PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
           if [ -n "$PREV_TAG" ]; then
             echo "## Changes since $PREV_TAG" > release_notes.md
@@ -59,6 +62,5 @@ jobs:
             build/chat-copilot-*.zip
           draft: false
           prerelease: ${{ contains(steps.get_version.outputs.version, '-') }}
-          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
