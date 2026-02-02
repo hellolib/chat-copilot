@@ -85,7 +85,10 @@ export class FloatingButton {
     button.type = 'button';
     button.setAttribute('aria-label', 'chat copilot');
 
-    const svg = createLogoUseSvg('chat-copilot-floating-icon', 31);
+    // 默认显示无光线版本的 Logo
+    const noLightUrl = this.options.getExtensionURL('assets/chat-copilot-btn-no-light.svg');
+    const lightUrl = this.options.getExtensionURL('assets/chat-copilot-btn.svg');
+    const svg = createLogoUseSvg('chat-copilot-floating-icon', 31, noLightUrl);
     button.appendChild(svg);
 
     button.addEventListener('click', (event) => {
@@ -227,12 +230,16 @@ export class FloatingButton {
     const closeDrawer = () => {
       wrapper.classList.remove('drawer-open');
       wrapper.classList.remove('drawer-open-down');
+      // 关闭抽屉时恢复无光线 Logo
+      svg.style.setProperty('--cc-logo-url', `url("${noLightUrl}")`);
     };
     const openDrawer = () => {
       if (closeTimer) {
         clearTimeout(closeTimer);
         closeTimer = null;
       }
+      // 打开抽屉时显示有光线 Logo
+      svg.style.setProperty('--cc-logo-url', `url("${lightUrl}")`);
       const wrapperRect = wrapper.getBoundingClientRect();
       const drawerHeight = drawer.offsetHeight;
       const spacing = 10;
