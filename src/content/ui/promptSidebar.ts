@@ -11,9 +11,31 @@ import { Toast } from '@shared/toast';
 const CONTENT_TRUNCATE_LENGTH = 100;
 const ANSWER_TRUNCATE_LENGTH = 150;
 
+
+const PUSH_TARGETS_MAP: Record<string, string> = {
+  'chatgpt.com': '.w-screen',//
+  'chat.openai.com': '.w-screen',//
+  'claude.ai': 'html',//
+  'chat.deepseek.com': '#root > div > div',//
+  'gemini.google.com': '#app-root',//
+  'grok.com': 'html',//
+  'kimi.com': 'html',//
+  'kimi.moonshot.cn': 'html',//
+  'perplexity.ai': 'html',
+  'www.perplexity.ai': 'html',
+  'www.qianwen.com': 'html',//
+  'chat.qwen.ai': 'html',//
+  'yiyan.baidu.com': 'html',//
+  'yuanbao.tencent.com': 'html',//
+};
+
+
 export class PromptSidebar {
   private adapter: PlatformAdapter;
   private sidebar: HTMLElement | null = null;
+  private initialBodyPaddingRight = '';
+  private pushTarget: HTMLElement | null = null;
+  private pushModeEnabled = true;
   private toggleButton: HTMLElement | null = null;
   private isOpen = false;
   private currentCategory: PromptCategory = 'coding';
@@ -69,7 +91,11 @@ export class PromptSidebar {
     try {
       const result = await chrome.storage.local.get(['settings']);
       this.showToggleButton = this.resolveToggleVisibility(result.settings);
+      this.pushModeEnabled = result.settings?.promptSidebarPushMode ?? true;
       this.updateToggleButtonVisibility();
+      if (!this.pushModeEnabled && this.isOpen) {
+        this.resetPanelOffset();
+      }
     } catch (error) {
       console.error('Failed to load settings:', error);
     }
@@ -83,7 +109,14 @@ export class PromptSidebar {
       if (areaName === 'local' && changes.settings) {
         const newSettings = changes.settings.newValue;
         this.showToggleButton = this.resolveToggleVisibility(newSettings);
+        this.pushModeEnabled = newSettings?.promptSidebarPushMode ?? true;
         this.updateToggleButtonVisibility();
+        if (!this.pushModeEnabled && this.isOpen) {
+          this.resetPanelOffset();
+        }
+        if (this.pushModeEnabled && this.isOpen) {
+          this.applyPanelOffset(this.sidebar?.offsetWidth ?? 0);
+        }
       }
     });
   }
@@ -455,6 +488,9 @@ export class PromptSidebar {
       const diff = startX - e.clientX;
       const newWidth = Math.min(Math.max(startWidth + diff, 280), 600);
       sidebar.style.width = `${newWidth}px`;
+      if (this.isOpen) {
+        this.applyPanelOffset(newWidth);
+      }
     });
 
     document.addEventListener('mouseup', () => {
@@ -464,6 +500,9 @@ export class PromptSidebar {
         document.body.style.userSelect = '';
         // 保存宽度到存储
         chrome.storage.local.set({ promptSidebarWidth: sidebar.offsetWidth });
+        if (this.isOpen) {
+          this.applyPanelOffset(sidebar.offsetWidth);
+        }
       }
     });
   }
@@ -605,6 +644,7 @@ export class PromptSidebar {
     this.sidebar.classList.add('open');
     this.toggleButton?.classList.add('active');
     this.isOpen = true;
+    this.applyPanelOffset(this.sidebar.offsetWidth);
   }
 
   /**
@@ -615,6 +655,44 @@ export class PromptSidebar {
     this.sidebar.classList.remove('open');
     this.toggleButton?.classList.remove('active');
     this.isOpen = false;
+    this.resetPanelOffset();
+  }
+
+  private applyPanelOffset(width: number): void {
+    if (!this.pushModeEnabled) { return; }
+    const target = this.resolvePushTarget();
+    if (!target) { return; }
+    if (!this.pushTarget || this.pushTarget !== target) {
+      this.pushTarget = target;
+      this.initialBodyPaddingRight = target.style.paddingRight || '';
+    }
+    target.style.paddingRight = `${width}px`;
+  }
+
+  private resetPanelOffset(): void {
+    if (this.pushTarget) {
+      this.pushTarget.style.paddingRight = this.initialBodyPaddingRight;
+      this.pushTarget = null;
+    }
+  }
+
+  private resolvePushTarget(): HTMLElement | null {
+    const selector = this.getPushTargetSelector();
+    if (!selector) { return null; }
+    return document.querySelector(selector);
+  }
+
+  private getPushTargetSelector(): string | null {
+    const host = window.location.host;
+    if (PUSH_TARGETS_MAP[host]) {
+      return PUSH_TARGETS_MAP[host];
+    }
+    for (const key of Object.keys(PUSH_TARGETS_MAP)) {
+      if (host.endsWith(`.${key}`)) {
+        return PUSH_TARGETS_MAP[key];
+      }
+    }
+    return null;
   }
 
   /**

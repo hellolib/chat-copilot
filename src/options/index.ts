@@ -39,6 +39,7 @@ class OptionsApp {
     await this.renderCustomRules();
     this.updateOptimizationAvailability();
     await this.loadFloatingButtonSettings();
+    await this.loadPromptSidebarSettings();
     this.initSidebarNavigation();
     // 处理页面加载时的 hash 导航
     this.handleHashNavigation();
@@ -338,6 +339,12 @@ class OptionsApp {
     document.getElementById('show-floating-button-toggle')?.addEventListener('change', (e) => {
       const checked = (e.target as HTMLInputElement).checked;
       this.saveFloatingButtonSettings(checked);
+    });
+
+    // 提示词广场侧边栏弹出方式
+    document.getElementById('prompt-sidebar-push-toggle')?.addEventListener('change', (e) => {
+      const checked = (e.target as HTMLInputElement).checked;
+      this.savePromptSidebarSettings(checked);
     });
 
     // 自定义优化规则相关
@@ -942,10 +949,30 @@ class OptionsApp {
   }
 
   /**
+   * 加载提示词广场侧边栏设置
+   */
+  private async loadPromptSidebarSettings(): Promise<void> {
+    const result = await chrome.storage.local.get(['settings']);
+    const pushModeEnabled = result.settings?.promptSidebarPushMode ?? true;
+
+    const toggle = document.getElementById('prompt-sidebar-push-toggle') as HTMLInputElement;
+    if (toggle) {
+      toggle.checked = pushModeEnabled;
+    }
+  }
+
+  /**
    * 保存悬浮按钮设置
    */
   private async saveFloatingButtonSettings(showToggle: boolean): Promise<void> {
     await this.saveSettings({showFloatingButton: showToggle});
+  }
+
+  /**
+   * 保存提示词广场侧边栏设置
+   */
+  private async savePromptSidebarSettings(pushModeEnabled: boolean): Promise<void> {
+    await this.saveSettings({promptSidebarPushMode: pushModeEnabled});
   }
 
   /**
