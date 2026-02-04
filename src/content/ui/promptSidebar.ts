@@ -33,9 +33,11 @@ const PUSH_TARGETS_MAP: Record<string, string> = {
 export class PromptSidebar {
   private adapter: PlatformAdapter;
   private sidebar: HTMLElement | null = null;
-  private initialBodyPaddingRight = '';
   private pushTarget: HTMLElement | null = null;
   private pushModeEnabled = true;
+  private pushTargetCleanupTimer: number | null = null;
+  private pushTargetTransitionHandler?: (event: TransitionEvent) => void;
+  private pushTargetRafId: number | null = null;
   private toggleButton: HTMLElement | null = null;
   private isOpen = false;
   private currentCategory: PromptCategory = 'coding';
@@ -46,6 +48,9 @@ export class PromptSidebar {
   private expandedPrompts: Set<string> = new Set(); // 展开的提示词ID
   private expandedAnswers: Set<string> = new Set(); // 展开的答案ID
   private isLoading = true;
+
+  private readonly pushTargetClass = 'chat-copilot-push-target';
+  private readonly pushTargetDraggingClass = 'chat-copilot-push-target--dragging';
 
   constructor(adapter: PlatformAdapter) {
     this.adapter = adapter;
@@ -94,7 +99,7 @@ export class PromptSidebar {
       this.pushModeEnabled = result.settings?.promptSidebarPushMode ?? true;
       this.updateToggleButtonVisibility();
       if (!this.pushModeEnabled && this.isOpen) {
-        this.resetPanelOffset();
+        this.resetPanelOffset(true);
       }
     } catch (error) {
       console.error('Failed to load settings:', error);
@@ -112,7 +117,7 @@ export class PromptSidebar {
         this.pushModeEnabled = newSettings?.promptSidebarPushMode ?? true;
         this.updateToggleButtonVisibility();
         if (!this.pushModeEnabled && this.isOpen) {
-          this.resetPanelOffset();
+          this.resetPanelOffset(true);
         }
         if (this.pushModeEnabled && this.isOpen) {
           this.applyPanelOffset(this.sidebar?.offsetWidth ?? 0);
@@ -481,6 +486,7 @@ export class PromptSidebar {
       startWidth = sidebar.offsetWidth;
       document.body.style.cursor = 'ew-resize';
       document.body.style.userSelect = 'none';
+      this.setPushTargetDragging(true);
     });
 
     document.addEventListener('mousemove', (e: MouseEvent) => {
@@ -498,6 +504,7 @@ export class PromptSidebar {
         isResizing = false;
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
+        this.setPushTargetDragging(false);
         // 保存宽度到存储
         chrome.storage.local.set({ promptSidebarWidth: sidebar.offsetWidth });
         if (this.isOpen) {
@@ -662,18 +669,86 @@ export class PromptSidebar {
     if (!this.pushModeEnabled) { return; }
     const target = this.resolvePushTarget();
     if (!target) { return; }
-    if (!this.pushTarget || this.pushTarget !== target) {
+    const isNewTarget = !this.pushTarget || this.pushTarget !== target;
+    if (isNewTarget) {
+      this.cleanupPushTarget();
       this.pushTarget = target;
-      this.initialBodyPaddingRight = target.style.paddingRight || '';
+      target.classList.add(this.pushTargetClass);
+      target.style.setProperty('--cc-push-offset', '0px');
     }
-    target.style.paddingRight = `${width}px`;
+    this.cancelPushTargetCleanup();
+    this.cancelPushTargetRaf();
+    if (isNewTarget) {
+      this.pushTargetRafId = window.requestAnimationFrame(() => {
+        this.pushTargetRafId = null;
+        if (this.pushTarget === target) {
+          target.style.setProperty('--cc-push-offset', `${width}px`);
+        }
+      });
+      return;
+    }
+    target.style.setProperty('--cc-push-offset', `${width}px`);
   }
 
-  private resetPanelOffset(): void {
-    if (this.pushTarget) {
-      this.pushTarget.style.paddingRight = this.initialBodyPaddingRight;
-      this.pushTarget = null;
+  private resetPanelOffset(immediate = false): void {
+    if (!this.pushTarget) { return; }
+    const target = this.pushTarget;
+    this.cancelPushTargetCleanup();
+    this.cancelPushTargetRaf();
+    if (immediate) {
+      this.cleanupPushTarget();
+      return;
     }
+    target.style.setProperty('--cc-push-offset', '0px');
+    this.pushTargetTransitionHandler = (event: TransitionEvent) => {
+      if (event.propertyName !== 'padding-right') { return; }
+      this.cleanupPushTarget();
+    };
+    target.addEventListener('transitionend', this.pushTargetTransitionHandler);
+    this.pushTargetCleanupTimer = window.setTimeout(() => {
+      this.cleanupPushTarget();
+    }, 520);
+  }
+
+  private setPushTargetDragging(isDragging: boolean): void {
+    if (!this.pushTarget) { return; }
+    this.pushTarget.classList.toggle(this.pushTargetDraggingClass, isDragging);
+  }
+
+  private cancelPushTargetCleanup(): void {
+    if (!this.pushTarget) { return; }
+    if (this.pushTargetCleanupTimer !== null) {
+      window.clearTimeout(this.pushTargetCleanupTimer);
+      this.pushTargetCleanupTimer = null;
+    }
+    if (this.pushTargetTransitionHandler) {
+      this.pushTarget.removeEventListener('transitionend', this.pushTargetTransitionHandler);
+      this.pushTargetTransitionHandler = undefined;
+    }
+  }
+
+  private cancelPushTargetRaf(): void {
+    if (this.pushTargetRafId !== null) {
+      window.cancelAnimationFrame(this.pushTargetRafId);
+      this.pushTargetRafId = null;
+    }
+  }
+
+  private cleanupPushTarget(): void {
+    if (!this.pushTarget) { return; }
+    const target = this.pushTarget;
+    this.cancelPushTargetRaf();
+    if (this.pushTargetCleanupTimer !== null) {
+      window.clearTimeout(this.pushTargetCleanupTimer);
+      this.pushTargetCleanupTimer = null;
+    }
+    if (this.pushTargetTransitionHandler) {
+      target.removeEventListener('transitionend', this.pushTargetTransitionHandler);
+      this.pushTargetTransitionHandler = undefined;
+    }
+    target.classList.remove(this.pushTargetClass, this.pushTargetDraggingClass);
+    target.style.removeProperty('--cc-push-offset');
+    this.pushTarget = null;
   }
 
   private resolvePushTarget(): HTMLElement | null {
