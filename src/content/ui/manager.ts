@@ -25,22 +25,28 @@ export class UIManager {
   private floatingButton: FloatingButton;
   private promptSidebar: PromptSidebar;
   private showFloatingButton = true;
+  private floatingButtonClickAction: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings' = 'prompt-plaza';
 
   constructor(adapter: PlatformAdapter) {
     this.adapter = adapter;
     this.promptSidebar = new PromptSidebar(adapter);
     this.floatingButton = new FloatingButton({
       getExtensionURL: this.getExtensionURL.bind(this),
-      onClick: () => this.handleOptimize(),
+      onClick: () => this.handleFloatingButtonClick(),
       actions: [
         {
           id: 'prompt-plaza',
           label: '提示词广场',
-          onClick: () => this.promptSidebar.toggle(),
+          onClick: () => this.promptSidebar.openTab('square'),
+        },
+        {
+          id: 'favorites',
+          label: '我的收藏',
+          onClick: () => this.promptSidebar.openTab('favorites'),
         },
         {
           id: 'settings',
-          label: '设置',
+          label: '插件设置',
           onClick: () => this.requestOpenOptionsPage(),
         },
       ],
@@ -79,6 +85,7 @@ export class UIManager {
     try {
       const result = await chrome.storage.local.get(['settings']);
       this.showFloatingButton = result.settings?.showFloatingButton ?? true;
+      this.floatingButtonClickAction = result.settings?.floatingButtonClickAction ?? 'prompt-plaza';
       this.floatingButton.setVisible(this.showFloatingButton);
     } catch (error) {
       ErrorHandler.logError(error, 'loadFloatingButtonSettings');
@@ -93,7 +100,29 @@ export class UIManager {
         this.showFloatingButton = newSettings.showFloatingButton;
         this.floatingButton.setVisible(this.showFloatingButton);
       }
+      if (newSettings?.floatingButtonClickAction) {
+        this.floatingButtonClickAction = newSettings.floatingButtonClickAction;
+      }
     });
+  }
+
+  private handleFloatingButtonClick(): void {
+    if (this.floatingButtonClickAction === 'none') {
+      return;
+    }
+    if (this.floatingButtonClickAction === 'prompt-plaza') {
+      this.promptSidebar.openTab('square');
+      return;
+    }
+    if (this.floatingButtonClickAction === 'favorites') {
+      this.promptSidebar.openTab('favorites');
+      return;
+    }
+    if (this.floatingButtonClickAction === 'settings') {
+      this.requestOpenOptionsPage();
+      return;
+    }
+    this.handleOptimize();
   }
 
   private requestOpenOptionsPage(): void {
@@ -504,10 +533,6 @@ export class UIManager {
       <div class="chat-copilot-dialog-content">
         <div class="chat-copilot-dialog-header">
           <div class="chat-copilot-header-left">
-            <h4 class="chat-copilot-title">
-              ${logoSvg}
-              Chat Copilot
-            </h4>
             <div class="chat-copilot-model-info">
               ${modelInfo.icon ? `<img src="${modelInfo.icon}" class="chat-copilot-model-icon" alt="model" />` : ''}
               <span>${this.escapeHtml(modelInfo.name)}</span>

@@ -40,10 +40,12 @@ export class PromptSidebar {
   private pushTargetRafId: number | null = null;
   private toggleButton: HTMLElement | null = null;
   private isOpen = false;
-  private currentCategory: PromptCategory = 'coding';
+  private activeTab: 'square' | 'favorites' = 'square';
+  private selectedCategory: PromptCategory | null = null;
   private searchKeyword = '';
   private prompts: PromptItem[] = [];
   private favoriteIds: Set<string> = new Set();
+  private favoritePrompts: Map<string, PromptItem> = new Map();
   private showToggleButton = true;
   private expandedPrompts: Set<string> = new Set(); // 展开的提示词ID
   private expandedAnswers: Set<string> = new Set(); // 展开的答案ID
@@ -59,6 +61,12 @@ export class PromptSidebar {
     this.setupStorageListener();
   }
 
+  private getVisibleCategories(): typeof PROMPT_CATEGORIES {
+    return PROMPT_CATEGORIES
+      .filter(cat => cat.enabled !== false)
+      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  }
+
   /**
    * 加载提示词数据
    */
@@ -71,12 +79,17 @@ export class PromptSidebar {
       this.prompts = [...builtinPrompts];
 
       // 从存储加载用户自定义提示词和收藏
-      const result = await chrome.storage.local.get(['customPrompts', 'favoritePromptIds']);
+      const result = await chrome.storage.local.get(['customPrompts', 'favoritePromptIds', 'favoritePrompts']);
       if (result.customPrompts) {
         this.prompts = [...this.prompts, ...result.customPrompts];
       }
       if (result.favoritePromptIds) {
         this.favoriteIds = new Set(result.favoritePromptIds);
+      }
+      if (result.favoritePrompts) {
+        this.favoritePrompts = new Map(
+          (result.favoritePrompts as PromptItem[]).map(prompt => [prompt.id, prompt]),
+        );
       }
     } catch (error) {
       console.error('Failed to load prompts:', error);
@@ -207,9 +220,20 @@ export class PromptSidebar {
    * 渲染侧边栏内容
    */
   private renderSidebarContent(): string {
+    const visibleCategories = this.getVisibleCategories();
+    if (this.selectedCategory) {
+      const visibleCategoryIds = new Set(visibleCategories.map(cat => cat.id));
+      if (!visibleCategoryIds.has(this.selectedCategory)) {
+        this.selectedCategory = null;
+      }
+    }
+
     return `
       <div class="chat-copilot-prompt-sidebar-header">
-        <h3>提示词广场</h3>
+        <div class="chat-copilot-prompt-sidebar-tabs">
+          <button class="chat-copilot-prompt-tab ${this.activeTab === 'square' ? 'active' : ''}" data-tab="square">提示词广场</button>
+          <button class="chat-copilot-prompt-tab ${this.activeTab === 'favorites' ? 'active' : ''}" data-tab="favorites">我的收藏</button>
+        </div>
         <button class="chat-copilot-prompt-sidebar-close" title="关闭">
           <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M18 6L6 18M6 6l12 12"/>
@@ -222,8 +246,8 @@ export class PromptSidebar {
       </div>
 
       <div class="chat-copilot-prompt-sidebar-categories">
-        ${PROMPT_CATEGORIES.map(cat => `
-          <button class="chat-copilot-prompt-category ${this.currentCategory === cat.id ? 'active' : ''}" data-category="${cat.id}">
+        ${visibleCategories.map(cat => `
+          <button class="chat-copilot-prompt-category ${this.selectedCategory === cat.id ? 'active' : ''}" data-category="${cat.id}">
             ${cat.name}
           </button>
         `).join('')}
@@ -253,6 +277,16 @@ export class PromptSidebar {
     const filteredPrompts = this.getFilteredPrompts();
 
     if (filteredPrompts.length === 0) {
+      if (this.activeTab === 'favorites') {
+        return `
+          <div class="chat-copilot-prompt-empty">
+            <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1">
+              <path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 6 4 4 6.5 4c1.54 0 3.04.99 3.57 2.36h1.87C12.46 4.99 13.96 4 15.5 4 18 4 20 6 20 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"/>
+            </svg>
+            <p>暂无收藏</p>
+          </div>
+        `;
+      }
       return `
         <div class="chat-copilot-prompt-empty">
           <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1">
@@ -271,7 +305,7 @@ export class PromptSidebar {
    */
   private renderPromptCard(prompt: PromptItem): string {
     const isFavorite = this.favoriteIds.has(prompt.id);
-    PROMPT_CATEGORIES.find(c => c.id === prompt.category);
+    const category = PROMPT_CATEGORIES.find(c => c.id === prompt.category);
     const isContentExpanded = this.expandedPrompts.has(prompt.id);
     const isAnswerExpanded = this.expandedAnswers.has(prompt.id);
 
@@ -292,19 +326,13 @@ export class PromptSidebar {
         : prompt.answer?.substring(0, ANSWER_TRUNCATE_LENGTH) + '...')
       : '';
 
-    // 难度标签
-    const difficultyLabels: Record<string, { text: string; class: string }> = {
-      easy: { text: '简单', class: 'easy' },
-      medium: { text: '中等', class: 'medium' },
-      hard: { text: '困难', class: 'hard' },
-    };
-    const difficulty = prompt.difficulty ? difficultyLabels[prompt.difficulty] : null;
-
     return `
       <div class="chat-copilot-prompt-card ${hasAnswer ? 'has-answer' : ''}" data-prompt-id="${prompt.id}">
         <div class="chat-copilot-prompt-card-header">
-          <h4 class="chat-copilot-prompt-card-title">${this.escapeHtml(prompt.title)}</h4>
-          ${difficulty ? `<span class="chat-copilot-prompt-difficulty ${difficulty.class}">${difficulty.text}</span>` : ''}
+          <h4 class="chat-copilot-prompt-card-title">
+            ${this.escapeHtml(prompt.title)}
+            ${category ? `<span class="chat-copilot-prompt-card-category">${this.escapeHtml(category.name)}</span>` : ''}
+          </h4>
           <button class="chat-copilot-prompt-card-favorite ${isFavorite ? 'active' : ''}" data-prompt-id="${prompt.id}" title="${isFavorite ? '取消收藏' : '收藏'}">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="${isFavorite ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
               <path d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
@@ -390,11 +418,29 @@ export class PromptSidebar {
       this.updatePromptList();
     });
 
+    // Tab 切换
+    sidebar.querySelectorAll('.chat-copilot-prompt-tab').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const tab = (e.currentTarget as HTMLElement).dataset.tab as 'square' | 'favorites';
+        if (this.activeTab === tab) { return; }
+        this.activeTab = tab;
+        this.searchKeyword = '';
+        this.selectedCategory = null;
+        this.updateTabs();
+        this.updatePromptList();
+        this.updateCategories();
+        const input = sidebar.querySelector('.chat-copilot-prompt-sidebar-search input') as HTMLInputElement | null;
+        if (input) {
+          input.value = '';
+        }
+      });
+    });
+
     // 分类切换
     sidebar.querySelectorAll('.chat-copilot-prompt-category').forEach(btn => {
       btn.addEventListener('click', (e) => {
         const category = (e.currentTarget as HTMLElement).dataset.category as PromptCategory;
-        this.currentCategory = category;
+        this.selectedCategory = this.selectedCategory === category ? null : category;
         this.updateCategories();
         this.updatePromptList();
       });
@@ -521,7 +567,24 @@ export class PromptSidebar {
     let filtered = this.prompts;
 
     // 按分类过滤
-    filtered = filtered.filter(p => p.category === this.currentCategory);
+    if (this.activeTab === 'favorites') {
+      const favoriteList: PromptItem[] = [];
+      this.favoriteIds.forEach(id => {
+        const prompt = this.prompts.find(p => p.id === id) || this.favoritePrompts.get(id);
+        if (prompt) {
+          favoriteList.push(prompt);
+        }
+      });
+      filtered = favoriteList;
+      if (this.selectedCategory) {
+        filtered = filtered.filter(p => p.category === this.selectedCategory);
+      }
+    } else if (this.selectedCategory) {
+      filtered = filtered.filter(p => p.category === this.selectedCategory);
+    }
+
+    // 过滤禁用项
+    filtered = filtered.filter(p => p.enabled !== false);
 
     // 按关键词搜索
     if (this.searchKeyword.trim()) {
@@ -533,7 +596,13 @@ export class PromptSidebar {
       );
     }
 
-    return filtered;
+    return filtered.sort((a, b) => {
+      const orderDiff = (a.order ?? 0) - (b.order ?? 0);
+      if (orderDiff !== 0) {
+        return orderDiff;
+      }
+      return a.title.localeCompare(b.title);
+    });
   }
 
   /**
@@ -542,8 +611,16 @@ export class PromptSidebar {
   private updateCategories(): void {
     if (!this.sidebar) { return; }
     this.sidebar.querySelectorAll('.chat-copilot-prompt-category').forEach(btn => {
-      const category = (btn as HTMLElement).dataset.category;
-      btn.classList.toggle('active', category === this.currentCategory);
+      const category = (btn as HTMLElement).dataset.category as PromptCategory | undefined;
+      btn.classList.toggle('active', !!category && this.selectedCategory === category);
+    });
+  }
+
+  private updateTabs(): void {
+    if (!this.sidebar) { return; }
+    this.sidebar.querySelectorAll('.chat-copilot-prompt-tab').forEach(btn => {
+      const tab = (btn as HTMLElement).dataset.tab as 'square' | 'favorites' | undefined;
+      btn.classList.toggle('active', !!tab && this.activeTab === tab);
     });
   }
 
@@ -590,15 +667,23 @@ export class PromptSidebar {
    * 切换收藏状态
    */
   private async toggleFavorite(promptId: string): Promise<void> {
+    const prompt = this.prompts.find(p => p.id === promptId);
     if (this.favoriteIds.has(promptId)) {
       this.favoriteIds.delete(promptId);
+      this.favoritePrompts.delete(promptId);
     } else {
       this.favoriteIds.add(promptId);
+      if (prompt) {
+        this.favoritePrompts.set(promptId, { ...prompt });
+      }
     }
 
     // 保存到存储
     try {
-      await chrome.storage.local.set({ favoritePromptIds: Array.from(this.favoriteIds) });
+      await chrome.storage.local.set({
+        favoritePromptIds: Array.from(this.favoriteIds),
+        favoritePrompts: Array.from(this.favoritePrompts.values()),
+      });
     } catch (error) {
       console.error('Failed to save favorites:', error);
     }
@@ -629,6 +714,26 @@ export class PromptSidebar {
       this.close();
     } else {
       this.open();
+    }
+  }
+
+  openTab(tab: 'square' | 'favorites'): void {
+    if (!this.sidebar) {
+      this.createSidebar();
+    }
+    this.activeTab = tab;
+    this.searchKeyword = '';
+    if (this.sidebar) {
+      const input = this.sidebar.querySelector('.chat-copilot-prompt-sidebar-search input') as HTMLInputElement | null;
+      if (input) {
+        input.value = '';
+      }
+      this.updateTabs();
+      this.updateCategories();
+      this.updatePromptList();
+    }
+    if (!this.isOpen) {
+      void this.open();
     }
   }
 

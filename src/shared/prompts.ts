@@ -7,14 +7,12 @@ import { PromptItem, PromptCategory, PromptCategoryJson } from './types';
 
 // 分类文件列表
 const CATEGORY_FILES: PromptCategory[] = [
-  'logic',
-  'knowledge',
-  'vision',
   'coding',
-  'hallucination',
-  'image_gen',
-  'writing',
-  'roleplay',
+  'text',
+  'image',
+  'ppt',
+  'video',
+  'general',
 ];
 
 // 缓存加载的提示词
@@ -37,12 +35,14 @@ async function loadCategoryPrompts(category: PromptCategory): Promise<PromptItem
     return data.prompts.map(item => ({
       id: item.id,
       title: item.title,
+      desc: item.desc,
       content: item.content,
       category: data.category,
       tags: item.tags,
       isBuiltin: true,
       answer: item.answer,
-      difficulty: item.difficulty,
+      order: item.order,
+      enabled: item.enabled,
     }));
   } catch (error) {
     console.error(`Error loading prompts for category ${category}:`, error);
@@ -66,7 +66,7 @@ export async function loadBuiltinPrompts(): Promise<PromptItem[]> {
     );
 
     // 合并所有提示词
-    cachedPrompts = results.flat();
+    cachedPrompts = results.flat().filter(item => item.enabled !== false);
     return cachedPrompts;
   } catch (error) {
     console.error('Error loading builtin prompts:', error);
