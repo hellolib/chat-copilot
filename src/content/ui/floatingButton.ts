@@ -167,18 +167,13 @@ export class FloatingButton {
         const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
         const clampedTop = Math.min(Math.max(0, rect.top), maxTop);
         const edgeOffset = this.getEdgeOffset();
-        const side: 'left' | 'right' = rect.left + rect.width / 2 < window.innerWidth / 2 ? 'left' : 'right';
+        const side: 'right' = 'right';
 
         wrapper.classList.add('snapping', 'floating-custom-position');
         wrapper.style.top = `${clampedTop}px`;
         wrapper.style.bottom = 'auto';
-        if (side === 'left') {
-          wrapper.style.left = `${edgeOffset}px`;
-          wrapper.style.right = 'auto';
-        } else {
-          wrapper.style.right = `${edgeOffset}px`;
-          wrapper.style.left = 'auto';
-        }
+        wrapper.style.right = `${edgeOffset}px`;
+        wrapper.style.left = 'auto';
 
         if (this.snapTimer) {
           clearTimeout(this.snapTimer);
@@ -288,7 +283,7 @@ export class FloatingButton {
     svg.setAttribute('height', '18');
     svg.setAttribute('fill', 'none');
     svg.setAttribute('stroke', 'currentColor');
-    svg.setAttribute('stroke-width', '2');
+    svg.setAttribute('stroke-width', '1.5');
     svg.setAttribute('stroke-linecap', 'round');
     svg.setAttribute('stroke-linejoin', 'round');
 
@@ -318,6 +313,13 @@ export class FloatingButton {
         el.setAttribute('rx', '1.2');
         svg.appendChild(el);
       });
+      return svg;
+    }
+
+    if (id === 'favorites') {
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z');
+      svg.appendChild(path);
       return svg;
     }
 
@@ -361,13 +363,8 @@ export class FloatingButton {
       wrapper.style.top = `${clampedTop}px`;
       wrapper.style.bottom = 'auto';
 
-      if (position.side === 'left') {
-        wrapper.style.left = `${edgeOffset}px`;
-        wrapper.style.right = 'auto';
-      } else {
-        wrapper.style.right = `${edgeOffset}px`;
-        wrapper.style.left = 'auto';
-      }
+      wrapper.style.right = `${edgeOffset}px`;
+      wrapper.style.left = 'auto';
     } catch (error) {
       ErrorHandler.logError(error, 'restoreFloatingButtonPosition');
     }

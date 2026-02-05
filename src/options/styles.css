@@ -946,6 +946,37 @@ html {
   color: var(--color-text-secondary);
 }
 
+.setting-select {
+  width: 180px;
+  min-width: 180px;
+  flex: 0 0 180px;
+}
+
+.setting-select .select-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: var(--color-text-secondary);
+}
+
+.setting-select .select-trigger {
+  gap: 8px;
+}
+
+.setting-select .select-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.setting-select .select-option-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+}
+
 /* Toggle Switch */
 .toggle-switch {
   position: relative;

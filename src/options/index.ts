@@ -34,6 +34,7 @@ class OptionsApp {
     await this.loadCustomRules();
     this.renderPromptMethodTags();
     this.bindEvents();
+    this.bindFloatingActionSelect();
     this.renderModelList();
     await this.renderQuickAccess();
     await this.renderCustomRules();
@@ -341,6 +342,12 @@ class OptionsApp {
       this.saveFloatingButtonSettings(checked);
     });
 
+    // 悬浮按钮点击动作
+    document.getElementById('floating-button-click-action')?.addEventListener('change', (e) => {
+      const value = (e.target as HTMLSelectElement).value as 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings';
+      this.saveFloatingButtonClickAction(value);
+    });
+
     // 提示词广场侧边栏弹出方式
     document.getElementById('prompt-sidebar-push-toggle')?.addEventListener('change', (e) => {
       const checked = (e.target as HTMLInputElement).checked;
@@ -386,6 +393,50 @@ class OptionsApp {
         `;
       })
       .join('');
+  }
+
+  private bindFloatingActionSelect(): void {
+    const customSelect = document.getElementById('floating-action-custom');
+    const trigger = document.getElementById('floating-action-trigger');
+    const options = document.getElementById('floating-action-options');
+    const iconContainer = document.getElementById('floating-action-icon');
+    const nativeSelect = document.getElementById('floating-button-click-action') as HTMLSelectElement | null;
+
+    if (!customSelect || !trigger || !options || !nativeSelect || !iconContainer) {
+      return;
+    }
+
+    trigger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      customSelect.classList.toggle('active');
+    });
+
+    options.querySelectorAll('.select-option').forEach((option) => {
+      option.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const value = (option as HTMLElement).dataset.value as 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings';
+        const label = option.querySelector('span')?.textContent?.trim() ?? '';
+        const icon = option.querySelector('svg')?.outerHTML ?? '';
+
+        options.querySelectorAll('.select-option').forEach((opt) => opt.classList.remove('selected'));
+        option.classList.add('selected');
+
+        const selectedValue = trigger.querySelector('.selected-value');
+        if (selectedValue) {
+          selectedValue.textContent = label;
+        }
+        iconContainer.innerHTML = icon;
+
+        nativeSelect.value = value;
+        nativeSelect.dispatchEvent(new Event('change'));
+
+        customSelect.classList.remove('active');
+      });
+    });
+
+    document.addEventListener('click', () => {
+      customSelect.classList.remove('active');
+    });
   }
 
   private async savePromptMethodTags(): Promise<void> {
@@ -941,10 +992,35 @@ class OptionsApp {
   private async loadFloatingButtonSettings(): Promise<void> {
     const result = await chrome.storage.local.get(['settings']);
     const showFloatingButton = result.settings?.showFloatingButton ?? true;
+    const clickAction = result.settings?.floatingButtonClickAction ?? 'prompt-plaza';
 
     const toggle = document.getElementById('show-floating-button-toggle') as HTMLInputElement;
     if (toggle) {
       toggle.checked = showFloatingButton;
+    }
+
+    const actionSelect = document.getElementById('floating-button-click-action') as HTMLSelectElement;
+    if (actionSelect) {
+      actionSelect.value = clickAction;
+    }
+
+    const actionCustom = document.getElementById('floating-action-custom');
+    const actionOptions = document.getElementById('floating-action-options');
+    const actionTrigger = document.getElementById('floating-action-trigger');
+    const actionIcon = document.getElementById('floating-action-icon');
+    if (actionCustom && actionOptions && actionTrigger) {
+      actionOptions.querySelectorAll('.select-option').forEach((option) => {
+        option.classList.toggle('selected', (option as HTMLElement).dataset.value === clickAction);
+      });
+      const selectedOption = actionOptions.querySelector(`.select-option[data-value="${clickAction}"]`);
+      const label = selectedOption?.querySelector('span')?.textContent?.trim() ?? '提示词广场';
+      const selectedValue = actionTrigger.querySelector('.selected-value');
+      if (selectedValue) {
+        selectedValue.textContent = label;
+      }
+      if (actionIcon) {
+        actionIcon.innerHTML = selectedOption?.querySelector('svg')?.outerHTML ?? '';
+      }
     }
   }
 
@@ -966,6 +1042,12 @@ class OptionsApp {
    */
   private async saveFloatingButtonSettings(showToggle: boolean): Promise<void> {
     await this.saveSettings({showFloatingButton: showToggle});
+  }
+
+  private async saveFloatingButtonClickAction(
+    action: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings',
+  ): Promise<void> {
+    await this.saveSettings({floatingButtonClickAction: action});
   }
 
   /**

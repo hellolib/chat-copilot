@@ -23,6 +23,7 @@ export class StorageManager {
         enabledQuickAccessSites: defaultEnabledSites,
         promptMethodTagIds: ['roleplay'], // 默认选中角色扮演
         showFloatingButton: true,
+        floatingButtonClickAction: 'prompt-plaza',
       };
 
       const existing = await this.get<UserSettings>('settings');
@@ -61,6 +62,11 @@ export class StorageManager {
 
         if (typeof existing.showFloatingButton !== 'boolean') {
           existing.showFloatingButton = true;
+          shouldSave = true;
+        }
+
+        if (!existing.floatingButtonClickAction) {
+          existing.floatingButtonClickAction = 'prompt-plaza';
           shouldSave = true;
         }
 

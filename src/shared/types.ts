@@ -146,17 +146,17 @@ export interface QuickAccessSite {
 
 // 所有支持的快速访问站点
 export const QUICK_ACCESS_SITES: QuickAccessSite[] = [
-  { id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/', icon: 'chatgpt.png' },
-  { id: 'claude', name: 'Claude', url: 'https://claude.ai/', icon: 'claude.png' },
-  { id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/', icon: 'gemini.png' },
-  { id: 'grok', name: 'Grok', url: 'https://grok.com/', icon: 'grok.png' },
-  { id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/', icon: 'deepseek.png' },
-  { id: 'qwen', name: 'Qwen', url: 'https://chat.qwen.ai/', icon: 'qianwen.png' },
-  { id: 'kimi', name: 'Kimi', url: 'https://kimi.moonshot.cn/', icon: 'kimi.png' },
-  { id: 'yuanbao', name: '元宝', url: 'https://yuanbao.tencent.com/', icon: 'yuanbao.png' },
-  { id: 'yiyan', name: '文心一言', url: 'https://yiyan.baidu.com/', icon: 'yiyan.png' },
-  { id: 'qianwen', name: '通义千问', url: 'https://www.qianwen.com/', icon: 'qianwen.png' },
-  { id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/', icon: 'perplexity.png' },
+  {id: 'chatgpt', name: 'ChatGPT', url: 'https://chatgpt.com/', icon: 'chatgpt.png'},
+  {id: 'claude', name: 'Claude', url: 'https://claude.ai/', icon: 'claude.png'},
+  {id: 'gemini', name: 'Gemini', url: 'https://gemini.google.com/', icon: 'gemini.png'},
+  {id: 'grok', name: 'Grok', url: 'https://grok.com/', icon: 'grok.png'},
+  {id: 'deepseek', name: 'DeepSeek', url: 'https://chat.deepseek.com/', icon: 'deepseek.png'},
+  {id: 'qwen', name: 'Qwen', url: 'https://chat.qwen.ai/', icon: 'qianwen.png'},
+  {id: 'kimi', name: 'Kimi', url: 'https://kimi.moonshot.cn/', icon: 'kimi.png'},
+  {id: 'yuanbao', name: '元宝', url: 'https://yuanbao.tencent.com/', icon: 'yuanbao.png'},
+  {id: 'yiyan', name: '文心一言', url: 'https://yiyan.baidu.com/', icon: 'yiyan.png'},
+  {id: 'qianwen', name: '通义千问', url: 'https://www.qianwen.com/', icon: 'qianwen.png'},
+  {id: 'perplexity', name: 'Perplexity', url: 'https://www.perplexity.ai/', icon: 'perplexity.png'},
 ];
 
 // 用户设置
@@ -228,16 +228,22 @@ export interface UserSettings {
   promptMethodTagIds?: PromptMethodTagId[];
   showFloatingButton?: boolean;
   showPromptSidebarToggle?: boolean;
+  floatingButtonClickAction?: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings';
 }
 
 // 平台适配器接口
 export interface PlatformAdapter {
   name: string;
   hostPatterns: string[];
+
   getInputElement(): HTMLElement | null;
+
   getSendButton(): HTMLElement | null;
+
   getInputValue(): string;
+
   setInputValue(value: string): void;
+
   injectButton(button: HTMLElement): void;
 }
 
@@ -247,60 +253,60 @@ export interface PlatformAdapter {
 
 // 提示词分类
 export type PromptCategory =
+  | 'general'       // 通用
   | 'coding'        // 编程能力
-  | 'logic'         // 逻辑推理
-  | 'knowledge'     // 知识储备
-  | 'vision'        // 识图能力
-  | 'hallucination' // 幻觉测试
-  | 'image_gen'     // 图片生成
-  | 'writing'       // 创意写作
-  | 'roleplay';     // 角色扮演
+  | 'image'         // 识图能力
+  | 'ppt'           // 演示文稿
+  | 'text'          // 文本
+  | 'video';        // 视频
 
 // 分类配置
 export interface PromptCategoryConfig {
   id: PromptCategory;
   name: string;
   icon: string;
+  desc?: string;
+  order?: number;
+  enabled?: boolean;
 }
 
 // 提示词分类配置列表
 export const PROMPT_CATEGORIES: PromptCategoryConfig[] = [
-  { id: 'coding', name: '编程能力', icon: '💻' },
-  { id: 'logic', name: '逻辑推理', icon: '🧠' },
-  { id: 'knowledge', name: '知识储备', icon: '📖' },
-  { id: 'vision', name: '识图能力', icon: '👁️' },
-  { id: 'hallucination', name: '幻觉测试', icon: '🔍' },
-  { id: 'image_gen', name: '图片生成', icon: '🎨' },
-  { id: 'writing', name: '创意写作', icon: '✍️' },
-  { id: 'roleplay', name: '角色扮演', icon: '🎭' },
+  { id: 'coding', name: '编程', icon: '', desc: '代码与工程任务', order: 10, enabled: true },
+  { id: 'text', name: '文本', icon: '', desc: '写作与文本处理', order: 20, enabled: true },
+  { id: 'image', name: '图像', icon: '️', desc: '识图与图像分析', order: 30, enabled: true },
+  { id: 'ppt', name: 'PPT', icon: '️', desc: '演示文稿与幻灯片', order: 35, enabled: true },
+  { id: 'video', name: '视频', icon: '', desc: '视频理解与生成', order: 40, enabled: true },
+  { id: 'general', name: '通用', icon: '️', desc: '通用对话与任务', order: 50, enabled: true },
 ];
-
-// 提示词难度
-export type PromptDifficulty = 'easy' | 'medium' | 'hard';
 
 // 提示词项
 export interface PromptItem {
   id: string;
   title: string;
+  desc?: string;
   content: string;
   category: PromptCategory;
   tags: string[];
   isBuiltin: boolean;
   isFavorite?: boolean;
+  order?: number;
+  enabled?: boolean;
   usageCount?: number;
   createdAt?: number;
   answer?: string; // 配对的答案
-  difficulty?: PromptDifficulty; // 难度等级
 }
 
 // JSON 文件中的提示词格式
 export interface PromptJsonItem {
   id: string;
   title: string;
+  desc?: string;
   content: string;
   answer?: string;
   tags: string[];
-  difficulty?: PromptDifficulty;
+  order?: number;
+  enabled?: boolean;
 }
 
 // JSON 文件的分类数据结构
@@ -308,6 +314,9 @@ export interface PromptCategoryJson {
   category: PromptCategory;
   name: string;
   icon: string;
+  desc?: string;
+  order?: number;
+  enabled?: boolean;
   prompts: PromptJsonItem[];
 }
 
