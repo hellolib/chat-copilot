@@ -206,7 +206,9 @@ class OptionsApp {
         <img src="${chrome.runtime.getURL(`assets/models-icons/${iconPath}`)}" alt="${m.provider}" class="model-provider-icon">
         <div class="model-info" data-id="${m.id}">
           <span class="model-name">${m.name}</span>
-          <span class="model-desc">${MODEL_PRESETS[m.provider]?.name ?? m.provider} · ${m.model}</span>
+          <span class="model-desc">${this.escapeHtml(
+            m.description?.trim() ? m.description : `${MODEL_PRESETS[m.provider]?.name ?? m.provider} · ${m.model}`,
+          )}</span>
         </div>
         <div class="model-actions">
           <button class="btn-test btn-test-inline" data-id="${m.id}">测试</button>
@@ -340,6 +342,7 @@ class OptionsApp {
     document.getElementById('show-floating-button-toggle')?.addEventListener('change', (e) => {
       const checked = (e.target as HTMLInputElement).checked;
       this.saveFloatingButtonSettings(checked);
+      this.setFloatingActionDisabled(!checked);
     });
 
     // 悬浮按钮点击动作
@@ -408,12 +411,18 @@ class OptionsApp {
 
     trigger.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (customSelect.classList.contains('is-disabled')) {
+        return;
+      }
       customSelect.classList.toggle('active');
     });
 
     options.querySelectorAll('.select-option').forEach((option) => {
       option.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (customSelect.classList.contains('is-disabled')) {
+          return;
+        }
         const value = (option as HTMLElement).dataset.value as 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings';
         const label = option.querySelector('span')?.textContent?.trim() ?? '';
         const icon = option.querySelector('svg')?.outerHTML ?? '';
@@ -620,6 +629,7 @@ class OptionsApp {
     const endpointInput = document.getElementById('model-endpoint') as HTMLInputElement | null;
     const apikeyInput = document.getElementById('model-apikey') as HTMLInputElement | null;
     const modelInput = document.getElementById('model-model') as HTMLInputElement | null;
+    const descInput = document.getElementById('model-description') as HTMLInputElement | null;
 
     if (providerSelect) {
       providerSelect.value = model.provider;
@@ -636,6 +646,9 @@ class OptionsApp {
     if (modelInput) {
       modelInput.value = model.model;
     }
+    if (descInput) {
+      descInput.value = model.description ?? '';
+    }
 
     // 应用 provider 对 API Key 显示等的控制逻辑
     this.updateCustomSelect(model.provider);
@@ -650,6 +663,7 @@ class OptionsApp {
     const endpoint = (document.getElementById('model-endpoint') as HTMLInputElement).value;
     const apiKey = (document.getElementById('model-apikey') as HTMLInputElement).value || undefined;
     const modelName = (document.getElementById('model-model') as HTMLInputElement).value;
+    const description = (document.getElementById('model-description') as HTMLInputElement).value || undefined;
 
     // 创建临时配置
     const config: Partial<ModelConfig> = {
@@ -658,6 +672,7 @@ class OptionsApp {
       endpoint,
       apiKey,
       model: modelName,
+      description,
     };
 
     // 清理和标准化配置
@@ -737,6 +752,7 @@ class OptionsApp {
     const endpoint = (document.getElementById('model-endpoint') as HTMLInputElement).value;
     const apiKey = (document.getElementById('model-apikey') as HTMLInputElement).value || undefined;
     const modelName = (document.getElementById('model-model') as HTMLInputElement).value;
+    const description = (document.getElementById('model-description') as HTMLInputElement).value || undefined;
 
     // 创建配置对象
     const config: Partial<ModelConfig> = {
@@ -745,6 +761,7 @@ class OptionsApp {
       endpoint,
       apiKey,
       model: modelName,
+      description,
     };
 
     // 清理和标准化配置
@@ -1022,6 +1039,8 @@ class OptionsApp {
         actionIcon.innerHTML = selectedOption?.querySelector('svg')?.outerHTML ?? '';
       }
     }
+
+    this.setFloatingActionDisabled(!showFloatingButton);
   }
 
   /**
@@ -1048,6 +1067,28 @@ class OptionsApp {
     action: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings',
   ): Promise<void> {
     await this.saveSettings({floatingButtonClickAction: action});
+  }
+
+  private setFloatingActionDisabled(disabled: boolean): void {
+    const settingItem = document.getElementById('floating-action-setting');
+    const customSelect = document.getElementById('floating-action-custom');
+    const nativeSelect = document.getElementById('floating-button-click-action') as HTMLSelectElement | null;
+
+    if (settingItem) {
+      settingItem.classList.toggle('is-disabled', disabled);
+      settingItem.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    }
+
+    if (customSelect) {
+      customSelect.classList.toggle('is-disabled', disabled);
+      if (disabled) {
+        customSelect.classList.remove('active');
+      }
+    }
+
+    if (nativeSelect) {
+      nativeSelect.disabled = disabled;
+    }
   }
 
   /**

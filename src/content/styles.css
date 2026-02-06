@@ -4,6 +4,8 @@
  * 基于设计令牌的简约现代风格
  */
 
+@import '../styles/toast.css';
+
 /* ========================================
  * 设计令牌 (内联，因为 Content Script 无法引用外部文件)
  * ======================================== */
@@ -710,8 +712,8 @@
 }
 
 .chat-copilot-dialog-footer button {
-  padding: 7px 14px;
-  border-radius: 9999px;
+  padding: 5px 12px;
+  border-radius: 6px;
   font-family: var(--cc-font-family);
   font-size: 12px;
   cursor: pointer;
@@ -723,7 +725,7 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  min-height: 30px;
+  min-height: 26px;
   white-space: nowrap;
   background: var(--cc-bg-base);
   color: var(--cc-text-secondary);
@@ -779,16 +781,31 @@
   opacity: 0.9;
 }
 
+/* Apply Button - Primary Action */
+.chat-copilot-btn-apply {
+  background: var(--cc-bg-base);
+  color: var(--cc-text-secondary);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.chat-copilot-btn-apply:hover {
+  background: var(--cc-bg-subtle);
+  color: var(--cc-text-primary);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
 [data-theme="dark"] .chat-copilot-btn-apply,
 .dark .chat-copilot-btn-apply {
-  background: var(--cc-text-inverse);
-  color: var(--cc-bg-base);
-  box-shadow: none;
+  background: var(--cc-bg-muted);
+  color: var(--cc-text-secondary);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="dark"] .chat-copilot-btn-apply:hover,
 .dark .chat-copilot-btn-apply:hover {
-  opacity: 0.9;
+  background: var(--cc-bg-subtle);
+  color: var(--cc-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 /* Copy Button */
@@ -820,22 +837,22 @@
 
 /* Cancel Button */
 .chat-copilot-btn-cancel {
-  background: transparent;
-  color: var(--cc-text-tertiary);
-  border-color: transparent;
+  background: var(--cc-bg-base);
+  color: var(--cc-text-secondary);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .chat-copilot-btn-cancel:hover {
   background: var(--cc-bg-subtle);
   color: var(--cc-text-primary);
-  border-color: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 [data-theme="dark"] .chat-copilot-btn-cancel,
 .dark .chat-copilot-btn-cancel {
-  background: transparent;
-  color: var(--cc-text-tertiary);
-  border-color: transparent;
+  background: var(--cc-bg-muted);
+  color: var(--cc-text-secondary);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 [data-theme="dark"] .chat-copilot-btn-cancel:hover,
@@ -843,125 +860,6 @@
   background: var(--cc-bg-subtle);
   color: var(--cc-text-primary);
   border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* ========================================
- * Toast - 通知
- * ======================================== */
-.cc-toast {
-  position: fixed;
-  top: calc(var(--cc-space-6) + 50px);
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  gap: var(--cc-space-2);
-  padding: var(--cc-space-2) var(--cc-space-4);
-  border-radius: var(--cc-radius-lg);
-  font-family: var(--cc-font-family);
-  font-size: var(--cc-font-size-sm);
-  font-weight: 500;
-  z-index: var(--cc-z-toast);
-  animation: cc-toast-in var(--cc-transition-slow) ease-out;
-  box-shadow: var(--cc-shadow-lg);
-  max-width: 360px;
-  pointer-events: none;
-}
-
-.cc-toast-icon {
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.cc-toast-message {
-  flex: 1;
-  line-height: 1.4;
-}
-
-.cc-toast-success {
-  background: #f0fdf4;
-  color: #166534;
-  border: 1px solid #bbf7d0;
-}
-
-.cc-toast-error {
-  background: #fef2f2;
-  color: #991b1b;
-  border: 1px solid #fecaca;
-}
-
-.cc-toast-info {
-  background: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-}
-
-.cc-toast-warning {
-  background: #fffbeb;
-  color: #92400e;
-  border: 1px solid #fde68a;
-}
-
-.cc-toast-hiding {
-  animation: cc-toast-out 0.2s ease-out forwards;
-}
-
-@keyframes cc-toast-in {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-@keyframes cc-toast-out {
-  from {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-
-  to {
-    opacity: 0;
-    transform: translateX(-50%) translateY(-10px);
-  }
-}
-
-[data-theme="dark"] .cc-toast-success,
-.dark .cc-toast-success {
-  background: #14532d;
-  color: #dcfce7;
-  border-color: #166534;
-}
-
-[data-theme="dark"] .cc-toast-error,
-.dark .cc-toast-error {
-  background: #7f1d1d;
-  color: #fee2e2;
-  border-color: #991b1b;
-}
-
-[data-theme="dark"] .cc-toast-info,
-.dark .cc-toast-info {
-  background: #1e3a8a;
-  color: #dbeafe;
-  border-color: #1e40af;
-}
-
-[data-theme="dark"] .cc-toast-warning,
-.dark .cc-toast-warning {
-  background: #78350f;
-  color: #fef3c7;
-  border-color: #92400e;
 }
 
 /* ========================================

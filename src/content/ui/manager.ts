@@ -51,6 +51,9 @@ export class UIManager {
         },
       ],
     });
+    if (this.adapter.name === 'Generic') {
+      this.showFloatingButton = false;
+    }
   }
 
   /**
@@ -83,6 +86,10 @@ export class UIManager {
 
   private async loadFloatingButtonSettings(): Promise<void> {
     try {
+      if (this.adapter.name === 'Generic') {
+        this.showFloatingButton = false;
+        return;
+      }
       const result = await chrome.storage.local.get(['settings']);
       this.showFloatingButton = result.settings?.showFloatingButton ?? true;
       this.floatingButtonClickAction = result.settings?.floatingButtonClickAction ?? 'prompt-plaza';
@@ -95,6 +102,7 @@ export class UIManager {
   private setupSettingsListener(): void {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName !== 'local' || !changes.settings) {return;}
+      if (this.adapter.name === 'Generic') {return;}
       const newSettings = changes.settings.newValue;
       if (newSettings && typeof newSettings.showFloatingButton === 'boolean') {
         this.showFloatingButton = newSettings.showFloatingButton;
@@ -144,7 +152,9 @@ export class UIManager {
   init(): void {
     this.initTheme();
     this.initTooltip();
-    this.floatingButton.init();
+    if (this.adapter.name !== 'Generic') {
+      this.floatingButton.init();
+    }
     void this.loadFloatingButtonSettings();
     this.setupSettingsListener();
     this.injectButton();
@@ -255,7 +265,7 @@ export class UIManager {
     if (!this.isInjected || !document.contains(this.button)) {
       this.injectButton();
     }
-    if (this.showFloatingButton) {
+    if (this.showFloatingButton && this.adapter.name !== 'Generic') {
       this.floatingButton.refresh();
     }
     this.promptSidebar.refresh();
@@ -265,6 +275,9 @@ export class UIManager {
    * 注入优化按钮
    */
   private injectButton(): void {
+    if (this.adapter.name === 'Generic') {
+      return;
+    }
     // 检查是否已注入
     if (document.querySelector('.chat-copilot-btn')) {
       // 如果按钮存在但不在DOM中，重新注入
@@ -524,10 +537,8 @@ export class UIManager {
 
     // 获取模型信息
     const modelInfo = await this.getCurrentModelInfo();
-
-    const logoSvg = this.getLogoSvgHtml();
-
     const dialog = document.createElement('div');
+
     dialog.className = 'chat-copilot-dialog';
     dialog.innerHTML = `
       <div class="chat-copilot-dialog-content">
@@ -751,5 +762,12 @@ export class UIManager {
    */
   togglePromptSidebar(): void {
     this.promptSidebar.toggle();
+  }
+
+  /**
+   * 打开提示词侧边栏并切换到指定标签
+   */
+  openPromptSidebarTab(tab: 'square' | 'favorites'): void {
+    this.promptSidebar.openTab(tab);
   }
 }

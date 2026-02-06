@@ -3,7 +3,7 @@
  */
 
 import './styles.css';
-import { QUICK_ACCESS_SITES, QuickAccessSite, ModelConfig, PROVIDER_ICONS } from '@shared/types';
+import { QUICK_ACCESS_SITES, QuickAccessSite, ModelConfig, PROVIDER_ICONS, MessageType } from '@shared/types';
 
 class PopupApp {
   private allSites: QuickAccessSite[] = QUICK_ACCESS_SITES;
@@ -296,6 +296,18 @@ class PopupApp {
   }
 
   private bindEvents(): void {
+    document.querySelectorAll<HTMLElement>('.prompt-menu-item').forEach((item) => {
+      item.addEventListener('click', () => {
+        const action = item.dataset.action;
+        if (action === 'prompt-plaza') {
+          void this.openPromptSidebar('square');
+        }
+        if (action === 'favorites') {
+          void this.openPromptSidebar('favorites');
+        }
+      });
+    });
+
     document.getElementById('btn-settings')?.addEventListener('click', () => {
       chrome.runtime.openOptionsPage();
     });
@@ -354,6 +366,83 @@ class PopupApp {
         }
       });
     }, 0);
+  }
+
+  private async openPromptSidebar(tab: 'square' | 'favorites'): Promise<void> {
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!activeTab?.id) {
+      this.showToast('未找到当前页面', 'error');
+      return;
+    }
+
+    chrome.tabs.sendMessage(
+      activeTab.id,
+      { type: MessageType.OPEN_PROMPT_SIDEBAR, payload: { tab } },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          this.showToast('当前页不支持', 'warning');
+          return;
+        }
+        if (!response?.success) {
+          this.showToast('未能打开提示词侧边栏', 'error');
+          return;
+        }
+        window.close();
+      },
+    );
+  }
+
+  private showToast(message: string, variant: 'success' | 'error' | 'info' | 'warning' = 'info'): void {
+    const existing = document.querySelector('.cc-toast');
+    if (existing) {
+      existing.remove();
+    }
+
+    const iconMap: Record<typeof variant, string> = {
+      success: `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 6L9 17l-5-5" />
+        </svg>
+      `,
+      error: `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12" />
+        </svg>
+      `,
+      info: `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 10v6" />
+          <path d="M12 7h.01" />
+        </svg>
+      `,
+      warning: `
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3l9 16H3l9-16z" />
+          <path d="M12 9v4" />
+          <path d="M12 17h.01" />
+        </svg>
+      `,
+    };
+
+    const toast = document.createElement('div');
+    toast.className = `cc-toast cc-toast-${variant}`;
+    toast.innerHTML = `
+      <span class="cc-toast-icon">${iconMap[variant]}</span>
+      <span class="cc-toast-message">${this.escapeHtml(message)}</span>
+    `;
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+      toast.classList.add('cc-toast-hiding');
+      setTimeout(() => toast.remove(), 220);
+    }, 2000);
+  }
+
+  private escapeHtml(text: string): string {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
   }
 }
 

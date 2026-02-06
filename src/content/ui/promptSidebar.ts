@@ -50,12 +50,14 @@ export class PromptSidebar {
   private expandedPrompts: Set<string> = new Set(); // 展开的提示词ID
   private expandedAnswers: Set<string> = new Set(); // 展开的答案ID
   private isLoading = true;
+  private supportsInsert = true;
 
   private readonly pushTargetClass = 'chat-copilot-push-target';
   private readonly pushTargetDraggingClass = 'chat-copilot-push-target--dragging';
 
   constructor(adapter: PlatformAdapter) {
     this.adapter = adapter;
+    this.supportsInsert = adapter.name !== 'Generic';
     this.loadPrompts();
     this.loadSettings();
     this.setupStorageListener();
@@ -383,12 +385,14 @@ export class PromptSidebar {
             </svg>
             复制
           </button>
-          <button class="chat-copilot-prompt-card-insert" data-prompt-id="${prompt.id}" title="写入输入框">
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14m-7-7h14"/>
-            </svg>
-            写入
-          </button>
+          ${this.supportsInsert ? `
+            <button class="chat-copilot-prompt-card-insert" data-prompt-id="${prompt.id}" title="写入输入框">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14m-7-7h14"/>
+              </svg>
+              写入
+            </button>
+          ` : ''}
           ${hasAnswer ? `
             <button class="chat-copilot-prompt-card-copy-answer" data-prompt-id="${prompt.id}" title="复制答案">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -653,6 +657,10 @@ export class PromptSidebar {
    * 写入提示词到输入框
    */
   private insertPrompt(promptId: string): void {
+    if (!this.supportsInsert) {
+      Toast.warning('请在支持的页面使用');
+      return;
+    }
     const prompt = this.prompts.find(p => p.id === promptId);
     if (!prompt) { return; }
 
