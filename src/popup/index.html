@@ -11,7 +11,7 @@
 <body>
   <div class="popup-container">
     <header class="popup-header">
-      <h1><span id="popup-icon" class="popup-logo" aria-hidden="true"></span> Chat Copilot</h1>
+      <h1>Chat Copilot</h1>
       <div class="popup-version" id="popup-version">v0.1.0</div>
     </header>
 
@@ -40,6 +40,34 @@
         <div class="stat-card">
           <span class="stat-value" id="total-count">0</span>
           <span class="stat-label">累计优化</span>
+        </div>
+      </div>
+
+      <div class="prompt-menu">
+        <div class="prompt-menu-grid">
+          <button class="prompt-menu-item prompt-menu-plaza" data-action="prompt-plaza" type="button" aria-label="打开提示词广场">
+            <span class="prompt-menu-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="2"></rect>
+                <rect x="14" y="3" width="7" height="7" rx="2"></rect>
+                <rect x="3" y="14" width="7" height="7" rx="2"></rect>
+                <rect x="14" y="14" width="7" height="7" rx="2"></rect>
+              </svg>
+            </span>
+            <span class="prompt-menu-content">
+              <span class="prompt-menu-name">提示词广场</span>
+            </span>
+          </button>
+          <button class="prompt-menu-item prompt-menu-favorites" data-action="favorites" type="button" aria-label="打开我的收藏">
+            <span class="prompt-menu-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 3l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3.1-5.8 3.1 1.1-6.5-4.7-4.6 6.5-.9L12 3z"></path>
+              </svg>
+            </span>
+            <span class="prompt-menu-content">
+              <span class="prompt-menu-name">我的收藏</span>
+            </span>
+          </button>
         </div>
       </div>
 

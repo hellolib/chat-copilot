@@ -625,59 +625,66 @@ html {
   flex-wrap: wrap;
 }
 
+.form-actions .btn-save {
+  margin-left: auto;
+}
+
 .form-actions button {
-  padding: 6px 14px;
-  border-radius: var(--radius-sm);
+  padding: 5px 12px;
+  border-radius: 6px;
   font-size: var(--font-size-sm);
   cursor: pointer;
   transition: all var(--transition-fast);
   font-weight: 500;
   user-select: none;
-  border: 1px solid transparent;
+  border: 1px solid rgba(0, 0, 0, 0.08);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 4px;
-  min-height: 30px;
+  min-height: 26px;
   white-space: nowrap;
+  background: var(--color-bg-base);
+  color: var(--color-text-secondary);
 }
 
 .form-actions button:active {
   transform: scale(0.97);
 }
 
-.btn-test {
-  background: var(--color-info-subtle);
-  color: #1E40AF;
-  border-color: rgba(59, 130, 246, 0.25);
+[data-theme="dark"] .form-actions button,
+.dark .form-actions button {
+  background: var(--color-bg-muted);
+  color: var(--color-text-secondary);
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
-.btn-test:hover {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: rgba(59, 130, 246, 0.35);
+[data-theme="dark"] .btn-test:hover,
+[data-theme="dark"] .btn-save:hover,
+[data-theme="dark"] .btn-cancel:hover,
+.dark .btn-test:hover,
+.dark .btn-save:hover,
+.dark .btn-cancel:hover {
+  background: var(--color-bg-subtle);
+  color: var(--color-text-primary);
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
-.btn-save {
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  box-shadow: 0 1px 3px rgba(13, 148, 136, 0.2);
-}
-
-.btn-save:hover {
-  background: var(--color-primary-hover);
-  box-shadow: 0 2px 6px rgba(13, 148, 136, 0.3);
-}
-
+.btn-test,
+.btn-save,
 .btn-cancel {
   background: var(--color-bg-base);
   color: var(--color-text-secondary);
-  border-color: var(--color-border);
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: none;
 }
 
+.btn-test:hover,
+.btn-save:hover,
 .btn-cancel:hover {
   background: var(--color-bg-muted);
   color: var(--color-text-primary);
-  border-color: var(--color-border);
+  border-color: rgba(0, 0, 0, 0.12);
 }
 
 /* ========================================
@@ -927,6 +934,32 @@ html {
 
 .setting-item:hover {
   border-color: var(--color-border);
+}
+
+.setting-item.is-disabled {
+  opacity: 0.6;
+  filter: grayscale(0.2);
+}
+
+.setting-item.is-disabled .setting-label,
+.setting-item.is-disabled .setting-desc {
+  color: var(--color-text-tertiary);
+}
+
+.setting-item.is-disabled .custom-select {
+  pointer-events: none;
+}
+
+.setting-item.is-disabled .select-trigger {
+  background: var(--color-bg-muted);
+  color: var(--color-text-tertiary);
+  border-color: var(--color-border);
+}
+
+.setting-item.is-disabled .select-icon,
+.setting-item.is-disabled .arrow-icon {
+  color: var(--color-text-tertiary);
+  border-color: var(--color-text-tertiary);
 }
 
 .setting-info {

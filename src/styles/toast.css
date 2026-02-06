@@ -1,0 +1,116 @@
+/**
+ * Shared Toast Styles
+ * Used by popup and content scripts to keep visuals consistent.
+ */
+
+.cc-toast {
+  position: fixed;
+  top: calc(var(--cc-space-6, var(--space-4, 16px)) + 50px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: var(--cc-space-2, var(--space-2, 8px));
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-family: var(--cc-font-family, var(--font-family, sans-serif));
+  font-size: var(--cc-font-size-sm, var(--font-size-sm, 13px));
+  font-weight: 500;
+  z-index: var(--cc-z-toast, var(--z-toast, 1300));
+  animation: cc-toast-in var(--cc-transition-slow, var(--transition-normal, 200ms)) ease-out;
+  box-shadow: none;
+  border: none;
+  max-width: 320px;
+  pointer-events: none;
+}
+
+.cc-toast-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: transparent;
+}
+
+.cc-toast-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.cc-toast-message {
+  flex: 1;
+  line-height: 1.4;
+}
+
+.cc-toast-success {
+  background: #ecfdf5;
+  color: #166534;
+}
+
+.cc-toast-error {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.cc-toast-info {
+  background: #eff6ff;
+  color: #1e40af;
+}
+
+.cc-toast-warning {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.cc-toast-hiding {
+  animation: cc-toast-out 0.2s ease-out forwards;
+}
+
+@keyframes cc-toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes cc-toast-out {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+[data-theme="dark"] .cc-toast-success,
+.dark .cc-toast-success {
+  background: #064e3b;
+  color: #dcfce7;
+}
+
+[data-theme="dark"] .cc-toast-error,
+.dark .cc-toast-error {
+  background: #7f1d1d;
+  color: #fee2e2;
+}
+
+[data-theme="dark"] .cc-toast-info,
+.dark .cc-toast-info {
+  background: #1e3a8a;
+  color: #dbeafe;
+}
+
+[data-theme="dark"] .cc-toast-warning,
+.dark .cc-toast-warning {
+  background: #78350f;
+  color: #fef3c7;
+}

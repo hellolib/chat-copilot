@@ -153,6 +153,9 @@ export class ConfigValidator {
     if (sanitized.model) {
       sanitized.model = sanitized.model.trim();
     }
+    if (sanitized.description) {
+      sanitized.description = sanitized.description.trim();
+    }
 
     // 确保数值字段的类型正确
     if (sanitized.maxTokens !== undefined) {

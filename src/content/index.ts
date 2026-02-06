@@ -5,7 +5,9 @@
 
 import './styles.css';
 import { PlatformDetector } from './adapters/detector';
+import { GenericAdapter } from './adapters/generic';
 import { UIManager } from './ui/manager';
+import { MessageType } from '@shared/types';
 
 class ContentScript {
   private detector: PlatformDetector;
@@ -20,11 +22,7 @@ class ContentScript {
    * 初始化
    */
   async init(): Promise<void> {
-    const adapter = this.detector.detect();
-
-    if (!adapter) {
-      return;
-    }
+    const adapter = this.detector.detect() ?? new GenericAdapter();
 
     console.log('chat copilot init...');
 
@@ -32,7 +30,9 @@ class ContentScript {
     this.uiManager.init();
 
     // 监听 DOM 变化，处理动态加载
-    this.observeDOM();
+    if (adapter.name !== 'Generic') {
+      this.observeDOM();
+    }
 
     // 监听来自 Popup 的消息
     this.setupMessageListener();
@@ -69,6 +69,11 @@ class ContentScript {
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       if (message.type === 'TOGGLE_PROMPT_SIDEBAR') {
         this.uiManager?.togglePromptSidebar();
+        sendResponse({ success: true });
+      }
+      if (message.type === MessageType.OPEN_PROMPT_SIDEBAR) {
+        const tab = (message.payload as { tab?: 'square' | 'favorites' } | undefined)?.tab ?? 'square';
+        this.uiManager?.openPromptSidebarTab(tab);
         sendResponse({ success: true });
       }
       return true;

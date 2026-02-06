@@ -12,6 +12,7 @@ export enum MessageType {
   SAVE_CUSTOM_RULES = 'SAVE_CUSTOM_RULES',
   DELETE_CUSTOM_RULE = 'DELETE_CUSTOM_RULE',
   OPEN_OPTIONS = 'OPEN_OPTIONS',
+  OPEN_PROMPT_SIDEBAR = 'OPEN_PROMPT_SIDEBAR',
 }
 
 // 消息结构
@@ -46,6 +47,7 @@ export type ModelProvider = 'openai' | 'claude' | 'gemini' | 'grok' | 'openroute
 export interface ModelConfig {
   id: string;
   name: string;
+  description?: string;
   provider: ModelProvider;
   endpoint: string;
   apiKey?: string;

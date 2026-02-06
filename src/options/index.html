@@ -105,7 +105,7 @@
 
               <form id="model-form">
                 <div class="form-group">
-                  <label>模型提供商</label>
+                  <label>模型提供商<span class="required-mark"></span></label>
                   <div class="custom-select" id="model-provider-custom">
                     <div class="select-trigger" id="select-trigger">
                       <img src="../assets/models-icons/openai.svg" class="select-trigger-icon" id="select-trigger-icon">
@@ -155,19 +155,23 @@
                   </select>
                 </div>
                 <div class="form-group">
-                  <label>显示名称</label>
+                  <label>显示名称<span class="required-mark"></span></label>
                   <input type="text" id="model-name" required>
                 </div>
                 <div class="form-group">
-                  <label>API 端点</label>
+                  <label>描述</label>
+                  <input type="text" id="model-description" placeholder="例如：主力模型、高质量输出（选填）">
+                </div>
+                <div class="form-group">
+                  <label>API 端点<span class="required-mark"></span></label>
                   <input type="url" id="model-endpoint" required>
                 </div>
                 <div class="form-group" id="apikey-group">
-                  <label>API Key</label>
+                  <label>API Key<span class="required-mark"></span></label>
                   <input type="password" id="model-apikey">
                 </div>
                 <div class="form-group">
-                  <label>模型</label>
+                  <label>模型<span class="required-mark"></span></label>
                   <input type="text" id="model-model" required>
                 </div>
                 <div class="form-actions">
@@ -229,8 +233,8 @@
                 </div>
 
                 <div class="form-actions">
-                  <button type="button" class="btn-cancel" id="btn-cancel-custom-rule">取消</button>
                   <button type="submit" class="btn-save">保存</button>
+                  <button type="button" class="btn-cancel" id="btn-cancel-custom-rule">取消</button>
                 </div>
               </form>
             </section>
@@ -253,7 +257,7 @@
             </label>
           </div>
 
-          <div class="setting-item">
+          <div class="setting-item" id="floating-action-setting">
             <div class="setting-info">
               <span class="setting-label">点击悬浮按钮</span>
               <span class="setting-desc">选择点击悬浮按钮时执行的动作或打开的页面</span>
