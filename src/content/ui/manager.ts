@@ -3,7 +3,16 @@
  * 管理注入到页面的 UI 组件
  */
 
-import { PlatformAdapter, MessageType, OptimizeResponse, MessageResponse, ModelConfig, PROVIDER_ICONS } from '@shared/types';
+import {
+  PlatformAdapter,
+  MessageType,
+  OptimizeResponse,
+  MessageResponse,
+  ModelConfig,
+  PROVIDER_ICONS,
+  FloatingButtonDrawerActionId,
+  FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS,
+} from '@shared/types';
 import { ErrorHandler, AppError, ErrorCode } from '@shared/errors';
 import { PromptSidebar } from './promptSidebar';
 import { createLogoUseSvg } from './logoSprite';
@@ -26,6 +35,7 @@ export class UIManager {
   private promptSidebar: PromptSidebar;
   private showFloatingButton = true;
   private floatingButtonClickAction: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings' = 'prompt-plaza';
+  private floatingButtonDrawerActions: FloatingButtonDrawerActionId[] = FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
 
   constructor(adapter: PlatformAdapter) {
     this.adapter = adapter;
@@ -33,23 +43,7 @@ export class UIManager {
     this.floatingButton = new FloatingButton({
       getExtensionURL: this.getExtensionURL.bind(this),
       onClick: () => this.handleFloatingButtonClick(),
-      actions: [
-        {
-          id: 'prompt-plaza',
-          label: '提示词广场',
-          onClick: () => this.promptSidebar.openTab('square'),
-        },
-        {
-          id: 'favorites',
-          label: '我的收藏',
-          onClick: () => this.promptSidebar.openTab('favorites'),
-        },
-        {
-          id: 'settings',
-          label: '插件设置',
-          onClick: () => this.requestOpenOptionsPage(),
-        },
-      ],
+      actions: this.buildFloatingDrawerActions(this.floatingButtonDrawerActions),
     });
     if (this.adapter.name === 'Generic') {
       this.showFloatingButton = false;
@@ -84,6 +78,66 @@ export class UIManager {
     }
   }
 
+  private buildFloatingDrawerActions(actionIds: FloatingButtonDrawerActionId[]) {
+    const actionMap: Record<FloatingButtonDrawerActionId, { id: string; label: string; onClick: () => void }> = {
+      'prompt-plaza': {
+        id: 'prompt-plaza',
+        label: '提示词广场',
+        onClick: () => this.promptSidebar.openTab('square'),
+      },
+      favorites: {
+        id: 'favorites',
+        label: '我的收藏',
+        onClick: () => this.promptSidebar.openTab('favorites'),
+      },
+      settings: {
+        id: 'settings',
+        label: '插件设置',
+        onClick: () => this.requestOpenOptionsPage(),
+      },
+      'official-site': {
+        id: 'official-site',
+        label: '官网',
+        onClick: () => this.openOfficialSite(),
+      },
+    };
+
+    const actions: { id: string; label: string; onClick: () => void }[] = [];
+    const seen = new Set<string>();
+    actionIds.forEach((id) => {
+      const action = actionMap[id];
+      if (!action || seen.has(action.id)) {
+        return;
+      }
+      actions.push(action);
+      seen.add(action.id);
+    });
+    return actions;
+  }
+
+  private normalizeFloatingDrawerActions(value: unknown): FloatingButtonDrawerActionId[] {
+    if (!Array.isArray(value)) {
+      return FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
+    }
+
+    const mapped: FloatingButtonDrawerActionId[] = [];
+    value.forEach((id) => {
+      if (id === 'optimize') {
+        mapped.push('official-site');
+        return;
+      }
+      if (id === 'prompt-plaza' || id === 'favorites' || id === 'settings' || id === 'official-site') {
+        mapped.push(id);
+      }
+    });
+
+    if (value.length === 0) {
+      return [];
+    }
+
+    return mapped.length > 0 ? mapped : FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
+  }
+
   private async loadFloatingButtonSettings(): Promise<void> {
     try {
       if (this.adapter.name === 'Generic') {
@@ -93,7 +147,11 @@ export class UIManager {
       const result = await chrome.storage.local.get(['settings']);
       this.showFloatingButton = result.settings?.showFloatingButton ?? true;
       this.floatingButtonClickAction = result.settings?.floatingButtonClickAction ?? 'prompt-plaza';
+      this.floatingButtonDrawerActions = this.normalizeFloatingDrawerActions(
+        result.settings?.floatingButtonDrawerActions,
+      );
       this.floatingButton.setVisible(this.showFloatingButton);
+      this.floatingButton.setActions(this.buildFloatingDrawerActions(this.floatingButtonDrawerActions));
     } catch (error) {
       ErrorHandler.logError(error, 'loadFloatingButtonSettings');
     }
@@ -110,6 +168,10 @@ export class UIManager {
       }
       if (newSettings?.floatingButtonClickAction) {
         this.floatingButtonClickAction = newSettings.floatingButtonClickAction;
+      }
+      if (newSettings && 'floatingButtonDrawerActions' in newSettings) {
+        this.floatingButtonDrawerActions = this.normalizeFloatingDrawerActions(newSettings.floatingButtonDrawerActions);
+        this.floatingButton.setActions(this.buildFloatingDrawerActions(this.floatingButtonDrawerActions));
       }
     });
   }
@@ -144,6 +206,14 @@ export class UIManager {
         Toast.error(response?.error || '打开设置页失败');
       }
     });
+  }
+
+  private openOfficialSite(): void {
+    try {
+      window.open('https://chatcopilot.com.cn', '_blank');
+    } catch (error) {
+      ErrorHandler.logError(error, 'openOfficialSite');
+    }
   }
 
   /**

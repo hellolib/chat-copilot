@@ -711,6 +711,17 @@
   border-top: none;
 }
 
+.chat-copilot-prompt-editor-footer {
+  justify-content: space-between;
+}
+
+.chat-copilot-dialog-footer-left,
+.chat-copilot-dialog-footer-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cc-space-2);
+}
+
 .chat-copilot-dialog-footer button {
   padding: 5px 12px;
   border-radius: 6px;
@@ -739,6 +750,88 @@
   opacity: 0.5;
   cursor: not-allowed;
   pointer-events: none;
+}
+
+/* Prompt Editor */
+.chat-copilot-prompt-editor-content {
+  max-width: 720px;
+}
+
+.chat-copilot-prompt-editor-body {
+  padding: 12px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.chat-copilot-prompt-editor-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--cc-text-tertiary);
+  transition: all 0.2s ease;
+}
+
+.chat-copilot-prompt-editor-close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--cc-error);
+}
+
+.chat-copilot-editor-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-copilot-editor-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--cc-text-secondary);
+  font-family: var(--cc-font-family);
+}
+
+.chat-copilot-editor-input,
+.chat-copilot-editor-textarea,
+.chat-copilot-editor-select {
+  width: 100%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-family: var(--cc-font-family);
+  color: var(--cc-text-primary);
+  background: var(--cc-bg-base);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.chat-copilot-editor-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+.chat-copilot-editor-input:focus,
+.chat-copilot-editor-textarea:focus,
+.chat-copilot-editor-select:focus {
+  border-color: rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="dark"] .chat-copilot-editor-input,
+.dark .chat-copilot-editor-input,
+[data-theme="dark"] .chat-copilot-editor-textarea,
+.dark .chat-copilot-editor-textarea,
+[data-theme="dark"] .chat-copilot-editor-select,
+.dark .chat-copilot-editor-select {
+  background: var(--cc-bg-subtle);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
 /* Re-optimize Button */
@@ -846,6 +939,36 @@
   background: var(--cc-bg-subtle);
   color: var(--cc-text-primary);
   border-color: rgba(0, 0, 0, 0.12);
+}
+
+.chat-copilot-btn-restore {
+  background: var(--cc-bg-base);
+  color: var(--cc-text-secondary);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+.chat-copilot-btn-restore:hover {
+  background: var(--cc-bg-subtle);
+  color: var(--cc-text-primary);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="dark"] .chat-copilot-btn-restore,
+.dark .chat-copilot-btn-restore,
+[data-theme="dark"] .chat-copilot-btn-cancel,
+.dark .chat-copilot-btn-cancel {
+  background: var(--cc-bg-muted);
+  color: var(--cc-text-secondary);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .chat-copilot-btn-restore:hover,
+.dark .chat-copilot-btn-restore:hover,
+[data-theme="dark"] .chat-copilot-btn-cancel:hover,
+.dark .chat-copilot-btn-cancel:hover {
+  background: var(--cc-bg-subtle);
+  color: var(--cc-text-primary);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="dark"] .chat-copilot-btn-cancel,
@@ -990,6 +1113,10 @@
   transition: all 0.22s ease;
   width: 30px;
   z-index: 1;
+}
+
+.chat-copilot-floating-drawer.is-empty {
+  display: none;
 }
 
 .chat-copilot-floating-action {
@@ -1300,13 +1427,13 @@ body.chat-copilot-modal-open .chat-copilot-floating-wrapper {
 
 /* Search Box */
 .chat-copilot-prompt-sidebar-search {
-  padding: 8px 14px;
   border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: var(--cc-bg-base);
+  /*background: var(--cc-bg-base);*/
   flex-shrink: 0;
 }
 
 .chat-copilot-prompt-sidebar-search input {
+  padding: 8px 14px;
   width: 100%;
   border: none;
   background: transparent;
@@ -1320,6 +1447,44 @@ body.chat-copilot-modal-open .chat-copilot-floating-wrapper {
 .chat-copilot-prompt-sidebar-search input::placeholder {
   color: var(--cc-text-tertiary);
   opacity: 0.7;
+}
+
+/* Favorites Actions */
+.chat-copilot-prompt-sidebar-actions {
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 6px 14px 8px;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  background: var(--cc-bg-base);
+  flex-shrink: 0;
+}
+
+.chat-copilot-prompt-sidebar[data-active-tab="favorites"] .chat-copilot-prompt-sidebar-actions {
+  display: flex;
+}
+
+.chat-copilot-prompt-sidebar-export {
+  width: 100%;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--cc-primary);
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+  font-family: var(--cc-font-family);
+}
+
+.chat-copilot-prompt-sidebar-export:hover {
+  background: rgba(99, 102, 241, 0.16);
+  border-color: rgba(99, 102, 241, 0.35);
 }
 
 /* Categories */
@@ -1513,7 +1678,8 @@ body.chat-copilot-modal-open .chat-copilot-floating-wrapper {
 }
 
 .chat-copilot-prompt-card-copy,
-.chat-copilot-prompt-card-insert {
+.chat-copilot-prompt-card-insert,
+.chat-copilot-prompt-card-edit {
   flex: 1;
   display: inline-flex;
   align-items: center;
@@ -1537,6 +1703,16 @@ body.chat-copilot-modal-open .chat-copilot-floating-wrapper {
 .chat-copilot-prompt-card-copy:hover {
   background: rgba(59, 130, 246, 0.1);
   color: var(--cc-info);
+}
+
+.chat-copilot-prompt-card-edit {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--cc-text-secondary);
+}
+
+.chat-copilot-prompt-card-edit:hover {
+  background: rgba(34, 197, 94, 0.1);
+  color: var(--cc-success);
 }
 
 .chat-copilot-prompt-card-insert {
@@ -1611,7 +1787,9 @@ body.chat-copilot-modal-open .chat-copilot-floating-wrapper {
 }
 
 [data-theme="dark"] .chat-copilot-prompt-card-copy,
-.dark .chat-copilot-prompt-card-copy {
+.dark .chat-copilot-prompt-card-copy,
+[data-theme="dark"] .chat-copilot-prompt-card-edit,
+.dark .chat-copilot-prompt-card-edit {
   background: rgba(255, 255, 255, 0.06);
 }
 
@@ -1635,6 +1813,13 @@ body.chat-copilot-modal-open .chat-copilot-floating-wrapper {
 .dark .chat-copilot-prompt-category:hover {
   border-color: rgba(99, 102, 241, 0.3);
   background: rgba(99, 102, 241, 0.08);
+}
+
+[data-theme="dark"] .chat-copilot-prompt-category.active,
+.dark .chat-copilot-prompt-category.active {
+  background: var(--cc-primary);
+  color: var(--cc-text-inverse);
+  border-color: var(--cc-primary);
 }
 
 [data-theme="dark"] .chat-copilot-prompt-sidebar-list::-webkit-scrollbar-thumb,
