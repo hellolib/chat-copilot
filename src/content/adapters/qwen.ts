@@ -9,13 +9,13 @@ export class QwenAdapter extends BaseAdapter {
   hostPatterns = ['chat.qwen.ai'];
 
   private readonly SEND_BUTTON_SELECTORS = [
-    '.omni-button-content button',
+    '.message-input-right-button-send',
     '.chat-prompt-send-button .send-button',
     '.chat-prompt-send-button .stop-button',
   ];
 
   getInputElement(): HTMLElement | null {
-    return document.querySelector('textarea#chat-input.chat-input');
+    return document.querySelector('textarea');
   }
 
   getSendButton(): HTMLElement | null {
