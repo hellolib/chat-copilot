@@ -167,7 +167,7 @@ export class FloatingButton {
         const maxTop = Math.max(0, window.innerHeight - wrapper.offsetHeight);
         const clampedTop = Math.min(Math.max(0, rect.top), maxTop);
         const edgeOffset = this.getEdgeOffset();
-        const side: 'right' = 'right';
+        const side = 'right' as const;
 
         wrapper.classList.add('snapping', 'floating-custom-position');
         wrapper.style.top = `${clampedTop}px`;

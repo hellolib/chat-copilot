@@ -206,14 +206,12 @@ class OptionsApp {
         <img src="${chrome.runtime.getURL(`assets/models-icons/${iconPath}`)}" alt="${m.provider}" class="model-provider-icon">
         <div class="model-info" data-id="${m.id}">
           <span class="model-name">${m.name}</span>
-          <span class="model-desc">${this.escapeHtml(
-            m.description?.trim() ? m.description : `${MODEL_PRESETS[m.provider]?.name ?? m.provider} · ${m.model}`,
-          )}</span>
+          <span class="model-desc">${this.escapeHtml(m.description?.trim() ? m.description : `${MODEL_PRESETS[m.provider]?.name ?? m.provider} · ${m.model}`)}</span>
         </div>
         <div class="model-actions">
           <button class="btn-test btn-test-inline" data-id="${m.id}">测试</button>
           <button class="btn-edit" data-id="${m.id}">编辑</button>
-        <button class="btn-delete ${isSelected ? 'disabled' : ''}" data-id="${m.id}" ${isSelected ? 'disabled' : ''}>删除</button>
+          <button class="btn-delete ${isSelected ? 'disabled' : ''}" data-id="${m.id}" ${isSelected ? 'disabled' : ''}>删除</button>
         </div>
       </div>
     `;
