@@ -3,7 +3,13 @@
  * 本地存储管理
  */
 
-import { ModelConfig, UserSettings, QUICK_ACCESS_SITES, CustomRule } from '@shared/types';
+import {
+  ModelConfig,
+  UserSettings,
+  QUICK_ACCESS_SITES,
+  CustomRule,
+  FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS,
+} from '@shared/types';
 import { AppError, ErrorCode, ErrorHandler } from '@shared/errors';
 
 export class StorageManager {
@@ -16,6 +22,7 @@ export class StorageManager {
       const defaultDisabledSites = ['yiyan', 'perplexity', 'qianwen'];
       // eslint-disable-next-line max-len
       const defaultEnabledSites = QUICK_ACCESS_SITES.map(site => site.id).filter(id => !defaultDisabledSites.includes(id));
+      const drawerActionsVersion = 2;
       
       const defaults: UserSettings = {
         currentModelId: 'builtin-rules',
@@ -24,6 +31,8 @@ export class StorageManager {
         promptMethodTagIds: ['roleplay'], // 默认选中角色扮演
         showFloatingButton: true,
         floatingButtonClickAction: 'prompt-plaza',
+        floatingButtonDrawerActions: FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS,
+        floatingButtonDrawerActionsVersion: drawerActionsVersion,
       };
 
       const existing = await this.get<UserSettings>('settings');
@@ -67,6 +76,26 @@ export class StorageManager {
 
         if (!existing.floatingButtonClickAction) {
           existing.floatingButtonClickAction = 'prompt-plaza';
+          shouldSave = true;
+        }
+
+        if (!Array.isArray(existing.floatingButtonDrawerActions)) {
+          existing.floatingButtonDrawerActions = FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
+          shouldSave = true;
+        } else {
+          // 兼容旧字段：optimize -> official-site，并过滤非法值
+          const rawActions = existing.floatingButtonDrawerActions as unknown as string[];
+          const normalized = rawActions
+            .map((id) => (id === 'optimize' ? 'official-site' : id))
+            .filter((id) => id === 'prompt-plaza' || id === 'favorites' || id === 'settings' || id === 'official-site');
+          if (normalized.join(',') !== rawActions.join(',')) {
+            existing.floatingButtonDrawerActions = normalized;
+            shouldSave = true;
+          }
+        }
+
+        if (typeof existing.floatingButtonDrawerActionsVersion !== 'number') {
+          existing.floatingButtonDrawerActionsVersion = drawerActionsVersion;
           shouldSave = true;
         }
 

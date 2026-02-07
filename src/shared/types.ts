@@ -223,6 +223,14 @@ export const PROMPT_METHOD_TAGS: PromptMethodTag[] = [
   },
 ];
 
+export type FloatingButtonDrawerActionId = 'prompt-plaza' | 'favorites' | 'settings' | 'official-site';
+
+export const FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS: FloatingButtonDrawerActionId[] = [
+  'prompt-plaza',
+  'favorites',
+  'settings',
+];
+
 export interface UserSettings {
   currentModelId: string;
   language: string;
@@ -231,6 +239,8 @@ export interface UserSettings {
   showFloatingButton?: boolean;
   showPromptSidebarToggle?: boolean;
   floatingButtonClickAction?: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings';
+  floatingButtonDrawerActions?: FloatingButtonDrawerActionId[];
+  floatingButtonDrawerActionsVersion?: number;
 }
 
 // 平台适配器接口

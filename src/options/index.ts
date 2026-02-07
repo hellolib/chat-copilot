@@ -13,6 +13,8 @@ import {
   CustomRule,
   PROMPT_METHOD_TAGS,
   PromptMethodTagId,
+  FloatingButtonDrawerActionId,
+  FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS,
 } from '@shared/types';
 import {ConfigValidator} from '@shared/validators';
 import {Toast} from '@shared/toast';
@@ -347,6 +349,14 @@ class OptionsApp {
     document.getElementById('floating-button-click-action')?.addEventListener('change', (e) => {
       const value = (e.target as HTMLSelectElement).value as 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings';
       this.saveFloatingButtonClickAction(value);
+    });
+
+    // 悬浮按钮悬停抽屉功能
+    document.getElementById('floating-drawer-actions')?.addEventListener('change', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target && target.classList.contains('floating-drawer-action-checkbox')) {
+        this.saveFloatingDrawerActions();
+      }
     });
 
     // 提示词广场侧边栏弹出方式
@@ -1008,6 +1018,7 @@ class OptionsApp {
     const result = await chrome.storage.local.get(['settings']);
     const showFloatingButton = result.settings?.showFloatingButton ?? true;
     const clickAction = result.settings?.floatingButtonClickAction ?? 'prompt-plaza';
+    const drawerActions = this.normalizeFloatingDrawerActions(result.settings?.floatingButtonDrawerActions);
 
     const toggle = document.getElementById('show-floating-button-toggle') as HTMLInputElement;
     if (toggle) {
@@ -1038,7 +1049,38 @@ class OptionsApp {
       }
     }
 
+    const drawerContainer = document.getElementById('floating-drawer-actions');
+    if (drawerContainer) {
+      drawerContainer.querySelectorAll<HTMLInputElement>('.floating-drawer-action-checkbox').forEach((checkbox) => {
+        const id = checkbox.dataset.actionId as FloatingButtonDrawerActionId | undefined;
+        checkbox.checked = id ? drawerActions.includes(id) : false;
+      });
+    }
+
     this.setFloatingActionDisabled(!showFloatingButton);
+  }
+
+  private normalizeFloatingDrawerActions(value: unknown): FloatingButtonDrawerActionId[] {
+    if (!Array.isArray(value)) {
+      return FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
+    }
+
+    if (value.length === 0) {
+      return [];
+    }
+
+    const mapped: FloatingButtonDrawerActionId[] = [];
+    value.forEach((id) => {
+      if (id === 'optimize') {
+        mapped.push('official-site');
+        return;
+      }
+      if (id === 'prompt-plaza' || id === 'favorites' || id === 'settings' || id === 'official-site') {
+        mapped.push(id);
+      }
+    });
+
+    return mapped.length > 0 ? mapped : FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
   }
 
   /**
@@ -1067,10 +1109,33 @@ class OptionsApp {
     await this.saveSettings({floatingButtonClickAction: action});
   }
 
+  private getFloatingDrawerActionsFromUI(): FloatingButtonDrawerActionId[] {
+    const container = document.getElementById('floating-drawer-actions');
+    if (!container) {
+      return FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
+    }
+
+    const selected: FloatingButtonDrawerActionId[] = [];
+    container.querySelectorAll<HTMLInputElement>('.floating-drawer-action-checkbox').forEach((checkbox) => {
+      const id = checkbox.dataset.actionId as FloatingButtonDrawerActionId | undefined;
+      if (checkbox.checked && id) {
+        selected.push(id);
+      }
+    });
+    return selected;
+  }
+
+  private async saveFloatingDrawerActions(): Promise<void> {
+    const selected = this.getFloatingDrawerActionsFromUI();
+    await this.saveSettings({floatingButtonDrawerActions: selected, floatingButtonDrawerActionsVersion: 2});
+  }
+
   private setFloatingActionDisabled(disabled: boolean): void {
     const settingItem = document.getElementById('floating-action-setting');
     const customSelect = document.getElementById('floating-action-custom');
     const nativeSelect = document.getElementById('floating-button-click-action') as HTMLSelectElement | null;
+    const drawerSetting = document.getElementById('floating-drawer-actions-setting');
+    const drawerCheckboxes = document.querySelectorAll<HTMLInputElement>('.floating-drawer-action-checkbox');
 
     if (settingItem) {
       settingItem.classList.toggle('is-disabled', disabled);
@@ -1087,6 +1152,15 @@ class OptionsApp {
     if (nativeSelect) {
       nativeSelect.disabled = disabled;
     }
+
+    if (drawerSetting) {
+      drawerSetting.classList.toggle('is-disabled', disabled);
+      drawerSetting.setAttribute('aria-disabled', disabled ? 'true' : 'false');
+    }
+
+    drawerCheckboxes.forEach((checkbox) => {
+      checkbox.disabled = disabled;
+    });
   }
 
   /**

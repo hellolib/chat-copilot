@@ -209,6 +209,7 @@ export class PromptSidebar {
 
     const sidebar = document.createElement('div');
     sidebar.className = 'chat-copilot-prompt-sidebar';
+    sidebar.dataset.activeTab = this.activeTab;
     sidebar.innerHTML = this.renderSidebarContent();
 
     // 绑定事件
@@ -257,6 +258,17 @@ export class PromptSidebar {
 
       <div class="chat-copilot-prompt-sidebar-list">
         ${this.renderPromptList()}
+      </div>
+
+      <div class="chat-copilot-prompt-sidebar-actions">
+        <button class="chat-copilot-prompt-sidebar-export" type="button" title="导出收藏为 JSON">
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"/>
+            <path d="M12 3v12"/>
+            <path d="M8 7l4-4 4 4"/>
+          </svg>
+          导出我的收藏
+        </button>
       </div>
 
       <div class="chat-copilot-prompt-sidebar-resize"></div>
@@ -385,6 +397,15 @@ export class PromptSidebar {
             </svg>
             复制
           </button>
+          ${this.activeTab === 'favorites' ? `
+            <button class="chat-copilot-prompt-card-edit" data-prompt-id="${prompt.id}" title="编辑">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+              </svg>
+              编辑
+            </button>
+          ` : ''}
           ${this.supportsInsert ? `
             <button class="chat-copilot-prompt-card-insert" data-prompt-id="${prompt.id}" title="写入输入框">
               <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2">
@@ -413,6 +434,10 @@ export class PromptSidebar {
     // 关闭按钮
     sidebar.querySelector('.chat-copilot-prompt-sidebar-close')?.addEventListener('click', () => {
       this.close();
+    });
+
+    sidebar.querySelector('.chat-copilot-prompt-sidebar-export')?.addEventListener('click', () => {
+      this.exportFavorites();
     });
 
     // 搜索输入
@@ -463,6 +488,8 @@ export class PromptSidebar {
         this.copyPrompt(promptId);
       } else if (button.classList.contains('chat-copilot-prompt-card-insert')) {
         this.insertPrompt(promptId);
+      } else if (button.classList.contains('chat-copilot-prompt-card-edit')) {
+        this.openFavoriteEditor(promptId);
       } else if (button.classList.contains('chat-copilot-prompt-card-favorite')) {
         this.toggleFavorite(promptId);
       } else if (button.classList.contains('chat-copilot-prompt-card-copy-answer')) {
@@ -509,7 +536,7 @@ export class PromptSidebar {
    * 复制答案
    */
   private copyAnswer(promptId: string): void {
-    const prompt = this.prompts.find(p => p.id === promptId);
+    const prompt = this.resolvePromptForAction(promptId);
     if (!prompt || !prompt.answer) { return; }
 
     navigator.clipboard.writeText(prompt.answer).then(() => {
@@ -572,14 +599,7 @@ export class PromptSidebar {
 
     // 按分类过滤
     if (this.activeTab === 'favorites') {
-      const favoriteList: PromptItem[] = [];
-      this.favoriteIds.forEach(id => {
-        const prompt = this.prompts.find(p => p.id === id) || this.favoritePrompts.get(id);
-        if (prompt) {
-          favoriteList.push(prompt);
-        }
-      });
-      filtered = favoriteList;
+      filtered = this.getFavoritePrompts();
       if (this.selectedCategory) {
         filtered = filtered.filter(p => p.category === this.selectedCategory);
       }
@@ -600,13 +620,42 @@ export class PromptSidebar {
       );
     }
 
-    return filtered.sort((a, b) => {
+    return this.sortPrompts(filtered);
+  }
+
+  private getFavoritePrompts(): PromptItem[] {
+    const favoriteList: PromptItem[] = [];
+    this.favoriteIds.forEach(id => {
+      const prompt = this.favoritePrompts.get(id) || this.prompts.find(p => p.id === id);
+      if (prompt) {
+        favoriteList.push(prompt);
+      }
+    });
+    return favoriteList;
+  }
+
+  private resolvePromptForAction(promptId: string): PromptItem | undefined {
+    if (this.activeTab === 'favorites') {
+      return this.favoritePrompts.get(promptId) || this.prompts.find(p => p.id === promptId);
+    }
+    return this.prompts.find(p => p.id === promptId);
+  }
+
+  private sortPrompts(prompts: PromptItem[]): PromptItem[] {
+    return prompts.sort((a, b) => {
       const orderDiff = (a.order ?? 0) - (b.order ?? 0);
       if (orderDiff !== 0) {
         return orderDiff;
       }
       return a.title.localeCompare(b.title);
     });
+  }
+
+  private parseTags(input: string): string[] {
+    return input
+      .split(/[,，]/)
+      .map(tag => tag.trim())
+      .filter(Boolean);
   }
 
   /**
@@ -626,6 +675,7 @@ export class PromptSidebar {
       const tab = (btn as HTMLElement).dataset.tab as 'square' | 'favorites' | undefined;
       btn.classList.toggle('active', !!tab && this.activeTab === tab);
     });
+    this.sidebar.dataset.activeTab = this.activeTab;
   }
 
   /**
@@ -643,7 +693,7 @@ export class PromptSidebar {
    * 复制提示词
    */
   private copyPrompt(promptId: string): void {
-    const prompt = this.prompts.find(p => p.id === promptId);
+    const prompt = this.resolvePromptForAction(promptId);
     if (!prompt) { return; }
 
     navigator.clipboard.writeText(prompt.content).then(() => {
@@ -651,6 +701,239 @@ export class PromptSidebar {
     }).catch(() => {
       Toast.error('复制失败');
     });
+  }
+
+  private exportFavorites(): void {
+    const favorites = this.sortPrompts(this.getFavoritePrompts());
+    if (favorites.length === 0) {
+      Toast.warning('暂无收藏可导出');
+      return;
+    }
+
+    const payload = {
+      exportedAt: new Date().toISOString(),
+      favorites,
+    };
+    const json = JSON.stringify(payload, null, 2);
+    const blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    link.href = url;
+    link.download = `chat-copilot-favorites-${timestamp}.json`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    Toast.success('收藏已导出');
+  }
+
+  private openFavoriteEditor(promptId: string): void {
+    if (this.activeTab !== 'favorites') { return; }
+
+    const sourcePrompt = this.favoritePrompts.get(promptId) || this.prompts.find(p => p.id === promptId);
+    if (!sourcePrompt) {
+      Toast.warning('未找到该收藏提示词');
+      return;
+    }
+
+    const existingDialog = document.querySelector('.chat-copilot-dialog.chat-copilot-prompt-editor');
+    if (existingDialog) {
+      existingDialog.remove();
+      document.body.classList.remove('chat-copilot-modal-open');
+    }
+
+    const visibleCategories = this.getVisibleCategories();
+    const fallbackCategory = PROMPT_CATEGORIES.find(category => category.id === sourcePrompt.category);
+    const categories = fallbackCategory && !visibleCategories.some(category => category.id === fallbackCategory.id)
+      ? [...visibleCategories, fallbackCategory]
+      : visibleCategories;
+
+    const dialog = document.createElement('div');
+    dialog.className = 'chat-copilot-dialog chat-copilot-prompt-editor';
+    dialog.innerHTML = `
+      <div class="chat-copilot-dialog-content chat-copilot-prompt-editor-content">
+        <div class="chat-copilot-dialog-header">
+          <div class="chat-copilot-header-left">
+            <h3 class="chat-copilot-title">编辑收藏提示词</h3>
+          </div>
+          <button class="chat-copilot-prompt-editor-close" title="关闭">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <div class="chat-copilot-dialog-body chat-copilot-prompt-editor-body">
+          <label class="chat-copilot-editor-field">
+            <span class="chat-copilot-editor-label">标题</span>
+            <input class="chat-copilot-editor-input" data-type="title" type="text" placeholder="请输入标题" />
+          </label>
+          <label class="chat-copilot-editor-field">
+            <span class="chat-copilot-editor-label">分类</span>
+            <select class="chat-copilot-editor-select" data-type="category">
+              ${categories.map(category => `
+                <option value="${category.id}" ${category.id === sourcePrompt.category ? 'selected' : ''}>
+                  ${this.escapeHtml(category.name)}
+                </option>
+              `).join('')}
+            </select>
+          </label>
+          <label class="chat-copilot-editor-field">
+            <span class="chat-copilot-editor-label">标签（逗号分隔）</span>
+            <input class="chat-copilot-editor-input" data-type="tags" type="text" placeholder="如：写作,营销,办公" />
+          </label>
+          <label class="chat-copilot-editor-field">
+            <span class="chat-copilot-editor-label">提示词内容</span>
+            <textarea class="chat-copilot-editor-textarea" data-type="content" rows="6" placeholder="请输入提示词内容"></textarea>
+          </label>
+        </div>
+        <div class="chat-copilot-dialog-footer chat-copilot-prompt-editor-footer">
+          <div class="chat-copilot-dialog-footer-left">
+            <button class="chat-copilot-btn-restore" type="button">复原</button>
+          </div>
+          <div class="chat-copilot-dialog-footer-right">
+            <button class="chat-copilot-btn-apply" type="button">保存</button>
+            <button class="chat-copilot-btn-cancel" type="button">取消</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const titleInput = dialog.querySelector('.chat-copilot-editor-input[data-type="title"]') as HTMLInputElement | null;
+    const categorySelect = dialog.querySelector('.chat-copilot-editor-select[data-type="category"]') as HTMLSelectElement | null;
+    const tagsInput = dialog.querySelector('.chat-copilot-editor-input[data-type="tags"]') as HTMLInputElement | null;
+    const contentTextarea = dialog.querySelector('.chat-copilot-editor-textarea[data-type="content"]') as HTMLTextAreaElement | null;
+
+    if (titleInput) {
+      titleInput.value = sourcePrompt.title;
+    }
+    if (categorySelect) {
+      categorySelect.value = sourcePrompt.category;
+    }
+    if (tagsInput) {
+      tagsInput.value = sourcePrompt.tags.join(', ');
+    }
+    if (contentTextarea) {
+      contentTextarea.value = sourcePrompt.content;
+    }
+
+    const originalTagsValue = sourcePrompt.tags.join(',');
+
+    const getCurrentValues = () => {
+      const title = titleInput?.value.trim() ?? '';
+      const content = contentTextarea?.value.trim() ?? '';
+      const category = (categorySelect?.value ?? sourcePrompt.category) as PromptCategory;
+      const tags = this.parseTags(tagsInput?.value ?? '');
+      return { title, content, category, tags };
+    };
+
+    const hasChanges = () => {
+      const current = getCurrentValues();
+      return (
+        current.title !== sourcePrompt.title ||
+        current.content !== sourcePrompt.content ||
+        current.category !== sourcePrompt.category ||
+        current.tags.join(',') !== originalTagsValue
+      );
+    };
+
+    const closeEditor = () => {
+      dialog.remove();
+      document.body.classList.remove('chat-copilot-modal-open');
+    };
+
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) {
+        if (!hasChanges() || confirm('更改内容未保存，是否要取消？')) {
+          closeEditor();
+        }
+      }
+    });
+
+    dialog.querySelector('.chat-copilot-prompt-editor-close')?.addEventListener('click', () => {
+      if (!hasChanges() || confirm('更改内容未保存，是否要取消？')) {
+        closeEditor();
+      }
+    });
+    dialog.querySelector('.chat-copilot-btn-cancel')?.addEventListener('click', () => {
+      if (!hasChanges() || confirm('更改内容未保存，是否要取消？')) {
+        closeEditor();
+      }
+    });
+    dialog.querySelector('.chat-copilot-btn-apply')?.addEventListener('click', async () => {
+      const { title, content, category, tags } = getCurrentValues();
+
+      if (!title || !content) {
+        Toast.warning('标题和内容不能为空');
+        return;
+      }
+
+      const updated: PromptItem = {
+        ...sourcePrompt,
+        title,
+        content,
+        category,
+        tags,
+      };
+
+      this.favoritePrompts.set(promptId, updated);
+      if (!this.favoriteIds.has(promptId)) {
+        this.favoriteIds.add(promptId);
+      }
+
+      try {
+        await chrome.storage.local.set({
+          favoritePromptIds: Array.from(this.favoriteIds),
+          favoritePrompts: Array.from(this.favoritePrompts.values()),
+        });
+        Toast.success('已更新收藏提示词');
+      } catch (error) {
+        console.error('Failed to save favorites:', error);
+        Toast.error('保存失败');
+      }
+
+      this.updatePromptList();
+      closeEditor();
+    });
+
+    dialog.querySelector('.chat-copilot-btn-restore')?.addEventListener('click', async () => {
+      const originalPrompt = this.prompts.find(p => p.id === promptId);
+      if (!originalPrompt) {
+        Toast.warning('提示词广场内容不存在');
+        return;
+      }
+
+      const confirmed = confirm('将恢复为提示词广场内容，已编辑内容会丢失，是否继续？');
+      if (!confirmed) { return; }
+
+      const restored: PromptItem = {
+        ...originalPrompt,
+        isFavorite: true,
+      };
+
+      this.favoritePrompts.set(promptId, restored);
+      if (!this.favoriteIds.has(promptId)) {
+        this.favoriteIds.add(promptId);
+      }
+
+      try {
+        await chrome.storage.local.set({
+          favoritePromptIds: Array.from(this.favoriteIds),
+          favoritePrompts: Array.from(this.favoritePrompts.values()),
+        });
+        Toast.success('已复原到提示词广场内容');
+      } catch (error) {
+        console.error('Failed to save favorites:', error);
+        Toast.error('复原失败');
+        return;
+      }
+
+      this.updatePromptList();
+      closeEditor();
+    });
+
+    document.body.appendChild(dialog);
+    document.body.classList.add('chat-copilot-modal-open');
   }
 
   /**
@@ -661,7 +944,7 @@ export class PromptSidebar {
       Toast.warning('请在支持的页面使用');
       return;
     }
-    const prompt = this.prompts.find(p => p.id === promptId);
+    const prompt = this.resolvePromptForAction(promptId);
     if (!prompt) { return; }
 
     this.adapter.setInputValue(prompt.content);

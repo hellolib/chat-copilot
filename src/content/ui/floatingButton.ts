@@ -28,6 +28,7 @@ export class FloatingButton {
   private options: FloatingButtonOptions;
   private wrapper: HTMLElement | null = null;
   private button: HTMLButtonElement | null = null;
+  private drawer: HTMLElement | null = null;
   private dragOffset = { x: 0, y: 0 };
   private dragMoved = false;
   private dragStart = { x: 0, y: 0 };
@@ -44,6 +45,7 @@ export class FloatingButton {
     if (existing) {
       this.wrapper = existing;
       this.button = existing.querySelector('.chat-copilot-floating-btn') as HTMLButtonElement | null;
+      this.drawer = existing.querySelector('.chat-copilot-floating-drawer') as HTMLElement | null;
       return;
     }
     const wrapper = this.createWrapper();
@@ -73,6 +75,13 @@ export class FloatingButton {
 
     if (this.wrapper) {
       this.wrapper.style.display = '';
+    }
+  }
+
+  setActions(actions: FloatingButtonAction[]): void {
+    this.options.actions = actions;
+    if (this.drawer) {
+      this.renderActions(this.drawer, actions);
     }
   }
 
@@ -199,23 +208,8 @@ export class FloatingButton {
 
     const drawer = document.createElement('div');
     drawer.className = 'chat-copilot-floating-drawer';
-    this.options.actions.forEach((action) => {
-      const actionButton = document.createElement('button');
-      actionButton.type = 'button';
-      actionButton.className = 'chat-copilot-floating-action';
-      actionButton.setAttribute('aria-label', action.label);
-      actionButton.appendChild(this.createActionIcon(action.id));
-      const actionTooltip = document.createElement('span');
-      actionTooltip.className = 'chat-copilot-floating-tooltip chat-copilot-floating-action-tooltip';
-      actionTooltip.textContent = action.label;
-      actionButton.appendChild(actionTooltip);
-      actionButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        action.onClick();
-      });
-      drawer.appendChild(actionButton);
-    });
+    this.renderActions(drawer, this.options.actions);
+    this.drawer = drawer;
 
     const tooltip = document.createElement('span');
     tooltip.className = 'chat-copilot-floating-tooltip';
@@ -232,6 +226,9 @@ export class FloatingButton {
       if (closeTimer) {
         clearTimeout(closeTimer);
         closeTimer = null;
+      }
+      if (drawer.classList.contains('is-empty')) {
+        return;
       }
       // 打开抽屉时显示有光线 Logo
       svg.style.setProperty('--cc-logo-url', `url("${lightUrl}")`);
@@ -273,6 +270,28 @@ export class FloatingButton {
     wrapper.appendChild(tooltip);
     wrapper.appendChild(drawer);
     return wrapper;
+  }
+
+  private renderActions(drawer: HTMLElement, actions: FloatingButtonAction[]): void {
+    drawer.innerHTML = '';
+    actions.forEach((action) => {
+      const actionButton = document.createElement('button');
+      actionButton.type = 'button';
+      actionButton.className = 'chat-copilot-floating-action';
+      actionButton.setAttribute('aria-label', action.label);
+      actionButton.appendChild(this.createActionIcon(action.id));
+      const actionTooltip = document.createElement('span');
+      actionTooltip.className = 'chat-copilot-floating-tooltip chat-copilot-floating-action-tooltip';
+      actionTooltip.textContent = action.label;
+      actionButton.appendChild(actionTooltip);
+      actionButton.addEventListener('click', (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        action.onClick();
+      });
+      drawer.appendChild(actionButton);
+    });
+    drawer.classList.toggle('is-empty', actions.length === 0);
   }
 
   private createActionIcon(id: string): SVGElement {
@@ -320,6 +339,21 @@ export class FloatingButton {
       const path = document.createElementNS(svgNS, 'path');
       path.setAttribute('d', 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z');
       svg.appendChild(path);
+      return svg;
+    }
+
+    if (id === 'official-site') {
+      const circle = document.createElementNS(svgNS, 'circle');
+      circle.setAttribute('cx', '12');
+      circle.setAttribute('cy', '12');
+      circle.setAttribute('r', '9');
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', 'M2.5 12h19');
+      const path2 = document.createElementNS(svgNS, 'path');
+      path2.setAttribute('d', 'M12 3a15 15 0 010 18a15 15 0 010-18');
+      svg.appendChild(circle);
+      svg.appendChild(path);
+      svg.appendChild(path2);
       return svg;
     }
 

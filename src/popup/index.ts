@@ -183,6 +183,7 @@ class PopupApp {
 
     const modelEl = document.getElementById('current-model');
     const modelIconEl = document.getElementById('current-model-icon') as HTMLImageElement;
+    const builtinTipEl = document.getElementById('builtin-model-tip');
 
     if (modelEl) {
       if (modelId === 'builtin-rules') {
@@ -191,6 +192,9 @@ class PopupApp {
           modelIconEl.src = chrome.runtime.getURL('assets/models-icons/inner.svg');
           modelIconEl.alt = 'builtin';
           modelIconEl.style.display = 'block';
+        }
+        if (builtinTipEl) {
+          builtinTipEl.style.display = 'inline-flex';
         }
       } else {
         const model = models.find((m) => m.id === modelId);
@@ -204,6 +208,9 @@ class PopupApp {
           modelIconEl.style.display = 'none';
         }
       }
+    }
+    if (builtinTipEl && modelId !== 'builtin-rules') {
+      builtinTipEl.style.display = 'none';
     }
   }
 
@@ -249,7 +256,17 @@ class PopupApp {
       )
       .join('');
 
-    container.innerHTML = builtinHtml + modelsHtml;
+    const addModelHtml = `
+      <div class="model-option model-option-add" data-action="open-model-settings">
+        <span class="model-option-icon model-option-add-icon">+</span>
+        <div class="model-option-info">
+          <span class="model-option-name">添加自定义模型</span>
+          <span class="model-option-desc">前往设置进行添加</span>
+        </div>
+      </div>
+    `;
+
+    container.innerHTML = builtinHtml + modelsHtml + addModelHtml;
 
     // 绑定点击事件
     container.querySelectorAll('.model-option').forEach((option) => {
@@ -260,6 +277,13 @@ class PopupApp {
           await this.selectModel(modelId);
           this.toggleModelDropdown();
         }
+      });
+    });
+
+    container.querySelectorAll<HTMLElement>('[data-action="open-model-settings"]').forEach((item) => {
+      item.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openModelSettings();
       });
     });
   }
@@ -346,6 +370,13 @@ class PopupApp {
       this.toggleModelDropdown();
     });
 
+    document.querySelectorAll<HTMLElement>('[data-action="open-model-settings"]').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openModelSettings();
+      });
+    });
+
     // 点击外部关闭下拉列表
     setTimeout(() => {
       document.addEventListener('click', (e) => {
@@ -366,6 +397,12 @@ class PopupApp {
         }
       });
     }, 0);
+  }
+
+  private openModelSettings(): void {
+    const optionsUrl = chrome.runtime.getURL('options/index.html#section-model');
+    chrome.tabs.create({ url: optionsUrl });
+    window.close();
   }
 
   private async openPromptSidebar(tab: 'square' | 'favorites'): Promise<void> {

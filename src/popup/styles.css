@@ -105,7 +105,7 @@ body {
 .model-card {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--space-3);
   background: var(--color-bg-base);
   padding: var(--space-3) var(--space-4);
@@ -144,8 +144,9 @@ body {
 .model-info {
   display: flex;
   flex-direction: column;
-  flex: 1;
   gap: 2px;
+  flex: 0 1 auto;
+  min-width: 0;
 }
 
 .model-label {
@@ -163,11 +164,68 @@ body {
   line-height: var(--line-height-tight);
 }
 
+.model-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+  margin-left: calc(-1 * var(--space-3) + 2px);
+}
+
+.model-tip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  max-width: 150px;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: var(--color-warning-subtle);
+  color: var(--color-warning);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  line-height: 1.2;
+  text-align: left;
+  white-space: normal;
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
+.model-tip-text {
+  display: block;
+}
+
+.model-tip-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.model-tip-link {
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--font-weight-semibold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.model-tip-link:hover {
+  color: var(--color-warning);
+  opacity: 0.9;
+}
+
 .model-arrow {
   font-size: var(--font-size-xs);
   color: var(--color-text-tertiary);
   transition: transform var(--transition-normal), color var(--transition-fast);
   flex-shrink: 0;
+  margin-left: auto;
 }
 
 .model-card.expanded .model-arrow {
@@ -250,6 +308,28 @@ body {
   width: 3px;
   background: var(--color-primary);
   border-radius: 0 2px 2px 0;
+}
+
+.model-option-add {
+  color: var(--color-primary);
+}
+
+.model-option-add .model-option-desc {
+  color: var(--color-text-tertiary);
+}
+
+.model-option-add .model-option-name {
+  font-weight: var(--font-weight-normal);
+}
+
+.model-option-add-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary-subtle);
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-base);
 }
 
 .model-option-icon {
