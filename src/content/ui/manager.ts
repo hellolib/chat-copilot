@@ -235,7 +235,11 @@ export class UIManager {
    * 初始化 Tooltip (Portal 模式)
    */
   private initTooltip(): void {
-    if (document.querySelector('.chat-copilot-btn-tooltip')) {return;}
+    const existing = document.querySelector('.chat-copilot-btn-tooltip') as HTMLElement | null;
+    if (existing) {
+      this.tooltip = existing;
+      return;
+    }
 
     this.tooltip = document.createElement('div');
     this.tooltip.className = 'chat-copilot-btn-tooltip';
@@ -334,6 +338,9 @@ export class UIManager {
   refresh(): void {
     if (!this.isInjected || !document.contains(this.button)) {
       this.injectButton();
+    }
+    if (!this.tooltip || !document.contains(this.tooltip)) {
+      this.initTooltip();
     }
     if (this.showFloatingButton && this.adapter.name !== 'Generic') {
       this.floatingButton.refresh();
