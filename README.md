@@ -21,6 +21,10 @@
 
 Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对话增强助手，旨在提升用户在使用 AI 平台时的效率和体验。通过智能提示词优化，帮助用户获得更精准、更高质量的 AI 回复。
 
+<div align="center">
+  <img src="src/assets/images/1-注入按钮.png" alt="注入按钮入口" width="760" />
+</div>
+
 ### 支持的平台
 
 | 国际平台 | 国内平台                                                                                                |
@@ -45,6 +49,19 @@ Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对
 - **优化风格** - 支持选择提示词生成风格，满足不同场景需求
 - **自定义优化规则** - 支持自定义提示词优化规则，满足不同场景需求
 
+<div align="center">
+  <img src="src/assets/images/2-优化对比.png" alt="优化前后对比" width="560" />
+</div>
+
+### 🧲 悬浮按钮
+
+- **快捷触达** - 侧边悬浮按钮一键打开常用功能
+- **可配置动作** - 支持自定义默认动作与抽屉菜单
+
+<div align="center">
+  <img src="src/assets/images/3-悬浮按钮.png" alt="悬浮按钮入口" width="560" />
+</div>
+
 ### 🎯 核心优势
 
 - **多平台支持** - 覆盖主流 AI 对话平台，一个插件搞定所有
@@ -55,7 +72,7 @@ Chat Copilot 是一款基于 Chrome Extension Manifest V3 标准开发的 AI 对
 
 ## 快速开始
 
-### 方式一：Chrome 商店安装（推荐）
+### 方式一：Chrome 商店安装（由于审批较慢，可能不是最新的）
 
 1. 访问 [Chrome Web Store](https://chromewebstore.google.com/detail/chat-copilot/ignafelbdjojmmofofhldldpgkceflal)
 2. 点击「添加至 Chrome」按钮
@@ -139,7 +156,6 @@ npm run format
 
 ## TODO
 
-- [ ] 提示词收藏夹 - 提示词对比页面收藏功能、管理收藏
 - [ ] 支持图像平台 - 扩展至图像生成 AI 平台
 
 ---
