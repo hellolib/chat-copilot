@@ -6,6 +6,7 @@
 import { ExportChatData, ExportConfig } from './config';
 import { TurndownService } from './turndown';
 import { formatFileName } from './filename';
+import { exportViaClipboard } from './clipboard';
 import { BACK_TO_TOP_LINK, truncate, escapeMd, formatLocalTime } from './utils';
 
 /**
@@ -19,11 +20,16 @@ export interface ExportResult {
 /**
  * Generate Markdown from chat data
  */
-export function generateMarkdown(
+export async function generateMarkdown(
   chatData: ExportChatData,
   config: ExportConfig,
   turndown: TurndownService,
-): ExportResult {
+): Promise<ExportResult> {
+  if (config.exportMethod === 'clipboard') {
+    return exportViaClipboard(chatData, config);
+  }
+
+  // --- DOM parsing path (existing logic unchanged) ---
   let toc = '';
   let content = '';
   let exportChatIndex = 0;
