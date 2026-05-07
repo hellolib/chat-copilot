@@ -31,18 +31,10 @@ export async function generateMarkdown(
         `[Chat Copilot] Clipboard export is not supported on ${chatData.platform}. Falling back to DOM parsing.`
       );
       // Fall through to DOM parsing below
-    } else if (!navigator.clipboard?.readText || !navigator.clipboard?.writeText) {
-      console.warn(
-        '[Chat Copilot] Clipboard API not available. Falling back to DOM parsing.'
-      );
-      // Fall through to DOM parsing below
     } else {
       try {
-        return await exportViaClipboard(chatData, config);
+        return await exportViaClipboard(chatData, config, turndown);
       } catch (error) {
-        if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          alert('剪贴板访问被拒绝。请在浏览器设置中允许剪贴板访问，或切换到 DOM 解析模式。');
-        }
         console.warn('[Chat Copilot] Clipboard export failed, falling back to DOM parsing:', error);
         // Fall through to DOM parsing below
       }
