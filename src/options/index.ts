@@ -15,6 +15,11 @@ import {
   PromptMethodTagId,
   FloatingButtonDrawerActionId,
   FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS,
+  FeishuConfig,
+  FeishuSpace,
+  ExportSettings,
+  ExportMethod,
+  DEFAULT_EXPORT_SETTINGS,
 } from '@shared/types';
 import {ConfigValidator} from '@shared/validators';
 import {Toast} from '@shared/toast';
@@ -43,7 +48,9 @@ class OptionsApp {
     this.updateOptimizationAvailability();
     await this.loadFloatingButtonSettings();
     await this.loadPromptSidebarSettings();
+    await this.loadExportSettings();
     this.initSidebarNavigation();
+    this.initFeishuConfig();
     // 处理页面加载时的 hash 导航
     this.handleHashNavigation();
   }
@@ -1096,6 +1103,41 @@ class OptionsApp {
     }
   }
 
+  // ========================================
+  // 导出设置
+  // ========================================
+
+  private async loadExportSettings(): Promise<void> {
+    const result = await chrome.storage.local.get(['exportSettings']);
+    const settings: ExportSettings = result.exportSettings ?? DEFAULT_EXPORT_SETTINGS;
+
+    const templateInput = document.getElementById('export-filename-template') as HTMLInputElement;
+    const tocToggle = document.getElementById('export-include-toc') as HTMLInputElement;
+    const fmToggle = document.getElementById('export-include-frontmatter') as HTMLInputElement;
+    const methodSelect = document.getElementById('export-method') as HTMLSelectElement;
+
+    if (templateInput) { templateInput.value = settings.filenameTemplate; }
+    if (tocToggle) { tocToggle.checked = settings.includeTOC; }
+    if (fmToggle) { fmToggle.checked = settings.includeFrontMatter; }
+    if (methodSelect) { methodSelect.value = settings.exportMethod || 'dom'; }
+
+    // Bind events
+    const saveExport = () => {
+      const newSettings: ExportSettings = {
+        filenameTemplate: templateInput?.value ?? DEFAULT_EXPORT_SETTINGS.filenameTemplate,
+        includeTOC: tocToggle?.checked ?? DEFAULT_EXPORT_SETTINGS.includeTOC,
+        includeFrontMatter: fmToggle?.checked ?? DEFAULT_EXPORT_SETTINGS.includeFrontMatter,
+        exportMethod: (methodSelect?.value as ExportMethod) ?? 'dom',
+      };
+      chrome.storage.local.set({ exportSettings: newSettings });
+    };
+
+    templateInput?.addEventListener('change', saveExport);
+    tocToggle?.addEventListener('change', saveExport);
+    fmToggle?.addEventListener('change', saveExport);
+    methodSelect?.addEventListener('change', saveExport);
+  }
+
   /**
    * 保存悬浮按钮设置
    */
@@ -1432,6 +1474,233 @@ class OptionsApp {
     } catch (error) {
       console.error('Failed to delete custom rule:', error);
       Toast.error('删除规则失败: ' + (error as Error).message);
+    }
+  }
+
+  // ========================================
+  // 飞书知识库配置
+  // ========================================
+
+  private feishuConfig: FeishuConfig = { appId: '', appSecret: '' };
+  private feishuSpaces: FeishuSpace[] = [];
+
+  /**
+   * 初始化飞书配置
+   */
+  private async initFeishuConfig(): Promise<void> {
+    await this.loadFeishuConfig();
+    this.bindFeishuEvents();
+  }
+
+  /**
+   * 加载飞书配置
+   */
+  private async loadFeishuConfig(): Promise<void> {
+    try {
+      const response = await chrome.runtime.sendMessage({ type: MessageType.GET_FEISHU_CONFIG });
+      if (response.success && response.data) {
+        this.feishuConfig = response.data as FeishuConfig;
+        this.populateFeishuForm();
+      }
+    } catch (error) {
+      console.error('Failed to load Feishu config:', error);
+    }
+  }
+
+  /**
+   * 填充飞书配置表单
+   */
+  private populateFeishuForm(): void {
+    const appIdInput = document.getElementById('feishu-app-id') as HTMLInputElement;
+    const appSecretInput = document.getElementById('feishu-app-secret') as HTMLInputElement;
+    const spaceSelect = document.getElementById('feishu-space-select') as HTMLSelectElement;
+
+    if (appIdInput && this.feishuConfig.appId) {
+      appIdInput.value = this.feishuConfig.appId;
+    }
+    if (appSecretInput && this.feishuConfig.appSecret) {
+      appSecretInput.value = this.feishuConfig.appSecret;
+    }
+
+    // 如果已保存 spaceId，尝试加载空间列表
+    if (this.feishuConfig.spaceId && spaceSelect) {
+      this.refreshFeishuSpaces();
+    }
+  }
+
+  /**
+   * 绑定飞书相关事件
+   */
+  private bindFeishuEvents(): void {
+    document.getElementById('feishu-test-connection')?.addEventListener('click', () => {
+      this.testFeishuConnection();
+    });
+
+    document.getElementById('feishu-save-config')?.addEventListener('click', () => {
+      this.saveFeishuConfig();
+    });
+
+    document.getElementById('feishu-refresh-spaces')?.addEventListener('click', () => {
+      this.refreshFeishuSpaces();
+    });
+  }
+
+  /**
+   * 获取表单中的飞书配置
+   */
+  private getFeishuFormConfig(): FeishuConfig {
+    const appId = (document.getElementById('feishu-app-id') as HTMLInputElement)?.value?.trim() || '';
+    const appSecret = (document.getElementById('feishu-app-secret') as HTMLInputElement)?.value?.trim() || '';
+    const spaceId = (document.getElementById('feishu-space-select') as HTMLSelectElement)?.value || undefined;
+
+    return { appId, appSecret, spaceId };
+  }
+
+  /**
+   * 测试飞书连接
+   */
+  private async testFeishuConnection(): Promise<void> {
+    const config = this.getFeishuFormConfig();
+
+    if (!config.appId || !config.appSecret) {
+      this.showFeishuStatus('请填写 App ID 和 App Secret', 'error');
+      return;
+    }
+
+    const testBtn = document.getElementById('feishu-test-connection') as HTMLButtonElement;
+    if (testBtn) {
+      testBtn.textContent = '测试中...';
+      testBtn.disabled = true;
+    }
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: MessageType.TEST_FEISHU_CONNECTION,
+        payload: config,
+      });
+
+      if (response.success) {
+        this.showFeishuStatus('连接成功！正在加载知识空间列表...', 'success');
+        // 自动加载知识空间
+        await this.refreshFeishuSpaces(config);
+      } else {
+        this.showFeishuStatus(response.error || '连接失败', 'error');
+      }
+    } catch (error) {
+      this.showFeishuStatus('连接失败: ' + (error as Error).message, 'error');
+    } finally {
+      if (testBtn) {
+        testBtn.textContent = '测试连接';
+        testBtn.disabled = false;
+      }
+    }
+  }
+
+  /**
+   * 刷新知识空间列表
+   */
+  private async refreshFeishuSpaces(config?: FeishuConfig): Promise<void> {
+    const feishuConfig = config || this.getFeishuFormConfig();
+    if (!feishuConfig.appId || !feishuConfig.appSecret) { return; }
+
+    const refreshBtn = document.getElementById('feishu-refresh-spaces') as HTMLButtonElement;
+
+    if (refreshBtn) {
+      refreshBtn.textContent = '加载中...';
+      refreshBtn.disabled = true;
+    }
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: MessageType.GET_FEISHU_SPACES,
+        payload: feishuConfig,
+      });
+
+      if (response.success && response.data?.spaces) {
+        this.feishuSpaces = response.data.spaces as FeishuSpace[];
+        this.renderFeishuSpaceSelect();
+        this.showFeishuStatus(`已加载 ${this.feishuSpaces.length} 个知识空间`, 'success');
+      } else {
+        this.showFeishuStatus(response.error || '获取知识空间列表失败', 'error');
+      }
+    } catch (error) {
+      this.showFeishuStatus('加载失败: ' + (error as Error).message, 'error');
+    } finally {
+      if (refreshBtn) {
+        refreshBtn.textContent = '刷新列表';
+        refreshBtn.disabled = false;
+      }
+    }
+  }
+
+  /**
+   * 渲染知识空间下拉列表
+   */
+  private renderFeishuSpaceSelect(): void {
+    const spaceSelect = document.getElementById('feishu-space-select') as HTMLSelectElement;
+    if (!spaceSelect) { return; }
+
+    spaceSelect.disabled = false;
+    spaceSelect.innerHTML = '<option value="">请选择知识空间</option>';
+
+    this.feishuSpaces.forEach(space => {
+      const option = document.createElement('option');
+      option.value = space.spaceId;
+      option.textContent = space.name;
+      if (space.spaceId === this.feishuConfig.spaceId) {
+        option.selected = true;
+      }
+      spaceSelect.appendChild(option);
+    });
+  }
+
+  /**
+   * 显示飞书配置状态
+   */
+  private showFeishuStatus(message: string, type: 'success' | 'error'): void {
+    const statusEl = document.getElementById('feishu-status');
+    if (!statusEl) { return; }
+
+    statusEl.className = `feishu-status ${type}`;
+    statusEl.textContent = message;
+  }
+
+  /**
+   * 保存飞书配置
+   */
+  private async saveFeishuConfig(): Promise<void> {
+    const config = this.getFeishuFormConfig();
+
+    if (!config.appId || !config.appSecret) {
+      this.showFeishuStatus('请填写 App ID 和 App Secret', 'error');
+      return;
+    }
+
+    const saveBtn = document.getElementById('feishu-save-config') as HTMLButtonElement;
+    if (saveBtn) {
+      saveBtn.textContent = '保存中...';
+      saveBtn.disabled = true;
+    }
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: MessageType.SAVE_FEISHU_CONFIG,
+        payload: config,
+      });
+
+      if (response.success) {
+        this.showFeishuStatus('飞书配置已保存', 'success');
+        this.feishuConfig = config;
+      } else {
+        this.showFeishuStatus(response.error || '保存失败', 'error');
+      }
+    } catch (error) {
+      this.showFeishuStatus('保存失败: ' + (error as Error).message, 'error');
+    } finally {
+      if (saveBtn) {
+        saveBtn.textContent = '保存配置';
+        saveBtn.disabled = false;
+      }
     }
   }
 
