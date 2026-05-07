@@ -357,6 +357,28 @@ export class FloatingButton {
       return svg;
     }
 
+    if (id === 'knowledge') {
+      // 大脑/知识图标
+      const path = document.createElementNS(svgNS, 'path');
+      path.setAttribute('d', 'M12 2C7.58 2 4 5.58 4 10c0 2.21.9 4.21 2.34 5.66L12 21l5.66-5.34A7.98 7.98 0 0020 10c0-4.42-3.58-8-8-8z');
+      const path2 = document.createElementNS(svgNS, 'path');
+      path2.setAttribute('d', 'M12 6v4l2.5 2.5');
+      svg.appendChild(path);
+      svg.appendChild(path2);
+      return svg;
+    }
+
+    if (id === 'export') {
+      // 导出/下载图标
+      const path1 = document.createElementNS(svgNS, 'path');
+      path1.setAttribute('d', 'M12 3v12m0 0l-4-4m4 4l4-4');
+      const path2 = document.createElementNS(svgNS, 'path');
+      path2.setAttribute('d', 'M5 17v2a2 2 0 002 2h10a2 2 0 002-2v-2');
+      svg.appendChild(path1);
+      svg.appendChild(path2);
+      return svg;
+    }
+
     const line1 = document.createElementNS(svgNS, 'path');
     line1.setAttribute('d', 'M4 7h16');
     const line2 = document.createElementNS(svgNS, 'path');

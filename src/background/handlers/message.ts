@@ -3,11 +3,13 @@
  * 处理扩展内部消息通信
  */
 
-import { Message, MessageType, OptimizeRequest, ModelConfig, MessageResponse, CustomRule } from '@shared/types';
+import { Message, MessageType, OptimizeRequest, ModelConfig, MessageResponse, CustomRule, FeishuConfig, ExtractKnowledgeRequest, SaveToFeishuRequest } from '@shared/types';
 import { ModelManager } from '../managers/model';
 import { StorageManager } from '../managers/storage';
 import { SecurityChecker } from '../security';
 import { ErrorHandler, AppError, ErrorCode } from '@shared/errors';
+import { FeishuClient } from '../feishu/client';
+import { extractKnowledge } from '../knowledge/extractor';
 
 export class MessageHandler {
   private modelManager: ModelManager;
@@ -151,6 +153,120 @@ export class MessageHandler {
             sendResponse({ success: true });
           } catch (error) {
             throw new AppError(ErrorCode.UNKNOWN_ERROR, '打开设置页失败', error);
+          }
+          break;
+        }
+
+        // ========================================
+        // 知识提炼与飞书知识库
+        // ========================================
+
+        case MessageType.EXTRACT_KNOWLEDGE: {
+          const extractRequest = message.payload as ExtractKnowledgeRequest;
+          if (!extractRequest || !extractRequest.messages || extractRequest.messages.length === 0) {
+            throw new AppError(ErrorCode.VALIDATION_ERROR, '缺少对话消息数据');
+          }
+
+          const result = await extractKnowledge(
+            extractRequest.messages,
+            async (systemPrompt: string, userContent: string) => {
+              // 复用模型管理器调用 AI
+              const response = await this.modelManager.optimize({
+                prompt: `${systemPrompt}\n\n${userContent}`,
+                platform: extractRequest.platform,
+              });
+              return response.optimized;
+            },
+          );
+
+          // 补充来源信息（URL 由 content script 传入，background worker 无 window 对象）
+          result.sourceUrl = extractRequest.sourceUrl || '';
+          result.sourcePlatform = extractRequest.platform;
+
+          sendResponse({
+            success: true,
+            data: {
+              originalConversation: extractRequest.messages,
+              knowledge: result,
+            },
+          });
+          break;
+        }
+
+        case MessageType.GET_FEISHU_CONFIG: {
+          try {
+            const feishuConfig = await this.storageManager.get<FeishuConfig>('feishuConfig');
+            sendResponse({ success: true, data: feishuConfig ?? null });
+          } catch (error) {
+            throw new AppError(ErrorCode.STORAGE_ERROR, '获取飞书配置失败', error);
+          }
+          break;
+        }
+
+        case MessageType.SAVE_FEISHU_CONFIG: {
+          try {
+            const config = message.payload as FeishuConfig;
+            if (!config || !config.appId || !config.appSecret) {
+              throw new AppError(ErrorCode.VALIDATION_ERROR, '请填写完整的飞书应用配置');
+            }
+            await this.storageManager.set('feishuConfig', config);
+            sendResponse({ success: true });
+          } catch (error) {
+            if (error instanceof AppError) {
+              throw error;
+            }
+            throw new AppError(ErrorCode.STORAGE_ERROR, '保存飞书配置失败', error);
+          }
+          break;
+        }
+
+        case MessageType.TEST_FEISHU_CONNECTION: {
+          try {
+            const config = message.payload as FeishuConfig;
+            if (!config || !config.appId || !config.appSecret) {
+              throw new AppError(ErrorCode.VALIDATION_ERROR, '请填写完整的飞书应用配置');
+            }
+
+            const feishuClient = new FeishuClient(config);
+            const testResult = await feishuClient.testConnection();
+            sendResponse({ success: testResult.success, data: testResult });
+          } catch (error) {
+            const errorMessage = ErrorHandler.getErrorMessage(error);
+            sendResponse({ success: false, error: errorMessage });
+          }
+          break;
+        }
+
+        case MessageType.GET_FEISHU_SPACES: {
+          try {
+            const config = message.payload as FeishuConfig;
+            if (!config || !config.appId || !config.appSecret) {
+              throw new AppError(ErrorCode.VALIDATION_ERROR, '请填写完整的飞书应用配置');
+            }
+
+            const feishuClient = new FeishuClient(config);
+            const spaces = await feishuClient.listSpaces();
+            sendResponse({ success: true, data: { spaces } });
+          } catch (error) {
+            const errorMessage = ErrorHandler.getErrorMessage(error);
+            sendResponse({ success: false, error: errorMessage });
+          }
+          break;
+        }
+
+        case MessageType.SAVE_TO_FEISHU: {
+          try {
+            const saveRequest = message.payload as SaveToFeishuRequest;
+            if (!saveRequest || !saveRequest.knowledge || !saveRequest.config) {
+              throw new AppError(ErrorCode.VALIDATION_ERROR, '缺少保存数据');
+            }
+
+            const feishuClient = new FeishuClient(saveRequest.config);
+            const saveResult = await feishuClient.saveKnowledge(saveRequest.knowledge);
+            sendResponse({ success: true, data: saveResult });
+          } catch (error) {
+            const errorMessage = ErrorHandler.getErrorMessage(error);
+            sendResponse({ success: false, error: errorMessage });
           }
           break;
         }

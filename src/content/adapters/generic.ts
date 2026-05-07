@@ -3,7 +3,7 @@
  * 在任意页面提供基础输入框读写能力
  */
 
-import { PlatformAdapter } from '@shared/types';
+import { PlatformAdapter, ConversationMessage } from '@shared/types';
 
 export class GenericAdapter implements PlatformAdapter {
   name = 'Generic';
@@ -71,6 +71,15 @@ export class GenericAdapter implements PlatformAdapter {
 
   injectButton(_button: HTMLElement): void {
     // 通用页面不注入优化按钮
+  }
+
+  getConversationHistory(): ConversationMessage[] {
+    // 通用页面无法可靠提取对话历史
+    return [];
+  }
+
+  getChatTitle(): string {
+    return document.title || 'chat';
   }
 
   private isEditableElement(el: HTMLElement): boolean {

@@ -1,47 +1,72 @@
 /**
  * Clipboard Export Strategy
- * Extracts ChatGPT's `.markdown` content from the DOM and converts to Markdown
- * via TurndownService. This is equivalent to what ChatGPT's native copy button
- * produces, but avoids the unreliability of programmatic clipboard access from
- * extension content scripts.
+ * Exports ChatGPT conversations by clicking the native "Copy" button
+ * and reading perfectly formatted Markdown from the clipboard.
  */
 
 import { ExportChatData, ExportConfig } from './config';
 import { ExportResult } from './engine';
-import { TurndownService } from './turndown';
 import { formatFileName } from './filename';
 import { BACK_TO_TOP_LINK, truncate, escapeMd, formatLocalTime } from './utils';
 
-/** ChatGPT conversation turn container — try the live selector first */
-const TURN_SELECTOR = 'section[data-testid^="conversation-turn-"], article[data-testid^="conversation-turn-"]';
-/** Content container within a turn */
-const CONTENT_SELECTOR = '.markdown, .whitespace-pre-wrap';
+const COPY_BUTTON_SELECTOR = 'button[data-testid="copy-turn-action-button"]';
+const TURN_SELECTOR = 'article[data-testid^="conversation-turn-"]';
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
- * Extract HTML content from a ChatGPT conversation turn element.
- * Returns innerHTML of the `.markdown` container, or null if not found.
+ * Click ChatGPT's copy button and read the clipboard to get Markdown.
+ * Retries up to 10 times if clipboard is empty.
  */
-function extractTurnContent(turn: HTMLElement): string | null {
-  const container = turn.querySelector<HTMLElement>(CONTENT_SELECTOR);
-  return container ? container.innerHTML : null;
+async function copyModelResponse(copyButton: HTMLElement): Promise<string> {
+  // Clear clipboard first
+  try {
+    await navigator.clipboard.writeText('');
+  } catch {
+    // Ignore clipboard clear errors
+  }
+
+  for (let attempt = 0; attempt < 10; attempt++) {
+    copyButton.click();
+    await sleep(300);
+    try {
+      const text = await navigator.clipboard.readText();
+      if (text) return text;
+    } catch {
+      // Permission denied or API error — break early
+      break;
+    }
+    await sleep(150);
+    // Re-clear clipboard before retry
+    try { await navigator.clipboard.writeText(''); } catch { /* ignore */ }
+  }
+
+  return '';
 }
 
 /**
- * Export chat via DOM content extraction + TurndownService conversion.
- * This produces the same Markdown that ChatGPT's native copy button provides,
- * without the fragility of programmatic clipboard access.
+ * Build a Markdown string for AI responses, filling in the content later.
+ * Returns a placeholder text for when copy fails.
+ */
+function buildAssistantPlaceholder(index: number): string {
+  return `## chat-${index}\n\n_[Content unavailable]_\n\n${BACK_TO_TOP_LINK}`;
+}
+
+/**
+ * Export chat via clipboard — clicks native ChatGPT copy buttons
+ * for each AI message and reads the resulting Markdown.
  */
 export async function exportViaClipboard(
   chatData: ExportChatData,
   config: ExportConfig,
-  turndown: TurndownService,
 ): Promise<ExportResult> {
-  const turns = document.querySelectorAll<HTMLElement>(TURN_SELECTOR);
-  if (turns.length === 0) {
+  // Collect all article sections on the page
+  const sections = document.querySelectorAll<HTMLElement>(TURN_SELECTOR);
+  if (sections.length === 0) {
     throw new Error('No conversation turns found on page. The page may not have finished loading.');
   }
 
-  const turnList = Array.from(turns);
+  // Build a map: message index -> copy button (AI messages only)
+  const sectionList = Array.from(sections);
   let aiIndex = 0;
 
   let toc = '';
@@ -55,27 +80,22 @@ export async function exportViaClipboard(
       toc += `- [${exportChatIndex}: ${escapeMd(preview)}](#chat-${exportChatIndex})\n`;
       content += `## chat-${exportChatIndex}\n\n> ${msg.contentText.replace(/\n/g, '\n> ')}\n\n`;
     } else {
-      const matchingTurn = turnList[aiIndex];
+      // Find the corresponding article section and its copy button
+      const matchingSection = sectionList[aiIndex];
       aiIndex++;
 
       let markdownContent = '';
-      if (matchingTurn) {
-        const html = extractTurnContent(matchingTurn);
-        if (html) {
-          try {
-            const wrapper = document.createElement('div');
-            wrapper.innerHTML = html;
-            markdownContent = turndown.turndown(wrapper);
-          } catch {
-            markdownContent = msg.contentText;
-          }
+      if (matchingSection) {
+        const copyBtn = matchingSection.querySelector<HTMLElement>(COPY_BUTTON_SELECTOR);
+        if (copyBtn) {
+          markdownContent = await copyModelResponse(copyBtn);
         }
       }
 
       if (markdownContent) {
         content += markdownContent + '\n\n' + BACK_TO_TOP_LINK;
       } else {
-        content += `## chat-${exportChatIndex}\n\n_[Content unavailable]_\n\n${BACK_TO_TOP_LINK}`;
+        content += buildAssistantPlaceholder(exportChatIndex);
       }
     }
   }
@@ -106,3 +126,4 @@ export async function exportViaClipboard(
 
   return { output: finalOutput, fileName };
 }
+

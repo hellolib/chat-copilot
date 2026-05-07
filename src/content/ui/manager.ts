@@ -12,6 +12,7 @@ import {
   PROVIDER_ICONS,
   FloatingButtonDrawerActionId,
   FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS,
+  ExtractKnowledgeResponse,
 } from '@shared/types';
 import { ErrorHandler, AppError, ErrorCode } from '@shared/errors';
 import { PromptSidebar } from './promptSidebar';
@@ -19,6 +20,8 @@ import { createLogoUseSvg } from './logoSprite';
 import { FloatingButton } from './floatingButton';
 import { Toast } from '@shared/toast';
 import { enhancePromptWithCustomRules } from '../utils/customRules';
+import { KnowledgeDialog } from './knowledgeDialog';
+import { ExportDialog } from './exportDialog';
 
 export class UIManager {
   private adapter: PlatformAdapter;
@@ -33,6 +36,8 @@ export class UIManager {
   private tooltip: HTMLElement | null = null;
   private floatingButton: FloatingButton;
   private promptSidebar: PromptSidebar;
+  private knowledgeDialog: KnowledgeDialog;
+  private exportDialog: ExportDialog;
   private showFloatingButton = true;
   private floatingButtonClickAction: 'optimize' | 'prompt-plaza' | 'favorites' | 'none' | 'settings' = 'prompt-plaza';
   private floatingButtonDrawerActions: FloatingButtonDrawerActionId[] = FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS;
@@ -40,6 +45,8 @@ export class UIManager {
   constructor(adapter: PlatformAdapter) {
     this.adapter = adapter;
     this.promptSidebar = new PromptSidebar(adapter);
+    this.knowledgeDialog = new KnowledgeDialog();
+    this.exportDialog = new ExportDialog(adapter);
     this.floatingButton = new FloatingButton({
       getExtensionURL: this.getExtensionURL.bind(this),
       onClick: () => this.handleFloatingButtonClick(),
@@ -100,6 +107,16 @@ export class UIManager {
         label: '官网',
         onClick: () => this.openOfficialSite(),
       },
+      knowledge: {
+        id: 'knowledge',
+        label: '提炼知识',
+        onClick: () => this.handleKnowledgeExtract(),
+      },
+      export: {
+        id: 'export',
+        label: '导出对话',
+        onClick: () => this.handleExport(),
+      },
     };
 
     const actions: { id: string; label: string; onClick: () => void }[] = [];
@@ -126,7 +143,7 @@ export class UIManager {
         mapped.push('official-site');
         return;
       }
-      if (id === 'prompt-plaza' || id === 'favorites' || id === 'settings' || id === 'official-site') {
+      if (id === 'prompt-plaza' || id === 'favorites' || id === 'settings' || id === 'official-site' || id === 'knowledge' || id === 'export') {
         mapped.push(id);
       }
     });
@@ -195,6 +212,69 @@ export class UIManager {
     this.handleOptimize();
   }
 
+  /**
+   * 处理知识提炼
+   */
+  private async handleKnowledgeExtract(): Promise<void> {
+    // 检查扩展上下文
+    if (!this.isExtensionContextValid()) {
+      Toast.error('扩展已更新，请刷新页面后重试');
+      return;
+    }
+
+    // 提取对话历史
+    const messages = this.adapter.getConversationHistory();
+    if (!messages || messages.length === 0) {
+      Toast.warning('未检测到对话内容，请先进行对话');
+      return;
+    }
+
+    // 显示加载弹窗
+    this.knowledgeDialog.showLoading('正在提取对话内容并调用 AI 提炼知识...');
+
+    try {
+      const response = await chrome.runtime.sendMessage({
+        type: MessageType.EXTRACT_KNOWLEDGE,
+        payload: {
+          messages,
+          platform: this.adapter.name,
+          sourceUrl: window.location.href,
+        },
+      }) as MessageResponse<ExtractKnowledgeResponse>;
+
+      if (!response) {
+        throw new AppError(ErrorCode.EXTENSION_CONTEXT_INVALIDATED, 'Extension context invalidated');
+      }
+
+      if (response.success && response.data) {
+        // 补充来源 URL
+        response.data.knowledge.sourceUrl = window.location.href;
+        response.data.knowledge.sourcePlatform = this.adapter.name;
+
+        // 显示结果弹窗
+        this.knowledgeDialog.close();
+        await this.knowledgeDialog.show(
+          response.data.originalConversation,
+          response.data.knowledge,
+        );
+      } else {
+        this.knowledgeDialog.close();
+        Toast.error(response.error || '知识提炼失败');
+      }
+    } catch (error) {
+      this.knowledgeDialog.close();
+      ErrorHandler.logError(error, 'handleKnowledgeExtract');
+      Toast.error('知识提炼失败: ' + ErrorHandler.getErrorMessage(error));
+    }
+  }
+
+  /**
+   * 处理导出对话
+   */
+  private handleExport(): void {
+    this.exportDialog.open();
+  }
+
   private requestOpenOptionsPage(): void {
     if (!this.isExtensionContextValid()) {
       Toast.error('扩展已更新，请刷新页面后重试');
@@ -229,6 +309,16 @@ export class UIManager {
     this.setupSettingsListener();
     this.injectButton();
     this.promptSidebar.init();
+    this.setupKnowledgeListeners();
+  }
+
+  /**
+   * 设置知识提炼相关的事件监听
+   */
+  private setupKnowledgeListeners(): void {
+    document.addEventListener('chat-copilot:re-extract', () => {
+      this.handleKnowledgeExtract();
+    });
   }
 
   /**
