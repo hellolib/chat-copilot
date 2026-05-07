@@ -13,6 +13,15 @@ export enum MessageType {
   DELETE_CUSTOM_RULE = 'DELETE_CUSTOM_RULE',
   OPEN_OPTIONS = 'OPEN_OPTIONS',
   OPEN_PROMPT_SIDEBAR = 'OPEN_PROMPT_SIDEBAR',
+  // 导出对话
+  EXPORT_CHAT = 'EXPORT_CHAT',
+  // 知识提炼与飞书集成
+  EXTRACT_KNOWLEDGE = 'EXTRACT_KNOWLEDGE',
+  SAVE_TO_FEISHU = 'SAVE_TO_FEISHU',
+  GET_FEISHU_SPACES = 'GET_FEISHU_SPACES',
+  TEST_FEISHU_CONNECTION = 'TEST_FEISHU_CONNECTION',
+  SAVE_FEISHU_CONFIG = 'SAVE_FEISHU_CONFIG',
+  GET_FEISHU_CONFIG = 'GET_FEISHU_CONFIG',
 }
 
 // 消息结构
@@ -223,12 +232,14 @@ export const PROMPT_METHOD_TAGS: PromptMethodTag[] = [
   },
 ];
 
-export type FloatingButtonDrawerActionId = 'prompt-plaza' | 'favorites' | 'settings' | 'official-site';
+export type FloatingButtonDrawerActionId = 'prompt-plaza' | 'favorites' | 'settings' | 'official-site' | 'knowledge' | 'export';
 
 export const FLOATING_BUTTON_DRAWER_DEFAULT_ACTIONS: FloatingButtonDrawerActionId[] = [
   'prompt-plaza',
   'favorites',
   'settings',
+  'knowledge',
+  'export',
 ];
 
 export interface UserSettings {
@@ -257,7 +268,31 @@ export interface PlatformAdapter {
   setInputValue(value: string): void;
 
   injectButton(button: HTMLElement): void;
+
+  /** 获取当前页面的对话历史（多轮问答对） */
+  getConversationHistory(): ConversationMessage[];
+
+  /** 获取当前对话的标题 */
+  getChatTitle(): string;
 }
+
+// 导出方式
+export type ExportMethod = 'dom' | 'clipboard';
+
+// 导出配置
+export interface ExportSettings {
+  filenameTemplate: string;
+  includeTOC: boolean;
+  includeFrontMatter: boolean;
+  exportMethod: ExportMethod;
+}
+
+export const DEFAULT_EXPORT_SETTINGS: ExportSettings = {
+  filenameTemplate: '{platform}_{title}_{timestamp}',
+  includeTOC: true,
+  includeFrontMatter: true,
+  exportMethod: 'dom',
+};
 
 // ========================================
 // 提示词广场相关类型
@@ -352,4 +387,75 @@ export interface SecurityCheckResult {
   riskLevel: 'low' | 'medium' | 'high';
   detectedIssues: string[];
   filteredContent?: string;
+}
+
+// ========================================
+// 知识提炼与飞书知识库相关类型
+// ========================================
+
+// 对话消息
+export interface ConversationMessage {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+// 知识提炼请求
+export interface ExtractKnowledgeRequest {
+  messages: ConversationMessage[];
+  platform: string;
+  sourceUrl: string;
+}
+
+// 知识提炼结果
+export interface KnowledgeResult {
+  title: string;
+  summary: string;
+  keyPoints: string[];
+  details: string;
+  tags: string[];
+  sourceUrl: string;
+  sourcePlatform: string;
+  createdAt: number;
+}
+
+// 知识提炼响应
+export interface ExtractKnowledgeResponse {
+  originalConversation: ConversationMessage[];
+  knowledge: KnowledgeResult;
+}
+
+// 飞书配置
+export interface FeishuConfig {
+  appId: string;
+  appSecret: string;
+  spaceId?: string;
+  spaceName?: string;
+  parentNodeToken?: string;
+}
+
+// 飞书知识空间信息
+export interface FeishuSpace {
+  spaceId: string;
+  name: string;
+  description?: string;
+  spaceType?: string;
+}
+
+// 保存到飞书的请求
+export interface SaveToFeishuRequest {
+  knowledge: KnowledgeResult;
+  config: FeishuConfig;
+}
+
+// 保存到飞书的响应
+export interface SaveToFeishuResponse {
+  success: boolean;
+  documentUrl?: string;
+  documentId?: string;
+  nodeToken?: string;
+}
+
+// 获取飞书空间列表响应
+export interface FeishuSpacesResponse {
+  spaces: FeishuSpace[];
 }
