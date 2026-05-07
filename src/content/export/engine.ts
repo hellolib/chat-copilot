@@ -6,7 +6,7 @@
 import { ExportChatData, ExportConfig } from './config';
 import { TurndownService } from './turndown';
 import { formatFileName } from './filename';
-import { exportViaClipboard } from './clipboard';
+import { exportViaClipboard, isClipboardSupported } from './clipboard';
 import { BACK_TO_TOP_LINK, truncate, escapeMd, formatLocalTime } from './utils';
 
 /**
@@ -26,14 +26,14 @@ export async function generateMarkdown(
   turndown: TurndownService,
 ): Promise<ExportResult> {
   if (config.exportMethod === 'clipboard') {
-    if (chatData.platform !== 'ChatGPT') {
+    if (!isClipboardSupported(chatData.platform)) {
       console.warn(
-        `[Chat Copilot] Clipboard export is not supported on ${chatData.platform}. Falling back to DOM parsing.`
+        `[Chat Copilot] Clipboard export is not supported on ${chatData.platform}. Falling back to DOM parsing.`,
       );
       // Fall through to DOM parsing below
     } else if (!navigator.clipboard?.readText || !navigator.clipboard?.writeText) {
       console.warn(
-        '[Chat Copilot] Clipboard API not available. Falling back to DOM parsing.'
+        '[Chat Copilot] Clipboard API not available. Falling back to DOM parsing.',
       );
       // Fall through to DOM parsing below
     } else {

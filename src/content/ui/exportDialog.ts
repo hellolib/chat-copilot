@@ -63,6 +63,40 @@ export class ExportDialog {
         replacement: () => '',
       });
     }
+
+    if (this.adapter.name === 'DeepSeek') {
+      // DeepSeek 代码块结构:
+      //   <div class="md-code-block">
+      //     <div class="md-code-block-banner-wrap">  ← UI 横幅，含语言标签 + "复制" / "下载" 按钮
+      //       <span>kotlin</span>
+      //       <button>复制</button> <button>下载</button>
+      //     </div>
+      //     <pre>{语法高亮过的代码}</pre>
+      //   </div>
+      // 默认 turndown 规则会把横幅当文本处理，导致 "kotlin 复制下载 ..." 混进正文，
+      // 且 ``` 围栏丢失。下面这条规则整体接管：直接输出 fenced code block。
+      this.turndownService.unshiftRule('deepseekCodeBlock', {
+        filter: (node: Element) =>
+          node.nodeName === 'DIV' && node.classList.contains('md-code-block'),
+        replacement: (_content, node) => {
+          // 语言标签：banner 内第一个 span 的文本（如 "bash" / "kotlin" / "text"）
+          const langSpan = node.querySelector('.md-code-block-banner span');
+          const lang = langSpan?.textContent?.trim() || '';
+          const pre = node.querySelector('pre');
+          const code = pre ? (pre as HTMLElement).innerText : '';
+          const cleaned = code.replace(/^\n+|\n+$/g, '');
+          return `\n\n\`\`\`${lang}\n${cleaned}\n\`\`\`\n\n`;
+        },
+      });
+
+      // 兜底：若代码块外层结构变化导致上面没拦住，至少把 banner 单独剥掉，
+      // 防止"复制下载"等 UI 文本污染正文。
+      this.turndownService.addRule('deepseekRemoveCodeBanner', {
+        filter: (node: Element) =>
+          node.nodeName === 'DIV' && node.classList.contains('md-code-block-banner-wrap'),
+        replacement: () => '',
+      });
+    }
   }
 
   /**
@@ -97,48 +131,87 @@ export class ExportDialog {
    */
   private populateContentHtml(messages: ExportedMessage[]): void {
     if (this.adapter.name === 'ChatGPT') {
-      // Current ChatGPT DOM: section[data-testid="conversation-turn-X"]
-      const sections = document.querySelectorAll<HTMLElement>(
-        'section[data-testid^="conversation-turn-"]',
-      );
+      this.populateChatGPTContentHtml(messages);
+      return;
+    }
+    if (this.adapter.name === 'DeepSeek') {
+      this.populateDeepSeekContentHtml(messages);
+      return;
+    }
+  }
 
-      if (sections.length > 0) {
-        sections.forEach((section) => {
-          const turnType = section.getAttribute('data-turn');
-          const header = section.querySelector('h4')?.textContent?.trim().toLowerCase() || '';
-          const isUser = turnType === 'user' || header.includes('you said');
-          const role = isUser ? 'user' : 'assistant';
+  private populateChatGPTContentHtml(messages: ExportedMessage[]): void {
+    // Current ChatGPT DOM: section[data-testid="conversation-turn-X"]
+    const sections = document.querySelectorAll<HTMLElement>(
+      'section[data-testid^="conversation-turn-"]',
+    );
 
-          const textContainer = section.querySelector<HTMLElement>(
-            '.markdown, .whitespace-pre-wrap',
-          );
+    if (sections.length > 0) {
+      sections.forEach((section) => {
+        const turnType = section.getAttribute('data-turn');
+        const header = section.querySelector('h4')?.textContent?.trim().toLowerCase() || '';
+        const isUser = turnType === 'user' || header.includes('you said');
+        const role = isUser ? 'user' : 'assistant';
 
-          if (textContainer) {
-            // Find the first unmatched message of this role
-            const msgIndex = messages.findIndex(
-              (m) => m.role === role && m.contentHtml === null,
-            );
-            if (msgIndex >= 0) {
-              messages[msgIndex].contentHtml = textContainer;
-            }
-          }
-        });
-        return;
-      }
-
-      // Fallback: older DOM with article[data-message-author-role]
-      const articles = document.querySelectorAll<HTMLElement>(
-        'article[data-message-author-role="user"], article[data-message-author-role="assistant"]',
-      );
-      articles.forEach((article) => {
-        const role = article.getAttribute('data-message-author-role');
-        if (role !== 'user' && role !== 'assistant') { return; }
-
-        const textContainer = article.querySelector<HTMLElement>(
+        const textContainer = section.querySelector<HTMLElement>(
           '.markdown, .whitespace-pre-wrap',
         );
 
-        const target = textContainer || article;
+        if (textContainer) {
+          // Find the first unmatched message of this role
+          const msgIndex = messages.findIndex(
+            (m) => m.role === role && m.contentHtml === null,
+          );
+          if (msgIndex >= 0) {
+            messages[msgIndex].contentHtml = textContainer;
+          }
+        }
+      });
+      return;
+    }
+
+    // Fallback: older DOM with article[data-message-author-role]
+    const articles = document.querySelectorAll<HTMLElement>(
+      'article[data-message-author-role="user"], article[data-message-author-role="assistant"]',
+    );
+    articles.forEach((article) => {
+      const role = article.getAttribute('data-message-author-role');
+      if (role !== 'user' && role !== 'assistant') { return; }
+
+      const textContainer = article.querySelector<HTMLElement>(
+        '.markdown, .whitespace-pre-wrap',
+      );
+
+      const target = textContainer || article;
+      const msgIndex = messages.findIndex(
+        (m) => m.role === role && m.contentHtml === null,
+      );
+      if (msgIndex >= 0) {
+        messages[msgIndex].contentHtml = target;
+      }
+    });
+  }
+
+  /**
+   * DeepSeek 的 DOM 结构:
+   * - user 消息文本容器: .fbb737a4（构建哈希；失效时回退到 .ds-message）
+   * - assistant 消息正文: .ds-markdown.ds-assistant-message-main-content
+   *
+   * 用联合选择器一次取出，按 DOM 顺序与 messages 数组对齐，避免多轮对话错位。
+   */
+  private populateDeepSeekContentHtml(messages: ExportedMessage[]): void {
+    const userSel = '.fbb737a4';
+    const assistantSel = '.ds-markdown.ds-assistant-message-main-content';
+
+    const nodes = document.querySelectorAll<HTMLElement>(`${userSel}, ${assistantSel}`);
+
+    // .fbb737a4 失效时回退到 .ds-message 结构识别
+    if (nodes.length === 0) {
+      const items = document.querySelectorAll<HTMLElement>('.ds-message');
+      items.forEach((item) => {
+        const md = item.querySelector<HTMLElement>(assistantSel);
+        const role: 'user' | 'assistant' = md ? 'assistant' : 'user';
+        const target = md ?? item;
         const msgIndex = messages.findIndex(
           (m) => m.role === role && m.contentHtml === null,
         );
@@ -146,13 +219,36 @@ export class ExportDialog {
           messages[msgIndex].contentHtml = target;
         }
       });
+      return;
     }
+
+    nodes.forEach((node) => {
+      const role: 'user' | 'assistant' =
+        node.classList.contains('ds-markdown') ? 'assistant' : 'user';
+      const msgIndex = messages.findIndex(
+        (m) => m.role === role && m.contentHtml === null,
+      );
+      if (msgIndex >= 0) {
+        messages[msgIndex].contentHtml = node;
+      }
+    });
   }
 
   /**
    * Open the export dialog
    */
   async open(): Promise<void> {
+    // 含虚拟列表的平台（如 DeepSeek）需要先把所有消息节点挂载/收集。
+    // 平台自己负责显示 LoadingOverlay（仅在确实需要滚动时弹出）。
+    if (typeof this.adapter.prepareForExport === 'function') {
+      try {
+        await this.adapter.prepareForExport();
+      } catch (error) {
+        console.warn('[Chat Copilot] prepareForExport failed:', error);
+        // 继续走，最差情况是只导出当前可见对话
+      }
+    }
+
     // Extract messages
     const messages = this.adapter.getConversationHistory();
     if (!messages || messages.length === 0) {

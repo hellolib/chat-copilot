@@ -5,6 +5,7 @@
  */
 
 @import '../styles/toast.css';
+@import '../styles/loadingOverlay.css';
 
 /* ========================================
  * 设计令牌 (内联，因为 Content Script 无法引用外部文件)

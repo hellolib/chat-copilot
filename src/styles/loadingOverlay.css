@@ -1,0 +1,77 @@
+/**
+ * Shared Loading Overlay Styles
+ */
+
+.cc-loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646; /* 比 DeepSeek 自身的弹层都高，但留 1 给系统级浮层 */
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: wait;
+  -webkit-user-select: none;
+  user-select: none;
+  animation: cc-loading-fade-in 160ms ease-out;
+}
+
+.cc-loading-overlay__card {
+  min-width: 220px;
+  padding: 22px 28px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.cc-loading-overlay__spinner {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid #e5e7eb;
+  border-top-color: #4096ff;
+  animation: cc-loading-spin 0.8s linear infinite;
+}
+
+.cc-loading-overlay__message {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #374151;
+  text-align: center;
+  max-width: 320px;
+  word-break: break-word;
+}
+
+@keyframes cc-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cc-loading-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .cc-loading-overlay__card {
+    background: #1f2937;
+  }
+
+  .cc-loading-overlay__message {
+    color: #f3f4f6;
+  }
+
+  .cc-loading-overlay__spinner {
+    border-color: #374151;
+    border-top-color: #60a5fa;
+  }
+}

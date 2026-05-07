@@ -269,11 +269,17 @@ export interface PlatformAdapter {
 
   injectButton(button: HTMLElement): void;
 
-  /** 获取当前页面的对话历史（多轮问答对） */
+  /** 获取当前对话历史（多轮问答对） */
   getConversationHistory(): ConversationMessage[];
 
   /** 获取当前对话的标题 */
   getChatTitle(): string;
+
+  /**
+   * 导出前的可选预处理（如让虚拟列表挂载所有消息节点）。
+   * 默认实现为空操作；含虚拟列表的平台可覆盖。
+   */
+  prepareForExport?(): Promise<void>;
 }
 
 // 导出方式
