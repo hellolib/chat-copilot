@@ -7,10 +7,11 @@
 import { ExportChatData, ExportConfig } from './config';
 import { ExportResult } from './engine';
 import { formatFileName } from './filename';
+import { BACK_TO_TOP_LINK, truncate, escapeMd, formatLocalTime } from './utils';
 
 const COPY_BUTTON_SELECTOR = 'button[data-testid="copy-turn-action-button"]';
 const TURN_SELECTOR = 'article[data-testid^="conversation-turn-"]';
-const SLEEP_MS = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
 
 /**
  * Click ChatGPT's copy button and read the clipboard to get Markdown.
@@ -26,7 +27,7 @@ async function copyModelResponse(copyButton: HTMLElement): Promise<string> {
 
   for (let attempt = 0; attempt < 10; attempt++) {
     copyButton.click();
-    await SLEEP_MS(300);
+    await sleep(300);
     try {
       const text = await navigator.clipboard.readText();
       if (text) return text;
@@ -34,7 +35,7 @@ async function copyModelResponse(copyButton: HTMLElement): Promise<string> {
       // Permission denied or API error — break early
       break;
     }
-    await SLEEP_MS(150);
+    await sleep(150);
     // Re-clear clipboard before retry
     try { await navigator.clipboard.writeText(''); } catch { /* ignore */ }
   }
@@ -47,7 +48,7 @@ async function copyModelResponse(copyButton: HTMLElement): Promise<string> {
  * Returns a placeholder text for when copy fails.
  */
 function buildAssistantPlaceholder(index: number): string {
-  return `## chat-${index}\n\n_[Content unavailable]_\n\n___\n###### [top](#table-of-contents)\n`;
+  return `## chat-${index}\n\n_[Content unavailable]_\n\n${BACK_TO_TOP_LINK}`;
 }
 
 /**
@@ -92,7 +93,7 @@ export async function exportViaClipboard(
       }
 
       if (markdownContent) {
-        content += markdownContent + '\n\n___\n###### [top](#table-of-contents)\n';
+        content += markdownContent + '\n\n' + BACK_TO_TOP_LINK;
       } else {
         content += buildAssistantPlaceholder(exportChatIndex);
       }
@@ -126,22 +127,3 @@ export async function exportViaClipboard(
   return { output: finalOutput, fileName };
 }
 
-// --- Utilities (mirror engine.ts utilities) ---
-
-function truncate(str: string, len = 70): string {
-  return str.length <= len ? str : str.slice(0, len).trim() + '...';
-}
-
-function escapeMd(text: string): string {
-  return text.replace(/[|\\`*_{}()#+\-!>[\]]/g, '\\$&');
-}
-
-function formatLocalTime(d: Date): string {
-  const pad = (n: number) => String(n).padStart(2, '0');
-  const tzOffsetMin = -d.getTimezoneOffset();
-  const sign = tzOffsetMin >= 0 ? '+' : '-';
-  const absOffset = Math.abs(tzOffsetMin);
-  const offsetHours = pad(Math.floor(absOffset / 60));
-  const offsetMinutes = pad(absOffset % 60);
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}${sign}${offsetHours}${offsetMinutes}`;
-}
